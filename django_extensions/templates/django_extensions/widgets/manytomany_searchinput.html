@@ -1,0 +1,233 @@
+{% load i18n %}
+<p id="autocomplete_{{ name }}" style="display: none;">
+    <input type="text" id="lookup_{{ name }}" value="{{ label }}"
+           style="display:none;" />
+    <a href="{{ related_url }}{{ url }}" class="related-lookup"
+       id="lookup_id_{{ name }}" style="display:none;"
+       onclick="return showRelatedObjectLookupPopup(this);">
+        <img src="{{ admin_media_prefix }}img/admin/selector-search.gif"
+             width="16" height="16" alt="{% trans "Lookup" %}" />
+    </a>
+    <input type="text" id="id_{{ name }}_raw" name="{{ name }}_raw"
+           style="display:none;" class="vForeignKeyRawIdAdminField"/>
+</p>
+<script type="text/javascript">
+$(document).ready(function() {
+    // Variables for DOM objects
+    var selectId = $("#id_{{ name }}");
+    var pAutocomplete= $("#autocomplete_{{ name }}");
+    var inputLookup = $("#lookup_{{ name }}");
+    var aLookup = $("#lookup_id_{{ name }}");
+    var inputRawId = $("#id_{{ name }}_raw");
+    var aAddId = $("#add_id_{{ name }}");
+    var pHelp = pAutocomplete.parent().children("p:last-child");
+    selectId.hide();
+    selectId.addClass("vAutocompleteWidget");
+    {% block add_item_link %}
+    // DOM objects to add items to ManyToMany field
+    var imgAddItem = $("<img>");
+    var srcAddItem = "{{ admin_media_prefix }}img/admin/icon_changelink.gif";
+    imgAddItem.attr("src", srcAddItem);
+    var aAddAutocomplete = $("<a>");
+    aAddAutocomplete.attr("href", "javascript:void(0)");
+    var spanAddItemText = $("<span>");
+    spanAddItemText.html("{% blocktrans %}Add item to {{ name }} list{% endblocktrans %}");
+    aAddAutocomplete.append(imgAddItem);
+    aAddAutocomplete.append(spanAddItemText);
+    aAddAutocomplete.click(showLookup);
+    var pAddAutocomplete = $("<p>");
+    pAddAutocomplete.attr("id", "add_autocomplete_{{ name }}");
+    pAddAutocomplete.addClass("add_manytomany_searchinput");
+    pAddAutocomplete.append(aAddAutocomplete);
+    aAddId.after(pAddAutocomplete);
+    {% endblock %}
+    inputRawId.after(aAddId);
+    // DOM object for item list
+    var ulList = $("<ul>");
+    ulList.attr("id", "list_{{ name }}");
+    ulList.addClass("manytomany_searchinput");
+    pAutocomplete.before(ulList);
+    pAutocomplete.after(pHelp);
+    // Set visibility
+    {% block set_visibility %}
+    ulList.hide();
+    inputLookup.show();
+    aLookup.show();
+    inputRawId.show();
+    aAddId.hide();
+    pHelp.hide();
+    {% endblock %}
+    // Load of initial values
+    var inputValue = inputRawId.val();
+    refreshRelations();
+    // Functions
+    function reset() {
+        inputRawId.val('');
+        inputLookup.val('');
+    };
+    function lookup(query) {
+        $.get('{{ search_path }}', {
+            'search_fields': '{{ search_fields }}',
+            'app_label': '{{ app_label }}',
+            'model_name': '{{ model_name }}',
+            'object_pk': query
+        }, function(data){
+            inputLookup.val(data);
+            inputValue = query;
+            if (data) {
+                addToList();
+            }
+        });
+    }
+    inputRawId.bind(($.browser.opera ? "keypress" : "keyup"),
+        function(event) {
+            if ($(this).val()) {
+                if (event.keyCode == 27) {
+                    reset();
+                    {% block input_raw_id_esc %}
+                    if (selectId.val()) {
+                        hideLookup();
+                    }
+                    {% endblock %}
+                }
+            };
+    }).blur(function () {
+        lookup($(this).val());
+    });
+    inputLookup.autocomplete('{{ search_path }}', {
+        extraParams: {
+            'search_fields': '{{ search_fields }}',
+            'app_label': '{{ app_label }}',
+            'model_name': '{{ model_name }}'
+        }
+    }).result(function(event, data, formatted) {
+        if (data) {
+            inputRawId.val(data[1]);
+            if (data[1]) {
+                addToList();
+            }
+        }
+    }).keyup(function(event){
+        if (event.keyCode == 27) {
+            reset();
+            {% block input_lookup_esc %}
+            if (selectId.val()) {
+                hideLookup();
+            }
+            {% endblock %}
+        };
+    });
+    function check() {
+        var checkValue = inputRawId.val();
+        if (checkValue) {
+            if (checkValue != inputValue) {
+                lookup(checkValue);
+            }
+        }
+    }
+    function addRelation(rawId, text) {
+        var imgDelete = $("<img>");
+        imgDelete.attr("src", "{{ admin_media_prefix }}img/admin/icon_deletelink.gif");
+        var aDelete = $("<a>");
+        aDelete.attr("href", "javascript:void(0)");
+        aDelete.click(removeFromListMiddleware((rawId).toString()));
+        aDelete.append(imgDelete);
+        var spanRawId = $("<span>");
+        spanRawId.attr("class", "item_id_{{ name }}");
+        spanRawId.attr("class", "item_id");
+        spanRawId.html(rawId);
+        var spanTxt = $("<span>");
+        spanTxt.attr("class", "item_txt_{{ name }}");
+        spanTxt.attr("class", "item_txt");
+        spanTxt.append(getAdminUrl(text, rawId));
+        var liItem = $("<li>");
+        liItem.attr("class", "item_{{ name }}");
+        liItem.append(aDelete);
+        liItem.append(spanTxt);
+        liItem.append(",");
+        liItem.append(spanRawId);
+        ulList.append(liItem);
+    }
+    function removeFromListMiddleware(rawId) {
+        return function removeFromList() {
+            {% block remove_from_list %}
+            var values = selectId.val() || [];
+            var position = values.indexOf(rawId);
+            if (position >= 0) {
+                values = values.slice(0, position).concat(values.slice(position+1));
+            }
+            selectId.val(values);
+            refreshRelations();
+            reset();
+            $("li.item_{{ name }}:first a").focus();
+            {% endblock %}
+        }
+    }
+    function addToList() {
+        {% block add_to_list %}
+        var value = parseInt(inputValue);
+        check();
+        if (value > 0) {
+            var values = selectId.val() || [];
+            if (values.indexOf(inputValue) < 0) {
+                values.push(inputValue);
+            }
+            selectId.val(values);
+            refreshRelations();
+            reset();
+        }
+        {% endblock %}
+        return false;
+    }
+    function refreshRelations() {
+        {% block refresh_relations %}
+        ulList.html('');
+        var len = selectId.children(":selected").each(function(i) {
+            addRelation($(this).val(), $(this).text());
+        }).length;
+        if (len > 0) {
+            ulList.show()
+            hideLookup();
+            aAddAutocomplete.focus();
+        } else {
+            ulList.hide();
+            showLookup();
+            aAddAutocomplete.show();
+        }
+        {% endblock %}
+    }
+    function hideLookup() {
+        {% block hide_lookup %}
+        pAutocomplete.hide();
+        aAddAutocomplete.show();
+        aAddAutocomplete.focus();
+        aAddId.hide();
+        pHelp.hide();
+        {% endblock %}
+    }
+    function showLookup() {
+        {% block show_lookup %}
+        pAutocomplete.show();
+        aAddAutocomplete.hide();
+        aAddId.show();
+        inputLookup.focus();
+        pHelp.show();
+        {% endblock %}
+    }
+    function getAdminUrl(text, rawId) {
+        var related_url = "{{ admin_related_url }}";
+        if (related_url) {
+            var url = related_url.replace("[?]", rawId);
+            var aTxt= $("<a>");
+            aTxt.attr("href", url);
+            aTxt.html(text);
+            aTxt.click(function() {
+                return showAddAnotherPopup(this);
+            });
+            return aTxt;
+        } else {
+            return document.createTextNode(text);
+        }
+    }
+});
+</script>

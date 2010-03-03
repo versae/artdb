@@ -1,0 +1,39 @@
+{% load adminmedia %}
+{% load i18n %}
+{% if cl.search_fields %}
+<div id="toolbar"><form id="changelist-search" action="" method="get">
+<div><!-- DIV needed for valid HTML -->
+<label for="searchbar"><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" alt="Search" /></label>
+<input type="text" size="40" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" />
+<input type="submit" value="{% trans 'Search' %}" />
+<input type="text" size="5" id="{{ search_var }}_view" id="searchbar" />
+<input type="button" value="{% trans 'View' %}"
+       onclick="viewObject(); return false;" />
+{% if show_result_count %}
+    <span class="small quiet">{% blocktrans count cl.result_count as counter %}1 result{% plural %}{{ counter }} results{% endblocktrans %} (<a href="?{% if cl.is_popup %}pop=1{% endif %}">{% blocktrans with cl.full_result_count as full_result_count %}{{ full_result_count }} total{% endblocktrans %}</a>)</span>
+{% endif %}
+{% for pair in cl.params.items %}
+    {% ifnotequal pair.0 search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endifnotequal %}
+{% endfor %}
+</div>
+</form></div>
+<script type="text/javascript">
+    document.getElementById("searchbar").focus();
+    var idView = document.getElementById('{{ search_var }}_view');
+    function viewObject() {
+        var href;
+        if (location.pathname.lastIndexOf("/") == location.pathname.length-1) {
+            href = idView.value +"/";
+        } else {
+            href = "/"+ idView.value +"/";
+        }
+        location.href = href;
+    }
+    if (opener) {
+        var text = window.name;
+        text = text.replace(/__dot__/g, '.');
+        text = text.replace(/__dash__/g, '-');
+        idView.value = opener.document.getElementById(text).value;
+    }
+</script>
+{% endif %}

@@ -1,0 +1,52 @@
+{% extends "django_extensions/widgets/manytomany_searchinput.html" %}
+{% load i18n %}
+{% block add_item_link %}// No add item link{% endblock %}
+{% block set_visibility %}
+    inputLookup.show();
+    aLookup.show();
+    inputRawId.show();
+    aAddId.show();
+    pHelp.hide();
+{% endblock %}
+{% block refresh_relations %}
+        ulList.html('');
+        var len = selectId.children(":selected").each(function(i) {
+            addRelation($(this).val(), $(this).text());
+            if ($(this).val() == '') {
+                showLookup();
+            } else {
+                hideLookup();
+            }
+        }).length;
+{% endblock %}
+{% block input_raw_id_esc %}{% endblock %}
+{% block input_lookup_esc %}{% endblock %}
+{% block remove_from_list %}
+            selectId.val("");
+            refreshRelations();
+            reset();
+            showLookup();
+            inputLookup.focus();
+{% endblock %}
+{% block add_to_list %}
+        var value = parseInt(inputValue);
+        check();
+        if (value > 0) {
+            selectId.val(inputValue);
+            refreshRelations();
+            reset();
+            hideLookup();
+            $("li.item_{{ name }}:first a").focus();
+        }
+{% endblock %}
+{% block hide_lookup %}
+        pAutocomplete.hide();
+        pHelp.hide();
+        ulList.show()
+{% endblock %}
+{% block show_lookup %}
+        pAutocomplete.show();
+        pHelp.show();
+        ulList.hide()
+        inputLookup.focus();
+{% endblock %}

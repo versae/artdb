@@ -1,0 +1,45 @@
+/* Global */
+v\:* {
+    behavior:url(#default#VML);
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Map */
+
+#mapContainer {
+    position: relative;
+    margin: 0;
+}
+
+#mapContainer, #map {
+    height: 100%;
+    width: 100%;
+}
+
+
+/* Progress */
+
+#progress {
+    float: left;
+    height: 17px;
+    left: 76px;
+    position: absolute;
+    top: 26px;
+    width: 268px;
+    display: none;
+    color: #6688CC;
+    font-size: 0.6em;
+    font-weight: bold;
+    font-family: 'Arial';
+    text-align: center;
+}
