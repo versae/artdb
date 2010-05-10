@@ -67,12 +67,36 @@ TimeControl.prototype.initialize = function(map) {
     $(minusDatePicker).attr('type', 'text');
     $(minusDatePicker).attr('readonly', true);
     $(minusDatePicker).attr('id', this.id +'MinusDatePicker');
+    $(minusDatePicker).val($.datepicker.formatDate(this.dateFormat, this.start));
+
+    var minusDatePickerLeft = document.createElement("span");
+    $(minusDatePickerLeft).addClass(this.css +"MinusDateLeft");
+    var minusDatePickerRight = document.createElement("span");
+    $(minusDatePickerRight).addClass(this.css +"MinusDateRight");
+    var minusDatePickerContainer = document.createElement("span");
+    $(minusDatePickerContainer).addClass(this.css +"MinusDateContainer");
+    $(minusDatePickerContainer).attr('id', this.id +'MinusDateContainer');
+    $(minusDatePickerContainer).append(minusDatePickerLeft);
+    $(minusDatePickerContainer).append(minusDatePicker);
+    $(minusDatePickerContainer).append(minusDatePickerRight);
 
     var plusDatePicker = document.createElement("input");
     $(plusDatePicker).addClass(this.css +"PlusDate");
     $(plusDatePicker).attr('type', 'text');
     $(plusDatePicker).attr('readonly', true);
     $(plusDatePicker).attr('id', this.id +'PlusDatePicker');
+    $(plusDatePicker).val($.datepicker.formatDate(this.dateFormat, this.end));
+
+    var plusDatePickerLeft = document.createElement("span");
+    $(plusDatePickerLeft).addClass(this.css +"PlusDateLeft");
+    var plusDatePickerRight = document.createElement("span");
+    $(plusDatePickerRight).addClass(this.css +"PlusDateRight");
+    var plusDatePickerContainer = document.createElement("span");
+    $(plusDatePickerContainer).addClass(this.css +"PlusDateContainer");
+    $(plusDatePickerContainer).attr('id', this.id +'PlusDateContainer');
+    $(plusDatePickerContainer).append(plusDatePickerLeft);
+    $(plusDatePickerContainer).append(plusDatePicker);
+    $(plusDatePickerContainer).append(plusDatePickerRight);
 
     var selectedInfo = document.createElement("span");
     $(selectedInfo).addClass(this.css +"Selected");
@@ -98,8 +122,8 @@ TimeControl.prototype.initialize = function(map) {
     container.appendChild(minusButton);
     container.appendChild(timeSlider);
     container.appendChild(plusButton);
-    container.appendChild(minusDatePicker);
-    container.appendChild(plusDatePicker);
+    container.appendChild(minusDatePickerContainer);
+    container.appendChild(plusDatePickerContainer);
     map.getContainer().appendChild(container);
 
     $('#'+ this.id +' .'+ this.css).slider("destroy");
@@ -120,7 +144,6 @@ TimeControl.prototype.initialize = function(map) {
 TimeControl.prototype.normalizeSelectedDate = function(val) {
     var sel;
     if (this.range) {
-        sel = Array;
         sel = [
             new Date(val[0] + this.yearStart,
                      this.start.getUTCMonth(),

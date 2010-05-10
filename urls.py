@@ -15,6 +15,9 @@ urlpatterns = patterns('',
     # map
     url(r'^map/$', direct_to_template, {'template': 'map.html'}),
 
+    # exhibit
+    url(r'^exhibit/', include('exhibit.urls')),
+
     # base
     url(r'^$', direct_to_template, {'template': 'map.html'}),
 

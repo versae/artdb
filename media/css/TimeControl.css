@@ -77,28 +77,81 @@
     font-size: 0.6em;
     font-weight: bold;
     font-family: 'Arial';
-    left: 195px;
+    left: 201px;
     position: absolute;
     text-align: right;
-    top: 20px;
-    width: 70px;
+    top: 23px;
+    width: 60px;
     z-index: -1;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -225px 0 transparent;
+    height: 14px;
+    text-align: center;
+}
+
+.sliderPlusDateLeft {
+    background-color: #FF00FF;
+    width: 10px;
+    height: 15px;
+    display: inline-block;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -64px 0px transparent;
+    top: 23px;
+    left: 171px;
+    position: relative;
+}
+
+.sliderPlusDateRight {
+    background-color: #FF00FF;
+    width: 10px;
+    height: 15px;
+    display: inline-block;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -372px 0px transparent;
+    top: 23px;
+    left: 231px;
+    position: relative;
+}
+
+.sliderPlusDateContainer {
+
 }
 
 .sliderMinusDate {
-    background: transparent none repeat scroll 0 0;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -225px 0 transparent;
     border: medium none;
     color: #6688CC;
     cursor: pointer;
     font-size: 0.6em;
     font-weight: bold;
     font-family: 'Arial';
-    left: 0px;
+    left: 10px;
     position: absolute;
     text-align: left;
-    top: 20px;
-    width: 90px;
+    top: 23px;
+    width: 60px;
     z-index: -1;
+    height: 14px;
+    text-align: center;
+}
+
+.sliderMinusDateLeft {
+    background-color: #FF00FF;
+    width: 10px;
+    height: 15px;
+    display: inline-block;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -64px 0px transparent;
+    top: 23px;
+    left: 0px;
+    position: relative;
+}
+
+.sliderMinusDateRight {
+    background-color: #FF00FF;
+    width: 10px;
+    height: 15px;
+    display: inline-block;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -372px 0px transparent;
+    top: 23px;
+    left: 60px;
+    position: relative;
 }
 
 .sliderSelectedContainer {
@@ -112,14 +165,30 @@
 .sliderSelectedLeft {
     background-color: #FF00FF;
     width: 10px;
+    height: 15px;
+    display: inline-block;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -64px 0px transparent
+}
+
+.sliderSelectedRight {
+    background-color: #FF00FF;
+    width: 10px;
+    height: 15px;
+    display: inline-block;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -372px 0px transparent
 }
 
 .sliderSelected {
-    position: relative;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -225px 0 transparent;
     color: #6688CC;
+    display: inline-block;
+    font-family: 'Arial';
     font-size: 0.6em;
     font-weight: bold;
-    font-family: 'Arial';
+    height: 15px;
+    padding-top: 2px;
+    position: relative;
+    top: -4px;
 }
 
 /* DatePicker */

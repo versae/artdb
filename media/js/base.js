@@ -33,7 +33,7 @@ function initialize() {
         css: 'slider',
         id: 'sliderTimeControl',
         start: new Date(1600, 1, 1),
-        end: new Date(1749, 12, 31),
+        end: new Date(1800, 6, 15),
         selected: [new Date(1675, 1, 1), new Date(1695, 1, 1)],
         format: "yy-mm-dd",
         zoom: TimeControl.YEAR,
@@ -71,7 +71,7 @@ function initialize() {
                 north_east_latitude: northEast.lat(),
             }
             $("#progress").show();
-            //$("#progress").progressbar("destroy");
+            // $("#progress").progressbar("destroy");
             $("#progress").progressbar({ value: 0 });
             $.getJSON(url, data, drawClusters);
         }

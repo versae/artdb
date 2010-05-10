@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'base',
     'artworks',
     'creators',
+    'exhibit',
 )
 
 LOGIN_URL = "/admin/"
