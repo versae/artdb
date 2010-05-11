@@ -95,7 +95,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.gis',
     'django_extensions',
-    'django_qbe',
     'olwidget',
     'base',
     'artworks',
