@@ -1,16 +1,16 @@
-google.load('jquery', '1.3.2');
-google.load('jqueryui', '1.7.2');
+google.load('jquery', '1.4.2');
+google.load('jqueryui', '1.8.1');
 google.load('maps', '2.x', {"other_params": "sensor=true"});
 
 function loadLibraries() {
     var libs = [
-        "/media/js/TimeControl.js",
         "/media/js/markerclusterer.js",
+        "/media/js/TimeControl.js",
     ];
     var libsLength = libs.length;
     for (i=0; i<libsLength; i++) {
         var lib = libs[i];
-        var counter = libsLength-1;
+        var counter = libsLength;
         $.getScript(lib, function(code) {
             counter--;
             if (counter == 0) {
@@ -28,21 +28,47 @@ function initialize() {
     var markers = [];
     var polygons = [];
     var markerClusterer = null;
+    var dateSelectedRange = null;
     var map = new google.maps.Map(document.getElementById('map'));
-    var timeControl = new TimeControl({
+    var timeControlOptions = {
         css: 'slider',
         id: 'sliderTimeControl',
         start: new Date(1600, 1, 1),
-        end: new Date(1800, 6, 15),
-        selected: [new Date(1675, 1, 1), new Date(1695, 1, 1)],
-        format: "yy-mm-dd",
-        zoom: TimeControl.YEAR,
+        end: new Date(1800, 1, 1),
+        selected: [new Date(1675, 1, 1), new Date(1725, 1, 1)],
+        format: "yy",
+        // There's really any other options for zoom yet.
+        // zoom: TimeControl.YEAR,
         onStart: onTimeChange,
         onTimeChange: onTimeChange
-    });
-    map.addControl(timeControl);
+    };
+    function ExhibitControl() {};
+    ExhibitControl.prototype = new google.maps.Control();
+    ExhibitControl.prototype.initialize = function(map) {
+        var container = document.createElement("div");
+        var exhibitDiv = $("<DIV>");
+        exhibitDiv.html("Exhibit");
+        exhibitDiv.attr("href", "javascript:void(0);");
+        exhibitDiv.addClass("exhibitMapControl");
+        $(container).append(exhibitDiv);
+        exhibitDiv.click(function() {
+            location.href = "/exhibit/artworks/?" + dateSelectedRange;
+            return false;
+        });
+        map.getContainer().appendChild(container);
+        return container;
+    }
+    ExhibitControl.prototype.getDefaultPosition = function() {
+      return new google.maps.ControlPosition(google.maps.ANCHOR_TOP_RIGHT, new google.maps.Size(214, 7));
+    }
+    map.addControl(new ExhibitControl());
+    map.addControl(new TimeControl(timeControlOptions));
     map.addControl(new google.maps.LargeMapControl3D());
-    map.addControl(new google.maps.MenuMapTypeControl());
+    map.addMapType(google.maps.PHYSICAL_MAP);
+    var hierarchyControl = new google.maps.HierarchicalMapTypeControl();
+    hierarchyControl.addRelationship(google.maps.SATELLITE_MAP, google.maps.HYBRID_MAP, null, false);
+    map.addControl(hierarchyControl);
+    map.setMapType(google.maps.PHYSICAL_MAP);
     // Centered at client location with zoom level 4
     var center;
     if (google.loader.ClientLocation) {
@@ -74,6 +100,7 @@ function initialize() {
             // $("#progress").progressbar("destroy");
             $("#progress").progressbar({ value: 0 });
             $.getJSON(url, data, drawClusters);
+            dateSelectedRange = "from="+ yearStart +"&to="+ yearEnd;
         }
     }
 

@@ -43,3 +43,18 @@ body {
     font-family: 'Arial';
     text-align: center;
 }
+
+
+/* Exhibit Map */
+.exhibitMapControl {
+    background: url("http://static.simile.mit.edu/graphics/logos/exhibit/exhibit-small-DarkRed.png") no-repeat scroll 0 -3px white;
+    border-color: #8B0000;
+    border-style: solid;
+    border-width: 1px 2px 2px 1px;
+    color: #8B0000;
+    cursor: pointer;
+    font-family: 'Arial';
+    font-size: 12px;
+    font-weight: bold;
+    padding: 1px 10px 0 35px;
+}

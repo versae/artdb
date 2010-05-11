@@ -2,6 +2,8 @@ function TimeControl(opts) {
     this.onStart = this.timeStartHandler(opts.onStart || function() {});
     this.onTimeChange = this.timeChangeHandler(opts.onTimeChange || function() {});
     this.onTimeMove = this.timeMoveHandler(opts.onTimeMove || function() {});
+    this.onStartChange = this.startChangeHandler(opts.onStartChange || function() {});
+    this.onEndChange = this.endChangeHandler(opts.onEndChange || function() {});
     this.css = opts.css || "slider";
     this.id = opts.id || "sliderTimeControl";
     this.start = opts.start || new Date(1900, 1, 1);
@@ -22,6 +24,8 @@ function TimeControl(opts) {
         this.selected = opts.selected.getUTCFullYear() - this.yearStart || start;
     }
     this.step = opts.zoom || this.YEAR;
+    this.defaultPosition = opts.position || new google.maps.ControlPosition(google.maps.ANCHOR_TOP_LEFT,
+                                                                            new google.maps.Size(75, 24));
 }
 TimeControl.prototype = new google.maps.Control();
 TimeControl.prototype.initialize = function(map) {
@@ -60,7 +64,7 @@ TimeControl.prototype.initialize = function(map) {
         minDate: this.start,
         maxDate: this.end,
         dateFormat: this.dateFormat
-    }
+    };
 
     var minusDatePicker = document.createElement("input");
     $(minusDatePicker).addClass(this.css +"MinusDate");
@@ -131,10 +135,12 @@ TimeControl.prototype.initialize = function(map) {
 
     var datePickerParamsMinus = datePickerParams;
     datePickerParamsMinus['defaultDate'] = this.start;
+    datePickerParamsMinus['onClose'] = this.onStartChange;
     $('#'+ this.id +'MinusDatePicker').datepicker(datePickerParamsMinus);
 
     var datePickerParamsPlus = datePickerParams;
     datePickerParamsPlus['defaultDate'] = this.end;
+    datePickerParamsPlus['onClose'] = this.onEndChange;
     $('#'+ this.id +'PlusDatePicker').datepicker(datePickerParamsPlus);
 
     this.selected = this.normalizeSelectedDate(this.selected);
@@ -195,9 +201,38 @@ TimeControl.prototype.timeMoveHandler = function(func) {
         return func(selected, parent.range);
     }
 }
+TimeControl.prototype.onStartChange = function(func) {
+    this.onStartChange = this.startChangeHandler(func);
+}
+TimeControl.prototype.startChangeHandler = function(func) {
+    var parent = this;
+    return function(dateText, inst) {
+        var date = $.datepicker.parseDate(parent.dateFormat, dateText);
+        parent.yearStart = date.getUTCFullYear() || 1900;
+        parent.max = Math.abs(parent.yearEnd - parent.yearStart);
+        $('#'+ parent.id +' .'+ parent.css).slider("option", "max", parent.max);
+        sliderOption = (this.range) ? 'values' : 'value';
+        $('#'+ parent.id +' .'+ parent.css).slider("option", sliderOption, parent.selected);
+        return func(date);
+    }
+}
+TimeControl.prototype.onEndChange = function(func) {
+    this.onEndChange = this.endChangeHandler(func);
+}
+TimeControl.prototype.endChangeHandler = function(func) {
+    var parent = this;
+    return function(dateText, inst) {
+        var sliderOption, date = $.datepicker.parseDate(parent.dateFormat, dateText);
+        parent.yearEnd = date.getUTCFullYear() || 2100;
+        parent.max = Math.abs(parent.yearEnd - parent.yearStart);
+        $('#'+ parent.id +' .'+ parent.css).slider("option", "max", parent.max);
+        sliderOption = (this.range) ? 'values' : 'value';
+        $('#'+ parent.id +' .'+ parent.css).slider("option", sliderOption, parent.selected);
+        return func(date);
+    }
+}
 TimeControl.prototype.getDefaultPosition = function() {
-    return new google.maps.ControlPosition(google.maps.ANCHOR_TOP_LEFT,
-                                           new google.maps.Size(75, 24));
+    return this.defaultPosition;
 }
 TimeControl.DAY = 1/(12*30);
 TimeControl.MONTH = 1/12;

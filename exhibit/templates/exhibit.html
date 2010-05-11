@@ -25,8 +25,7 @@
     <tr valign="top">
         <td ex:role="viewPanel">
             <div
-                ex:role="view"
-                ex:possibleOrders=".creators, .serie, .creation_year_start, .creation_year_end, .size">
+                ex:role="view">
             </div>
             <div
                 ex:role="view"
@@ -48,6 +47,13 @@
              <div ex:role="facet" ex:expression=".creators" ex:facetLabel="Creators"></div>
              <div ex:role="facet" ex:expression=".serie" ex:facetLabel="Serie"></div>
              <div ex:role="facet" ex:expression=".size" ex:facetLabel="Size"></div>
+             <div
+                ex:role="facet"
+                ex:expression=".creation_year_end"
+                ex:facetLabel="Century"
+                ex:facetClass="NumericRange"
+                ex:interval="100">
+            </div>
              <div
                 ex:role="facet"
                 ex:expression=".creation_year_start"

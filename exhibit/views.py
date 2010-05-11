@@ -51,6 +51,11 @@ def json_artworks(request):
                 "valueType": "number",
             },
         },
+        "types": {
+            "Artwork": {
+                "pluralLabel": "Artworks",
+            }
+        },
         "items": items
     })
     return HttpResponse(dumps(data), mimetype=mimetype)
