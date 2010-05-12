@@ -7,8 +7,8 @@ from artworks.models import Artwork
 
 
 def artworks_exhibit(request):
-    date_from = None
-    date_to = None
+    year_from = None
+    year_to = None
     if request.GET and "from" in request.GET and "to" in request.GET:
         year_from = int(request.GET.get("from", 0))
         year_to = int(request.GET.get("to", 0))
