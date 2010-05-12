@@ -13,16 +13,13 @@ urlpatterns = patterns('',
     url(r'^artworks/', include('artworks.urls')),
 
     # map
-    url(r'^map/$', direct_to_template, {'template': 'map.html'}),
+    url(r'^map/$', direct_to_template, {'template': 'map.html'}, name="map"),
 
     # exhibit
     url(r'^exhibit/', include('exhibit.urls')),
 
     # base
     url(r'^$', direct_to_template, {'template': 'map.html'}),
-
-    # qbe
-    url(r'^qbe/', include('django_qbe.urls')),
 
     # admin
     url(r'^admin/', include(admin_site.urls)),

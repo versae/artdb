@@ -3,72 +3,95 @@
 
 {% block title %}{% trans "Exhibition" %}{% endblock %}
 {% block extra_links %}
-<link href="{% url json_artworks %}" type="application/json" rel="exhibit/data" />{% endblock %}
+{% if year_from and year_to %}
+<link href="{% url artworks_json %}?from={{ year_from }}&to={{ year_to }}" type="application/json" rel="exhibit/data" />
+{% else %}
+<link href="{% url artworks_json %}" type="application/json" rel="exhibit/data" />
+{% endif %}
+{% endblock %}
 {% block extra_scripts %}
 <script src="http://static.simile.mit.edu/exhibit/api-2.0/exhibit-api.js" type="text/javascript"></script>
 <script src="http://static.simile.mit.edu/exhibit/extensions-2.0/time/time-extension.js" type="text/javascript"></script>
-
 {% endblock %}
 
-{% block body %}
-<h1>{% trans "Artworks exhibition" %}</h1>
+{% block header %}
+<h1>
+{% if year_from and year_to %}
+    {% blocktrans %}
+    Artworks exhibition from {{ year_from }} to {{ year_to }}
+    {% endblocktrans %}
+{% else %}
+    {% trans "Artworks exhibition" %}
+{% endif %}
+</h1>
+{% endblock %}
 
-<table width="100%">
-    <tr>
-        <td>
-            <div ex:role="facet" ex:facetClass="TextSearch"></div>
-        </td>
-        <td>
-            {% trans "Filter" %}
-        </td>
-    </tr>
-    <tr valign="top">
-        <td ex:role="viewPanel">
-            <div
-                ex:role="view">
-            </div>
-            <div
-                ex:role="view"
-                ex:viewClass="Timeline"
-                ex:start=".creation_year_start"
-                ex:end=".creation_year_end">
-            </div>
-            <div
-                ex:role="exhibit-view"
-                ex:viewClass="Exhibit.TabularView"
-                ex:columns=".label, .creators, .serie, .creation_year_start, .creation_year_end"
-                ex:columnLabels="{% trans "name" %}, {% trans "creators" %}, {% trans "size" %}", {% trans "creation year start" %}, {% trans "creation year end" %}
-                ex:columnFormats="list, list, list, list, list"
-                ex:sortColumn="0"
-                ex:sortAscending="true">
-            </div>
-        </td>
-        <td width="25%">
-             <div ex:role="facet" ex:expression=".creators" ex:facetLabel="Creators"></div>
-             <div ex:role="facet" ex:expression=".serie" ex:facetLabel="Serie"></div>
-             <div ex:role="facet" ex:expression=".size" ex:facetLabel="Size"></div>
-             <div
-                ex:role="facet"
-                ex:expression=".creation_year_end"
-                ex:facetLabel="Century"
-                ex:facetClass="NumericRange"
-                ex:interval="100">
-            </div>
-             <div
-                ex:role="facet"
-                ex:expression=".creation_year_start"
-                ex:facetLabel="Creation year start"
-                ex:facetClass="NumericRange"
-                ex:interval="25">
-            </div>
-             <div
-                ex:role="facet"
-                ex:expression=".creation_year_end"
-                ex:facetLabel="Creation year end"
-                ex:facetClass="NumericRange"
-                ex:interval="25">
-            </div>
-        </td>
-    </tr>
-</table>
+{% block nav %}
+{% comment %}
+<ul>
+    <li>
+        {% if year_from and year_to %}
+            <a href="{% url map %}#from={{ year_from }}&to={{ year_to }}">{% trans "Back to the map" %}</a>
+        {% else %}
+            <a href="{% url map %}">{% trans "Back to the map" %}</a>
+        {% endif %}
+    </li>
+</ul>
+{% endcomment %}
+{% endblock %}
+
+{% block main %}
+    <div ex:role="viewPanel">
+        <div
+            ex:role="view">
+        </div>
+        <div
+            ex:role="view"
+            ex:viewClass="Timeline"
+            ex:start=".creation_year_start"
+            ex:end=".creation_year_end">
+        </div>
+        <div
+            ex:role="exhibit-view"
+            ex:viewClass="Exhibit.TabularView"
+            ex:columns=".label, .creators, .serie, .creation_year_start, .creation_year_end"
+            ex:columnLabels="{% trans "name" %}, {% trans "creators" %}, {% trans "size" %}", {% trans "creation year start" %}, {% trans "creation year end" %}
+            ex:columnFormats="list, list, list, list, list"
+            ex:sortColumn="0"
+            ex:sortAscending="true">
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+     <div id="searchBox">
+        <strong>{% trans "Search" %}</strong> <div ex:role="facet" ex:facetClass="TextSearch"></div>
+     </div>
+     <div ex:role="facet" ex:expression=".creators" ex:facetLabel="{% trans "Creators" %}"></div>
+     <div ex:role="facet" ex:expression=".serie" ex:facetLabel="{% trans "Serie" %}"></div>
+     <div ex:role="facet" ex:expression=".size" ex:facetLabel="{% trans "Size" %}"></div>
+     <div ex:role="facet" ex:expression=".current_place" ex:facetLabel="{% trans "Place (current)" %}"></div>
+     <div
+        ex:role="facet"
+        ex:scroll="false"
+        ex:expression=".creation_year_end"
+        ex:facetLabel="{% trans "Century" %}"
+        ex:facetClass="NumericRange"
+        ex:interval="100">
+    </div>
+     <div
+        ex:role="facet"
+        ex:expression=".creation_year_start"
+        ex:facetLabel="{% trans "Creation year start" %}"
+        ex:facetClass="NumericRange"
+        ex:interval="25">
+    </div>
+     <div
+        ex:role="facet"
+        ex:expression=".creation_year_end"
+        ex:facetLabel="{% trans "Creation year end" %}"
+        ex:facetClass="NumericRange"
+        ex:onshow="alert(1);"
+        ex:interval="25">
+    </div>
 {% endblock %}

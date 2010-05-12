@@ -6,17 +6,28 @@ from django.utils.simplejson import dumps
 from artworks.models import Artwork
 
 
-def artworks_view(request):
+def artworks_exhibit(request):
+    date_from = None
+    date_to = None
+    if request.GET and "from" in request.GET and "to" in request.GET:
+        year_from = int(request.GET.get("from", 0))
+        year_to = int(request.GET.get("to", 0))
     return render_to_response('exhibit.html',
-                              {},
+                              {"year_from": year_from,
+                               "year_to": year_to},
                               context_instance=RequestContext(request))
 
-def json_artworks(request):
+def artworks_json(request):
     mimetype = "application/json"
     data = {}
     items = []
-    artworks = Artwork.objects.all()
-    for artwork in artworks[:100]:
+    if request.GET and "from" in request.GET and "to" in request.GET:
+        year_from = int(request.GET.get("from", 0))
+        year_to = int(request.GET.get("to", 0))
+        artworks = Artwork.objects.in_range(year_from, year_to)
+    else:
+        artworks = Artwork.objects.all()
+    for artwork in artworks:
         creators = [creator.creator.name
                     for creator in artwork.artworkcreator_set.all()]
         images = [image for image in artwork.images.all()]
@@ -31,6 +42,7 @@ def json_artworks(request):
             "inscription": artwork.inscription,
             "notes": artwork.notes,
             "image": images,
+            "current_place": artwork.current_place and artwork.current_place.title,
         }
         items.append(artwork_dic)
     data.update({
@@ -42,6 +54,9 @@ def json_artworks(request):
                 "valueType": "item",
             },
             "serie": {
+                "valueType": "item",
+            },
+            "current_place": {
                 "valueType": "item",
             },
             "creation_year_start": {
@@ -59,3 +74,7 @@ def json_artworks(request):
         "items": items
     })
     return HttpResponse(dumps(data), mimetype=mimetype)
+
+
+def artworks_history(request):
+    return HttpResponse(u"")

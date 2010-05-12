@@ -1,4 +1,5 @@
-/* Global */
+/* Globals */
+
 v\:* {
     behavior:url(#default#VML);
 }
@@ -11,8 +12,44 @@ html, body {
 body {
     margin: 0;
     padding: 0;
+    color: #444;
 }
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table tr th {
+    border: 1px #ddd;
+}
+
+table tr td {
+    border-color: #ddd;
+    border-style: solid;
+    border-width: 0px 1px 1px 1px;
+}
+
+#wrap {
+    width: 970px;
+    margin: 0 auto;
+    background: #fff;
+    font: 12px/1.6 Arial, sans-serif;
+}
+
+
+#wrap h1 {
+    margin: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* Header */
+
+#header {
+    padding: 5px 10px;
+    background: #fff;
+}
 
 /* Map */
 
@@ -46,6 +83,7 @@ body {
 
 
 /* Exhibit Map */
+
 .exhibitMapControl {
     background: url("http://static.simile.mit.edu/graphics/logos/exhibit/exhibit-small-DarkRed.png") no-repeat scroll 0 -3px white;
     border-color: #8B0000;
@@ -57,4 +95,68 @@ body {
     font-size: 12px;
     font-weight: bold;
     padding: 1px 10px 0 35px;
+}
+
+
+/* Nav */
+
+#nav {
+    padding: 5px 10px;
+    background: #fff;
+}
+
+#nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#nav li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Main */
+
+#main {
+    float: left;
+    width: 700px;
+    padding: 10px;
+    background: #fff;
+}
+
+h2 {
+    margin: 0 0 1em;
+}
+
+
+/* Sidebar */
+
+#sidebar {
+    float: right;
+    width: 230px;
+    padding: 10px;
+    background: #fff;
+}
+
+#searchBox input[type="text"] {
+    border: 1px solid #ddd;
+}
+
+/* Footer */
+
+#footer {
+    clear:both;
+    padding: 5px 10px;
+    background: #fff;
+}
+
+#footer p {
+    margin: 0;
+}
+
+* html #footer {
+    height: 1px;
 }
