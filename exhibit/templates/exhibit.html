@@ -43,11 +43,14 @@
 {% block main %}
     <div ex:role="viewPanel">
         <div
+            ex:showDuplicates="true"
             ex:role="view">
         </div>
         <div
             ex:role="view"
             ex:viewClass="Timeline"
+            ex:topBandUnit="year"
+            ex:bottomBandUnit="decade"
             ex:start=".creation_year_start"
             ex:end=".creation_year_end">
         </div>
@@ -55,7 +58,7 @@
             ex:role="exhibit-view"
             ex:viewClass="Exhibit.TabularView"
             ex:columns=".label, .creators, .serie, .creation_year_start, .creation_year_end"
-            ex:columnLabels="{% trans "name" %}, {% trans "creators" %}, {% trans "size" %}", {% trans "creation year start" %}, {% trans "creation year end" %}
+            ex:columnLabels="{% trans "Name" %}, {% trans "Creators" %}, {% trans "Serie" %}", {% trans "Creation year start" %}, {% trans "Creation year end" %}
             ex:columnFormats="list, list, list, list, list"
             ex:sortColumn="0"
             ex:sortAscending="true">
@@ -65,7 +68,12 @@
 
 {% block sidebar %}
      <div id="searchBox">
-        <strong>{% trans "Search" %}</strong> <div ex:role="facet" ex:facetClass="TextSearch"></div>
+        <strong>{% trans "Search" %}</strong>
+        <div
+            ex:role="facet"
+            ex:queryParamName="q"
+            ex:facetClass="TextSearch">
+        </div>
      </div>
      <div ex:role="facet" ex:expression=".creators" ex:facetLabel="{% trans "Creators" %}"></div>
      <div ex:role="facet" ex:expression=".serie" ex:facetLabel="{% trans "Serie" %}"></div>
