@@ -33,13 +33,10 @@ def artworks_json(request):
         creators = [creator.creator.name
                     for creator in artwork.artworkcreator_set.all()]
         images = [image for image in artwork.images.all()]
-        admin_reverse = reverse("admin:artworks_artwork_change",
-                                args=[artwork.id])
-        admin_url = u"%s://%s%s" % ("https" and request.is_secure() or "http",
-                                     request.get_host(),
-                                     admin_reverse)
         artwork_dic = {
-            "admin": admin_url,
+            "identifier": artwork.id,
+            "admin": reverse("admin:artworks_artwork_change",
+                             args=[artwork.id]),
             "type": artwork._meta.object_name,
             "label": artwork.title,
             "serie": artwork.serie and artwork.serie.title,
@@ -56,6 +53,9 @@ def artworks_json(request):
         items.append(artwork_dic)
     data.update({
         "properties": {
+            "id": {
+                "valueType": "number",
+            },
             "label": {
                 "valueType": "item",
             },

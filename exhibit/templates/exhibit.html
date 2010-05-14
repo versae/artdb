@@ -43,7 +43,7 @@
 {% block main %}
     <div ex:role="viewPanel">
         <div
-            ex:showDuplicates="true"
+            ex:showDuplicates="false"
             ex:role="view">
         </div>
         <div
@@ -57,10 +57,10 @@
         <div
             ex:role="exhibit-view"
             ex:viewClass="Exhibit.TabularView"
-            ex:columns=".label, .creators, .serie, .creation_year_start, .creation_year_end"
-            ex:columnLabels="{% trans "Name" %}, {% trans "Creators" %}, {% trans "Serie" %}", {% trans "Creation year start" %}, {% trans "Creation year end" %}
-            ex:columnFormats="list, list, list, list, list"
-            ex:sortColumn="0"
+            ex:columns=".identifier, .label, .creators, .serie, .creation_year_start, .creation_year_end"
+            ex:columnLabels="{% trans "ID" %}, {% trans "Name" %}, {% trans "Creators" %}, {% trans "Serie" %}", {% trans "Creation year start" %}, {% trans "Creation year end" %}
+            ex:columnFormats="list, list, list, list, list, list"
+            ex:sortColumn="1"
             ex:sortAscending="true">
         </div>
     </div>
