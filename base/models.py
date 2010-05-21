@@ -16,10 +16,10 @@ class Image(models.Model):
 
 
 class BibliographicReference(models.Model):
-    title = models.CharField(_(u'Title'), max_length=200)
+    title = models.TextField(_(u'Title'))
     url = models.URLField(_(u'URL'), verify_exists=False, blank=True,
                           null=True)
-    isbn = models.IntegerField(_(u'ISBN'), max_length=10, blank=True,
+    isbn = models.IntegerField(_(u'ISBN'), max_length=30, blank=True,
                                null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
 
