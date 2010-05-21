@@ -62,25 +62,29 @@ var olwidget = {
      * Constructors for layers
      */
     wms: {
-        map: function() {
-            return new OpenLayers.Layer.WMS(
-                    "OpenLayers WMS",
-                    "http://labs.metacarta.com/wms/vmap0",
-                    {layers: 'basic'}
-            );
-        },
-        nasa: function() {
-            return new OpenLayers.Layer.WMS(
-                    "NASA Global Mosaic",
-                    "http://t1.hypercube.telascience.org/cgi-bin/landsat7",
-                    {layers: "landsat7"}
-            );
-        },
-        blank: function() {
-            return new OpenLayers.Layer("", {isBaseLayer: true});
+        map: function(type) {
+            if (type === "map") {
+                return new OpenLayers.Layer.WMS(
+                        "OpenLayers WMS",
+                        "http://labs.metacarta.com/wms/vmap0",
+                        {layers: 'basic'}
+                );
+            } else if (type === "nasa") {
+                return new OpenLayers.Layer.WMS(
+                        "NASA Global Mosaic",
+                        "http://t1.hypercube.telascience.org/cgi-bin/landsat7",
+                        {layers: "landsat7"}
+                );
+            } else if (type === "blank") {
+                return new OpenLayers.Layer("", {isBaseLayer: true});
+            }
+            return false;
         }
     },
     osm: {
+        map: function(type) {
+            return this[type]();
+        },
         mapnik: function() {
             // Not using OpenLayers.Layer.OSM.Mapnik constructor because of
             // an IE6 bug.  This duplicates that constructor.
@@ -98,6 +102,9 @@ var olwidget = {
         }
     },
     google: {
+        map: function(type) {
+            return this[type]();
+        },
         streets: function() {
             return new OpenLayers.Layer.Google("Google Streets", 
                     {sphericalMercator: true, numZoomLevels: 20});
@@ -108,7 +115,8 @@ var olwidget = {
         },
         satellite: function() {
             return new OpenLayers.Layer.Google("Google Satellite", 
-                    {sphericalMercator: true, type: G_SATELLITE_MAP});
+                    {sphericalMercator: true, type: G_SATELLITE_MAP,
+                        numZoomLevels: 22});
         },
         hybrid: function() {
             return new OpenLayers.Layer.Google("Google Hybrid", 
@@ -116,13 +124,13 @@ var olwidget = {
         }
     },
     yahoo: {
-        map: function() {
+        map: function(type) {
             return new OpenLayers.Layer.Yahoo("Yahoo", 
                     {sphericalMercator: true, numZoomLevels: 20});
         }
     },
     ve: {
-        map: function(type, typeName) {
+        map: function(type) {
             /* 
                VE does not play nice with vector layers at zoom level 1.
                Also, map may need "panMethod: OpenLayers.Easing.Linear.easeOut"
@@ -132,13 +140,23 @@ var olwidget = {
 
             */
                 
-            return new OpenLayers.Layer.VirtualEarth("Microsoft VE (" + typeName + ")", 
-                {sphericalMercator: true, minZoomLevel: 2, type: type });
+            var typeCode = this.types[type]();
+            return new OpenLayers.Layer.VirtualEarth("Microsoft VE (" + type + ")", 
+                {sphericalMercator: true, minZoomLevel: 2, type: typeCode });
         },
-        road: function() { return this.map(VEMapStyle.Road, "Road"); },
-        shaded: function() { return this.map(VEMapStyle.Shaded, "Shaded"); },
-        aerial: function() { return this.map(VEMapStyle.Aerial, "Aerial"); },
-        hybrid: function() { return this.map(VEMapStyle.Hybrid, "Hybrid"); }
+        types: {
+            road: function() { return VEMapStyle.Road; },
+            shaded: function() { return VEMapStyle.Shaded; },
+            aerial: function() { return VEMapStyle.Aerial; },
+            hybrid: function() { return VEMapStyle.Hybrid; }
+        }
+    },
+    cloudmade: {
+        map: function(type) {
+            return new OpenLayers.Layer.CloudMade("CloudMade " + type, {
+                styleId: type
+            });
+        }
     },
 
 
@@ -147,11 +165,11 @@ var olwidget = {
      * Useful for applying defaults in nested objects.
      */
     deepJoinOptions: function(destination, source) {
-        if (destination == undefined) {
+        if (destination === undefined) {
             destination = {};
         }
         for (var a in source) {
-            if (source[a] != undefined) {
+            if (source[a] !== undefined) {
                 if (typeof(source[a]) == 'object' && source[a].constructor != Array) {
                     destination[a] = this.deepJoinOptions(destination[a], source[a]);
                 } else {
@@ -179,7 +197,6 @@ olwidget.BaseMap = OpenLayers.Class(OpenLayers.Map, {
         var defaults = {
             mapOptions: {
                 units: 'm',
-                maxResolution: 156543.0339,
                 projection: "EPSG:900913",
                 displayProjection: "EPSG:4326",
                 maxExtent: [-20037508.34, -20037508.34, 20037508.34, 20037508.34],
@@ -233,17 +250,20 @@ olwidget.BaseMap = OpenLayers.Class(OpenLayers.Map, {
         var layers = [];
         for (var i = 0; i < opts.layers.length; i++) {
             var parts = opts.layers[i].split(".");
-            layers.push(olwidget[parts[0]][parts[1]]());
+            layers.push(olwidget[parts[0]].map(parts[1]));
             
             // workaround for problems with Microsoft layers and vector layer drift
             // (see http://openlayers.com/dev/examples/ve-novibrate.html)
             if (parts[0] == "ve") {
-                if (opts.mapOptions.panMethod == undefined) {
+                if (opts.mapOptions.panMethod === undefined) {
                     opts.mapOptions.panMethod = OpenLayers.Easing.Linear.easeOut;
                 }
             }
         }
-        var styleMap = new OpenLayers.StyleMap({'default': new OpenLayers.Style(opts.overlayStyle)});
+        var styleMap = new OpenLayers.StyleMap({'default': 
+            new OpenLayers.Style(opts.overlayStyle, {
+                context: opts.overlayStyleContext
+            })});
 
         // Super constructor
         OpenLayers.Map.prototype.initialize.apply(this, [mapDiv.id, opts.mapOptions]);
@@ -253,8 +273,17 @@ olwidget.BaseMap = OpenLayers.Class(OpenLayers.Map, {
     },
     initCenter: function() {
         if (this.opts.zoomToDataExtent && this.vectorLayer.features.length > 0) {
-            if (this.vectorLayer.features.length == 1 &&
+            if (this.opts.cluster) {
+                var extent = this.vectorLayer.features[0].geometry.getBounds();
+                for (var i = 0; i < this.vectorLayer.features.length; i++) {
+                    for (var j = 0; j < this.vectorLayer.features[i].cluster.length; j++) {
+                        extent.extend(this.vectorLayer.features[i].cluster[j].geometry.getBounds());
+                    }
+                }
+                this.zoomToExtent(extent);
+            } else if (this.vectorLayer.features.length == 1 &&
                     this.vectorLayer.features[0].geometry.CLASS_NAME == "OpenLayers.Geometry.Point") {
+
                 this.setCenter(this.vectorLayer.features[0].geometry.getBounds().getCenterLonLat(), 
                                this.opts.defaultZoom);
             } else {
@@ -297,7 +326,9 @@ olwidget.EditableMap = OpenLayers.Class(olwidget.BaseMap, {
         }
 
         this.initWKT();
-        this.initCenter();
+        if (this.opts.layers.length > 0) {
+            this.initCenter();
+        }
         this.initControls();
     },
     initWKT: function() {
@@ -487,16 +518,7 @@ olwidget.InfoMap = OpenLayers.Class(olwidget.BaseMap, {
             popupDirection: 'auto',
             popupPaginationSeparator: ' of ',
             cluster: false,
-            clusterDisplay: "paginate",
-            clusterStyle: {
-                pointRadius: "${radius}",
-                strokeWidth: "${width}",
-                label: "${label}",
-                labelSelect: true,
-                fontSize: "11px",
-                fontFamily: "Helvetica, sans-serif",
-                fontColor: "#ffffff"
-            }
+            clusterDisplay: "paginate"
         };
 
         options = olwidget.deepJoinOptions(infomapDefaults, options);
@@ -507,7 +529,7 @@ olwidget.InfoMap = OpenLayers.Class(olwidget.BaseMap, {
             this.div.style.position = 'relative';
         }
 
-        if (this.opts.cluster == true) {
+        if (this.opts.cluster === true) {
             this.addClusterStrategy();
         }
 
@@ -520,8 +542,16 @@ olwidget.InfoMap = OpenLayers.Class(olwidget.BaseMap, {
             if (feature.constructor != Array) {
                 feature = [feature];
             }
+            var htmlInfo = infoArray[i][1];
             for (var k = 0; k < feature.length; k++) {
-                feature[k].attributes = { html: infoArray[i][1] };
+                if (typeof htmlInfo === "object") {
+                    feature[k].attributes = htmlInfo;
+                    if (typeof htmlInfo.style !== "undefined") {
+                        feature[k].style = OpenLayers.Util.applyDefaults(htmlInfo.style, this.opts.overlayStyle);
+                    }
+                } else {
+                    feature[k].attributes = { html: htmlInfo };
+                }
                 features.push(feature[k]);
             }
         }
@@ -540,7 +570,16 @@ olwidget.InfoMap = OpenLayers.Class(olwidget.BaseMap, {
         this.select.activate();
     },
     addClusterStrategy: function() {
-        var style_context = {
+        var defaultClusterStyle = {
+                pointRadius: "${radius}",
+                strokeWidth: "${width}",
+                label: "${label}",
+                labelSelect: true,
+                fontSize: "11px",
+                fontFamily: "Helvetica, sans-serif",
+                fontColor: "#ffffff"
+        };
+        var context = {
             width: function(feature) {
                 return (feature.cluster) ? 2 : 1;
             },
@@ -564,16 +603,24 @@ olwidget.InfoMap = OpenLayers.Class(olwidget.BaseMap, {
                 return (feature.cluster && feature.cluster.length > 1) ? feature.cluster.length : '';
             }
         };
+        if (this.opts.overlayStyleContext !== undefined) {
+            OpenLayers.Util.applyDefaults(context, this.opts.overlayStyleContext);
+        }
 
         var defaultStyleOpts = OpenLayers.Util.applyDefaults(
-            OpenLayers.Util.applyDefaults({}, this.opts.clusterStyle), 
+            OpenLayers.Util.applyDefaults({}, defaultClusterStyle), 
             this.vectorLayer.styleMap.styles['default'].defaultStyle);
         var selectStyleOpts = OpenLayers.Util.applyDefaults(
-            OpenLayers.Util.applyDefaults({}, this.opts.clusterStyle),
-            this.vectorLayer.styleMap.styles['select'].defaultStyle);
+            OpenLayers.Util.applyDefaults({}, defaultClusterStyle),
+                this.vectorLayer.styleMap.styles.select.defaultStyle);
+        if (this.opts.clusterStyle !== undefined) {
+            defaultStyleOpts = olwidget.deepJoinOptions(defaultStyleOpts, this.opts.clusterStyle);
+            selectStyleOpts = olwidget.deepJoinOptions(selectStyleOpts, this.opts.clusterStyle);
+            window.console && console.warn("olwidget: ``clusterStyle`` option is deprecated.  Use ``overlayStyle`` instead.");
+        }
 
-        var defaultStyle = new OpenLayers.Style(defaultStyleOpts, {context: style_context});
-        var selectStyle = new OpenLayers.Style(selectStyleOpts, {context: style_context});
+        var defaultStyle = new OpenLayers.Style(defaultStyleOpts, {context: context});
+        var selectStyle = new OpenLayers.Style(selectStyleOpts, {context: context});
         this.removeLayer(this.vectorLayer);
         this.vectorLayer = new OpenLayers.Layer.Vector(this.opts.name, { 
             styleMap: new OpenLayers.StyleMap({ 'default': defaultStyle, 'select': selectStyle }),
@@ -596,7 +643,7 @@ olwidget.InfoMap = OpenLayers.Class(olwidget.BaseMap, {
         this.popups.push(popup);
         var popupDiv = popup.draw();
         if (popupDiv) {
-            popupDiv.style.zIndex = this.Z_INDEX_BASE['Popup'] +
+            popupDiv.style.zIndex = this.Z_INDEX_BASE.Popup +
                                     this.popups.length;
             this.div.appendChild(popupDiv);
             // store a reference to this function so we can unregister on removal
@@ -615,12 +662,8 @@ olwidget.InfoMap = OpenLayers.Class(olwidget.BaseMap, {
         OpenLayers.Util.removeItem(this.popups, popup);
         if (popup.div) {
             try {
-                //if (this.opts.popupsOutside) {
-                    this.div.removeChild(popup.div);
-                    this.events.unregister("move", this, this.popupMoveFunc);
-                //} else {
-                //    this.layerContainerDiv.removeChild(popup.div);
-                //}
+                this.div.removeChild(popup.div);
+                this.events.unregister("move", this, this.popupMoveFunc);
             } catch (e) { }
         }
         popup.map = null;
@@ -746,7 +789,7 @@ olwidget.Popup = OpenLayers.Class(OpenLayers.Popup.Framed, {
             this.fixedRelativePosition = true;
             this.relativePosition = relativePosition;
         }
-        if (separator == undefined) {
+        if (separator === undefined) {
             this.separator = ' of ';
         } else {
             this.separator = separator;
@@ -765,7 +808,7 @@ olwidget.Popup = OpenLayers.Class(OpenLayers.Popup.Framed, {
      * the array element specified by this.page.
      */
     setContentHTML: function(contentHTML) {
-        if (contentHTML != null) {
+        if (contentHTML !== null && contentHTML !== undefined) {
             this.contentHTML = contentHTML;
         }
 
@@ -779,7 +822,7 @@ olwidget.Popup = OpenLayers.Class(OpenLayers.Popup.Framed, {
             showPagination = this.contentHTML.length > 1;
         }
 
-        if ((this.contentDiv != null) && (pageHTML != null)) {
+        if ((this.contentDiv !== null) && (pageHTML !== null)) {
             var popup = this; // for closures
 
             // Clear old contents
@@ -823,7 +866,7 @@ olwidget.Popup = OpenLayers.Class(OpenLayers.Popup.Framed, {
 
                 var count = document.createElement("div");
                 count.className = "olwidgetPaginationCount";
-                count.innerHTML = (this.page + 1) + " of " + this.contentHTML.length;
+                count.innerHTML = (this.page + 1) + this.separator + this.contentHTML.length;
                 var next = document.createElement("div");
                 next.className = "olwidgetPaginationNext";
                 next.innerHTML = "next";
@@ -915,10 +958,10 @@ olwidget.Popup = OpenLayers.Class(OpenLayers.Popup.Framed, {
                 block.div.style.width = (w < 0 ? 0 : w) + 'px';
                 block.div.style.height = (h < 0 ? 0 : h) + 'px';
 
-                block.div.style.left = (l != null) ? l + 'px' : '';
-                block.div.style.bottom = (b != null) ? b + 'px' : '';
-                block.div.style.right = (r != null) ? r + 'px' : '';
-                block.div.style.top = (t != null) ? t + 'px' : '';
+                block.div.style.left = (l !== null) ? l + 'px' : '';
+                block.div.style.bottom = (b !== null) ? b + 'px' : '';
+                block.div.style.right = (r !== null) ? r + 'px' : '';
+                block.div.style.top = (t !== null) ? t + 'px' : '';
 
                 block.div.className = positionBlock.className;
             }
@@ -928,7 +971,7 @@ olwidget.Popup = OpenLayers.Class(OpenLayers.Popup.Framed, {
         }
     },
     updateSize: function() {
-        if (this.map.opts.popupsOutside == true) {
+        if (this.map.opts.popupsOutside === true) {
             var preparedHTML = "<div class='" + this.contentDisplayClass+ "'>" +
                 this.contentDiv.innerHTML +
                 "</div>";

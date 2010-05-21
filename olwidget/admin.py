@@ -81,11 +81,6 @@ class GeoModelAdmin(ModelAdmin):
             else:
                 # fallback: allow all types.
                 geometry = ['polygon', 'point', 'linestring']
-        # HACK: In order to select geoemtry and is_collection from options
-        # if 'geometry' in self.options:
-        #    geometry = self.options['geometry']
-        # if 'is_collection' in self.options:
-        #    is_collection = self.options['is_collection']
 
         options = copy.deepcopy(self.options) 
         options.update({
@@ -110,7 +105,12 @@ class GeoModelAdmin(ModelAdmin):
             info = []
             for obj in cl.get_query_set():
                 # Transform the fields into one projection.
-                geoms = [getattr(obj, field) for field in self.list_map]
+                geoms = []
+                for field in self.list_map:
+                    geom = getattr(obj, field)
+                    if callable(geom):
+                        geom = geom()
+                    geoms.append(geom)
                 for geom in geoms:
                     geom.transform(int(DEFAULT_PROJ))
 

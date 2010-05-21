@@ -1,8 +1,15 @@
 google.load('search', '1');
-google.load('jquery', '1.4.1')
+if (!window.jQuery) {
+    google.load('jquery', '1.4.2');
+}
 
 google.setOnLoadCallback(function() {
-    var $ = jQuery.noConflict();
+    var $;
+    if (window.jQuery) {
+        $ = window.jQuery;
+    } else {
+        $ = jQuery.noConflict();
+    }
     var className = "googleimagessearchinput";
     var searchControl = new google.search.SearchControl();
     var imageSearch = new google.search.ImageSearch();

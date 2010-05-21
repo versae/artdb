@@ -1,8 +1,15 @@
 google.load('search', '1');
-google.load('jquery', '1.3.2')
+if (!window.jQuery) {
+    google.load('jquery', '1.4.2');
+}
 
 google.setOnLoadCallback(function() {
-    var $ = jQuery.noConflict();
+    var $;
+    if (window.jQuery) {
+        $ = window.jQuery;
+    } else {
+        $ = jQuery.noConflict();
+    }
     var className = "olwidgetgooglemapssearch";
     var searchControl = new google.search.SearchControl();
     var localSearch = new google.search.LocalSearch();

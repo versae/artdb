@@ -45,11 +45,10 @@ class GeospatialReferenceAdmin(GeoModelAdmin):
     class Media:
         js = ('http://openlayers.org/api/2.8/OpenLayers.js',
               'http://openstreetmap.org/openlayers/OpenStreetMap.js',
-              '%sjs/olwidget.js' % settings.MEDIA_URL,
+              '%solwidget/js/olwidget.js' % settings.MEDIA_URL,
               'http://maps.google.com/maps?file=api&v=2&key=%s&sensor=true' \
-              % settings.GOOGLE_MAPS_API_KEY,
-              'http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=',)
-        css = {'all': ('%scss/olwidget.css' % settings.MEDIA_URL, )}
+              % settings.GOOGLE_MAPS_API_KEY)
+        css = {'all': ('%solwidget/css/olwidget.css' % settings.MEDIA_URL, )}
 
     form = GeospatialReferenceAdminForm
     verbose_name = _(u"References")
@@ -71,8 +70,7 @@ class GeospatialReferenceAdmin(GeoModelAdmin):
     options = {
         'layers': ['google.hybrid', 'google.streets', 'google.physical',
                    'google.satellite', 'osm.mapnik', 'osm.osmarender',
-                   've.road', 've.shaded', 've.aerial', 've.hybrid', 'wms.map',
-                   'wms.nasa', 'yahoo.map'],
+                   've.road', 've.shaded', 've.aerial', 've.hybrid'],
         'map_options': {
             'controls': ['LayerSwitcher', 'Navigation', 'PanZoom',
                          'Attribution', 'Scale', 'ScaleLine'],
