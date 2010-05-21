@@ -88,5 +88,6 @@ def artworks_json(request):
     return HttpResponse(dumps(data), mimetype=mimetype)
 
 
-def artworks_history(request):
+def artworks_history(request):  
+    """Used for Exhibit to safe a navigation history."""
     return HttpResponse(u"")
