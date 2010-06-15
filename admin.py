@@ -4,9 +4,9 @@ from django.contrib import admin
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin
 
-from artworks.models import Artwork, ArtworkCreator, Virgin, Serie
-from artworks.admin import (ArtworkAdmin, ArtworkCreatorAdmin, SerieAdmin,
-                            VirginAdmin)
+from artworks.models import Artwork, Virgin, Serie # ArtworkCreator
+from artworks.admin import (ArtworkAdmin, SerieAdmin,
+                            VirginAdmin) # ArtworkCreatorAdmin
 from base.models import BibliographicReference, GeospatialReference, Image
 from base.admin import (BibliographicReferenceAdmin, GeospatialReferenceAdmin,
                         ImageAdmin)

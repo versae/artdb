@@ -10,7 +10,9 @@ from creators.models import Creator
 
 class Serie(models.Model):
     title = models.CharField(_(u'Title'), max_length=250)
-    notes = models.TextField(_(u'Notes'))
+    notes = models.TextField(_(u'Notes'), blank=True, null=True)
+    # Migration
+    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
 
     def __unicode__(self):
         return self.title
@@ -18,11 +20,16 @@ class Serie(models.Model):
 
 class Virgin(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
-    place = models.ForeignKey(GeospatialReference, verbose_name=_(u'place'),
-                              blank=True, null=True)
+    apparition_place = models.ForeignKey(GeospatialReference,
+                                         verbose_name=_(u'apparition place'),
+                                         blank=True, null=True)
     apparition_date = models.DateField(_(u'Apparition date'), blank=True,
                                        null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
+    # Migration
+    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
+    fm_apparition_place = models.TextField(_(u'Filemaker apparition place'),
+                                           blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -68,14 +75,26 @@ class Artwork(models.Model):
                                         verbose_name=_(u'references'),
                                         blank=True, null=True)
     size = models.CharField(_(u'Size'), max_length=150, blank=True, null=True)
-    serie = models.ForeignKey(Serie, verbose_name=_(u'artwork serie'),
+    serie = models.ForeignKey(Serie, verbose_name=_(u'serie'),
                               blank=True, null=True)
     input_date = models.DateTimeField(_(u'Input date'), auto_now_add=True,
                                       blank=True, null=True)
-#    creators = models.ManyToManyField(Creator, verbose_name=_(u"Creators"),
-#                                      through='ArtworkCreator',
-#                                      blank=True, null=True)
+    creators = models.ManyToManyField(Creator, verbose_name=_(u"Creators"),
+                                      blank=True, null=True)
     user = models.ForeignKey(User, verbose_name=_(u'user'))
+    # Migration
+    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
+    fm_original_place = models.TextField(_(u'Filemaker original place'),
+                                         blank=True, null=True)
+    fm_current_place = models.TextField(_(u'Filemaker current place'),
+                                        blank=True, null=True)
+    fm_serie = models.IntegerField(_(u'Filemaker serie'),
+                                   blank=True, null=True)
+    fm_inventory = models.TextField(_(u'Filemaker inventory number'),
+                                    blank=True, null=True)
+    fm_descriptors = models.TextField(_(u'Filemaker descriptor'),
+                                      blank=True, null=True)
+
     objects = ArtworkManager()
 
     def __unicode__(self):
@@ -94,17 +113,22 @@ class ArtworkVirgin(models.Model):
     ethnic = models.CharField(_(u'Ethnic'), max_length=200, blank=True,
                               null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
+    # Migration
+    fm_artwork_id = models.IntegerField(_(u'Filemaker Artwork ID'),
+                                       blank=True, null=True)
+    fm_virgin_id = models.IntegerField(_(u'Filemaker Virgin ID'),
+                                       blank=True, null=True)
 
     def __unicode__(self):
         return _(u"%s in %s") % (self.virgin.name, self.artwork.title)
 
 
-class ArtworkCreator(models.Model):
-    artwork = models.ForeignKey(Artwork, verbose_name=_(u'artwork'))
-    creator = models.ForeignKey(Creator, verbose_name=_(u'creator'))
+#class ArtworkCreator(models.Model):
+#    artwork = models.ForeignKey(Artwork, verbose_name=_(u'artwork'))
+#    creator = models.ForeignKey(Creator, verbose_name=_(u'creator'))
 
-    class Meta:
-        verbose_name_plural = _(u'Artworks by creators')
+#    class Meta:
+#        verbose_name_plural = _(u'Artworks by creators')
 
-    def __unicode__(self):
-        return _(u"%s by %s") % (self.artwork.title, self.creator.name)
+#    def __unicode__(self):
+#        return _(u"%s by %s") % (self.artwork.title, self.creator.name)

@@ -68,3 +68,7 @@
 .manytomany_searchinput span.item_id {
     color: #999999;
 }
+
+.vAutocompleteWidget {
+    display: none;
+}
