@@ -24,7 +24,6 @@ class School(models.Model):
                                    blank=True, null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
     # Migration
-    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
     fm_place = models.TextField(_(u'Filemaker place'), blank=True, null=True)
 
     def __unicode__(self):
@@ -68,13 +67,10 @@ class Creator(models.Model):
                                       blank=True, null=True)
     user = models.ForeignKey(User, verbose_name=_(u'user'))
     # Migration
-    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
     fm_birth_place = models.TextField(_(u'Filemaker birth place'),
                                       blank=True, null=True)
     fm_death_place = models.TextField(_(u'Filemaker death place'),
                                       blank=True, null=True)
-    fm_school_id = models.IntegerField(_(u'Filemaker school ID'),
-                                       blank=True, null=True)
     fm_bibliography = models.TextField(_(u'Filemaker bibliography'),
                                        blank=True, null=True)
     fm_descriptors = models.TextField(_(u'Filemaker descriptors'),
@@ -87,14 +83,14 @@ class Creator(models.Model):
 class WorkingHistory(models.Model):
     creator = models.ForeignKey(Creator, verbose_name=_(u'creator'))
     place = models.ForeignKey(GeospatialReference,
-                              verbose_name=_(u'place'))
+                              verbose_name=_(u'place'),
+                              blank=True, null=True)
     start_year = models.IntegerField(_(u'Start year'), max_length=4,
                                      blank=True, null=True)
     end_year = models.IntegerField(_(u'End year'), max_length=4,
                                    blank=True, null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
     # Migration
-    fm_creator_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
     fm_place = models.TextField(_(u'Filemaker place'),
                                 blank=True, null=True)
 
@@ -102,4 +98,7 @@ class WorkingHistory(models.Model):
         verbose_name_plural = _(u'Working histories')
 
     def __unicode__(self):
-        return _(u"%s at %s") % (self.creator.name, self.place.title)
+        if self.place:
+            return _(u"%s at %s") % (self.creator.name, self.place.title)
+        else:
+            return _(u"%s") % self.creator.name

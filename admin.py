@@ -4,6 +4,9 @@ from django.contrib import admin
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin
 
+from django_descriptors.models import Descriptor
+from django_descriptors.admin import DescriptorAdmin
+
 from artworks.models import Artwork, Virgin, Serie # ArtworkCreator
 from artworks.admin import (ArtworkAdmin, SerieAdmin,
                             VirginAdmin) # ArtworkCreatorAdmin
@@ -23,6 +26,8 @@ class AdminSite(admin.AdminSite):
 def setup_admin():
     admin_site.register(User, UserAdmin)
     admin_site.register(Group, admin.ModelAdmin)
+
+    admin_site.register(Descriptor, DescriptorAdmin)
 
     admin_site.register(BibliographicReference, BibliographicReferenceAdmin)
     admin_site.register(GeospatialReference, GeospatialReferenceAdmin)

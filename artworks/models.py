@@ -11,8 +11,6 @@ from creators.models import Creator
 class Serie(models.Model):
     title = models.CharField(_(u'Title'), max_length=250)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
-    # Migration
-    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
 
     def __unicode__(self):
         return self.title
@@ -27,7 +25,6 @@ class Virgin(models.Model):
                                        null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
     # Migration
-    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
     fm_apparition_place = models.TextField(_(u'Filemaker apparition place'),
                                            blank=True, null=True)
 
@@ -75,6 +72,8 @@ class Artwork(models.Model):
                                         verbose_name=_(u'references'),
                                         blank=True, null=True)
     size = models.CharField(_(u'Size'), max_length=150, blank=True, null=True)
+    inventory = models.CharField(_(u'Inventory number'), max_length=150,
+                                 blank=True, null=True)
     serie = models.ForeignKey(Serie, verbose_name=_(u'serie'),
                               blank=True, null=True)
     input_date = models.DateTimeField(_(u'Input date'), auto_now_add=True,
@@ -83,16 +82,13 @@ class Artwork(models.Model):
                                       blank=True, null=True)
     user = models.ForeignKey(User, verbose_name=_(u'user'))
     # Migration
-    fm_id = models.IntegerField(_(u'Filemaker ID'), blank=True, null=True)
     fm_original_place = models.TextField(_(u'Filemaker original place'),
                                          blank=True, null=True)
     fm_current_place = models.TextField(_(u'Filemaker current place'),
                                         blank=True, null=True)
-    fm_serie = models.IntegerField(_(u'Filemaker serie'),
-                                   blank=True, null=True)
     fm_inventory = models.TextField(_(u'Filemaker inventory number'),
                                     blank=True, null=True)
-    fm_descriptors = models.TextField(_(u'Filemaker descriptor'),
+    fm_descriptors = models.TextField(_(u'Filemaker descriptors'),
                                       blank=True, null=True)
 
     objects = ArtworkManager()
@@ -113,11 +109,6 @@ class ArtworkVirgin(models.Model):
     ethnic = models.CharField(_(u'Ethnic'), max_length=200, blank=True,
                               null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
-    # Migration
-    fm_artwork_id = models.IntegerField(_(u'Filemaker Artwork ID'),
-                                       blank=True, null=True)
-    fm_virgin_id = models.IntegerField(_(u'Filemaker Virgin ID'),
-                                       blank=True, null=True)
 
     def __unicode__(self):
         return _(u"%s in %s") % (self.virgin.name, self.artwork.title)

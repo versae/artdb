@@ -30,8 +30,8 @@ def artworks_json(request):
     else:
         artworks = Artwork.objects.all()
     for artwork in artworks:
-        creators = [creator.creator.name
-                    for creator in artwork.artworkcreator_set.all()]
+        creators = [creator.name
+                    for creator in artwork.creators.all()]
         images = [image for image in artwork.images.all()]
         artwork_dic = {
             "identifier": artwork.id,

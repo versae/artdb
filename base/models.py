@@ -19,7 +19,7 @@ class BibliographicReference(models.Model):
     title = models.TextField(_(u'Title'))
     url = models.URLField(_(u'URL'), verify_exists=False, blank=True,
                           null=True)
-    isbn = models.IntegerField(_(u'ISBN'), max_length=30, blank=True,
+    isbn = models.CharField(_(u'ISBN'), max_length=30, blank=True,
                                null=True)
     notes = models.TextField(_(u'Notes'), blank=True, null=True)
 

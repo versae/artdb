@@ -4,6 +4,7 @@ from django.core import urlresolvers
 from django.contrib import admin
 from django.utils.translation import ugettext as _
 
+from django_descriptors.admin import DescribedItemInline
 from django_extensions.admin import AutocompleteAdmin
 
 from artworks.models import Artwork, ArtworkVirgin #, ArtworkCreator
@@ -37,14 +38,14 @@ class ArtworkVirginInline(admin.TabularInline):
                 'fields': ('main_theme', 'miraculous', 'ethnic'),
             }),
     )
-    raw_id_fields = ('artwork', )
+    raw_id_fields = ('artwork', 'virgin')
 
 
 class ArtworkCreatorInline(admin.StackedInline):
 #    model = ArtworkCreator
     model = Artwork.creators.through
     extra = 1
-#    raw_id_fields = ('artwork', 'creator')
+    raw_id_fields = ('artwork', 'creator')
 
 
 class ArtworkAdminForm(forms.ModelForm):
@@ -56,19 +57,24 @@ class ArtworkAdminForm(forms.ModelForm):
 class ArtworkAdmin(AutocompleteAdmin):
 
     form = ArtworkAdminForm
-    inlines = (ArtworkVirginInline, )
+    inlines = (ArtworkVirginInline, DescribedItemInline)
 #    inlines = (ArtworkCreatorInline, ArtworkVirginInline)
     fieldsets = (
             (None, {
-                'fields': ('title', 'serie', 'creators', 'creation_year_start',
-                           'creation_year_end', 'inscription',
-                           'original_place', 'current_place'),
+                'fields': ('title', 'serie', 'creators',
+                           'creation_year_start', 'creation_year_end',
+                           'fm_inventory', 'inventory', 'inscription',
+                           'fm_original_place', 'original_place',
+                           'fm_current_place', 'current_place',
+                           'fm_descriptors'),
             }),
             (_(u'More info'), {
                 'classes': ('collapse', ),
                 'fields': ('size', 'images', 'references', 'notes'),
             }),
     )
+    readonly_fields = ('fm_original_place', 'fm_current_place',
+                       'fm_inventory', 'fm_descriptors')
     exclude = ('user', )
     search_fields = ('title', 'creation_year_start', 'creation_year_end',
                      'inscription', 'notes', 'size', 'serie__title')
@@ -80,8 +86,8 @@ class ArtworkAdmin(AutocompleteAdmin):
         'images': ('url', 'image'),
         'references': ('url', 'title', 'isbn'),
     }
-    list_display = ('title', 'creation_year', 'creators', 'inscription',
-                    'notes', 'size')
+    list_display = ('title', 'creation_year', 'creators_list',
+                    'truncated_inscription', 'truncated_notes', 'size')
 #    raw_id_fields = ('images', )
 
     def save_model(self, request, obj, form, change):
@@ -89,21 +95,40 @@ class ArtworkAdmin(AutocompleteAdmin):
         obj.save()
 
     def creation_year(self, obj):
-        return u"%s-%s" % (obj.creation_year_start, obj.creation_year_end)
+        if obj.creation_year_start and obj.creation_year_end:
+            return u"%s-%s" % (obj.creation_year_start, obj.creation_year_end)
+        elif obj.creation_year_start and not obj.creation_year_end:
+            return u"%s~" % obj.creation_year_start
+        elif not obj.creation_year_start and obj.creation_year_end:
+            return u"~%s" % obj.creation_year_end
+        else:
+            return u""
     creation_year.short_description = _(u"Creation")
 
-    def creators(self, obj):
+    def creators_list(self, obj):
         artwork_creators = obj.creators.all()
         creators = []
         for artwork_creator in artwork_creators:
             admin_url = urlresolvers.reverse("admin:creators_creator_change",
-                                             args=[artwork_creator.creator.id])
+                                             args=[artwork_creator.id])
             creators.append("<a href='%s'>%s</a>" \
                             % (admin_url,
-                               artwork_creator.creator.name))
+                               artwork_creator.name))
         return " / ".join(creators)
-    creators.allow_tags = True
-    creators.short_description = _(u"Creators")
+    creators_list.allow_tags = True
+    creators_list.short_description = _(u"Creators")
+
+    def truncated_inscription(self, obj):
+        return self.truncated(obj.inscription)
+
+    def truncated_notes(self, obj):
+        return self.truncated(obj.notes)
+
+    def truncated(self, obj):
+        if len(obj) > 150:
+            return u"%s..." % obj[:150]
+        else:
+            return u""
 
 
 #class ArtworkCreatorAdmin(AutocompleteAdmin):
@@ -133,6 +158,11 @@ class ArtworkAdmin(AutocompleteAdmin):
 class SerieAdmin(admin.ModelAdmin):
 
     inlines = (ArtworkInline, )
+    fieldsets = (
+            (None, {
+                'fields': ('title', 'notes'),
+            }),
+    )
     search_fields = ('title', 'notes')
     list_display = ('title', 'artworks', 'notes')
 
@@ -141,11 +171,22 @@ class SerieAdmin(admin.ModelAdmin):
     artworks.short_description = _(u"# Artworks")
 
 
-class VirginAdmin(admin.ModelAdmin):
+class VirginAdmin(AutocompleteAdmin):
 
     inlines = (ArtworkVirginInline, )
+    fieldsets = (
+            (None, {
+                'fields': ('name',
+                           'fm_apparition_place', 'apparition_place',
+                           'apparition_date', 'notes'),
+            }),
+    )
+    readonly_fields = ('fm_apparition_place', )
     search_fields = ('name', 'apparition_place', 'apparition_date')
     list_display = ('name', 'apparition_place', 'artworks', 'apparition_date')
+    related_search_fields = {
+        'apparition_place': ('title', 'address', 'description'),
+    }
 
     def artworks(self, obj):
         return obj.artwork_set.count()

@@ -20,6 +20,7 @@ echo "Installing fixtures"
 ./manage.py loaddata base/fixtures/data.xml
 ./manage.py loaddata creators/fixtures/data.xml
 ./manage.py loaddata artworks/fixtures/data.xml
+./manage.py loaddata base/fixtures/descriptors.xml
 # ./manage.py migrate
 
 if (( $? )) ; then
