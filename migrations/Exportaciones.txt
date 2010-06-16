@@ -1,0 +1,35 @@
+FMSchool
+--------
+IDFM, nombre, Lugar, Fecha_Inicio, Fecha_Fin
+
+FMVirgin
+--------
+IDFM, nombre, Lugar_aparicion, Fecha_aparicion, Notas
+
+FMSerie
+-------
+IDFM, Nombre, notas
+
+FMCreator
+---------
+IDFM, Nombre, Género, Fecha_Nac, Lugar_Nac, Fecha_Muerte, Lugar_Muerte, IDSchool, Actividad_Inicio, Actividad_Fin, Notas, Bibliografía, Descriptores
+
+FMWorkingHistory
+----------------
+IDFMAutor, Lugar, Fecha_Inicio, Fecha_Fin
+
+FMArtworks
+----------
+IDFM, Titulo, Creation_year_start, Creation_year_end, inscription, notes, Original_place: (Nombre lugar + Pais + Provincia + Poblacion), Current_place: (Nombre lugar + Pais + Provincia + Poblacion), size, serie, NºInventario, Descriptores
+
+FMArtworksCreator
+-----------------
+IDObra, IDAutor
+
+FMArtworksVirgin
+----------------
+IDObra, IDVirgen, episodio, Main_theme, Milagrosa, etnia
+
+FMMaestros
+----------
+IDDiscipulo, IDMaestro

@@ -1,2 +1,5 @@
 *.xml
 local_settings.py
+*.csv
+django_descriptors
+media/django_descriptors
