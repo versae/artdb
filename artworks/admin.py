@@ -120,9 +120,11 @@ class ArtworkAdmin(AutocompleteAdmin):
 
     def truncated_inscription(self, obj):
         return self.truncated(obj.inscription)
+    truncated_inscription.short_description = _(u"Inscription")
 
     def truncated_notes(self, obj):
         return self.truncated(obj.notes)
+    truncated_notes.short_description = _(u"Notes")
 
     def truncated(self, obj):
         if len(obj) > 150:

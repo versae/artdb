@@ -111,7 +111,7 @@ class SchoolAdmin(AutocompleteAdmin):
         artworks_count = 0
         creators = Creator.objects.filter(school=obj)
         for creator in creators:
-            artworks_count += creator.artworks_set.count()
+            artworks_count += creator.artwork_set.count()
         return artworks_count
     artworks_num.allow_tags = True
     artworks_num.short_description = _(u"# Artworks")
