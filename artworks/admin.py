@@ -94,6 +94,15 @@ class ArtworkAdmin(AutocompleteAdmin):
         obj.user = request.user
         obj.save()
 
+    # Needed in order to save user in DescribedItem
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if isinstance(instance, DescribedItemInline.model):
+                instance.user = request.user
+                instance.save()
+        formset.save_m2m()
+
     def creation_year(self, obj):
         if obj.creation_year_start and obj.creation_year_end:
             return u"%s-%s" % (obj.creation_year_start, obj.creation_year_end)
