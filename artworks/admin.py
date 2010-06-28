@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from django import forms
 from django.core import urlresolvers
 from django.contrib import admin
@@ -87,11 +89,14 @@ class ArtworkAdmin(AutocompleteAdmin):
         'references': ('url', 'title', 'isbn'),
     }
     list_display = ('title', 'creation_year', 'creators_list',
-                    'truncated_inscription', 'truncated_notes', 'size')
+                    'truncated_inscription', 'truncated_notes', 'size',
+                    'user', 'input_date')
+    list_filter = ('user', 'input_date')
 #    raw_id_fields = ('images', )
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
+        obj.input_date = datetime.now()
         obj.save()
 
     # Needed in order to save user in DescribedItem

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib import admin
 from django.utils.translation import ugettext as _
@@ -41,10 +43,13 @@ class CreatorAdmin(AutocompleteAdmin):
         'images': ('url', 'image'),
         'references': ('url', 'title', 'isbn'),
     }
-    list_display = ('name', 'gender', 'life', 'activity', 'artworks', 'school')
+    list_display = ('name', 'gender', 'life', 'activity', 'artworks', 'school',
+                    'user', 'input_date')
+    list_filter = ('user', 'input_date')
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
+        obj.input_date = datetime.now()
         obj.save()
 
     def life(self, obj):
