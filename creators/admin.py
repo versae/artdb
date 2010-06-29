@@ -52,6 +52,15 @@ class CreatorAdmin(AutocompleteAdmin):
         obj.input_date = datetime.now()
         obj.save()
 
+    # Needed in order to save user in DescribedItem
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if isinstance(instance, DescribedItemInline.model):
+                instance.user = request.user
+                instance.save()
+        formset.save_m2m()
+
     def life(self, obj):
         if obj.birth_year and obj.death_year:
             return u"%s-%s" % (obj.birth_year, obj.death_year)
@@ -75,7 +84,7 @@ class CreatorAdmin(AutocompleteAdmin):
     activity.short_description = _(u"Activity period")
 
     def artworks(self, obj):
-        artworks_num = obj.artworks_set.count()
+        artworks_num = obj.artwork_set.count()
         return artworks_num
     artworks.allow_tags = True
     artworks.short_description = _(u"# Artworks")
