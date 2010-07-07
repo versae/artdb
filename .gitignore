@@ -1,5 +1,7 @@
 *.xml
 local_settings.py
 *.csv
+*.list
 django_descriptors
 media/django_descriptors
+backups/*.json

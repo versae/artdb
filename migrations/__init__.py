@@ -5,6 +5,9 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 
+from django_descriptors.models import DescribedItem, Descriptor
+
+from base.models import GeospatialReference
 from artworks.models import Artwork, ArtworkVirgin, Serie, Virgin
 from creators.models import Creator, School, WorkingHistory
 
@@ -304,3 +307,288 @@ def migrate_all():
     print "- %s relaciones entre Artworks y Virgins" \
           % ArtworkVirgin.objects.count()
     print "Completado"
+
+
+def update_artworks_decriptors():
+    """
+    artwotk_id:descriptor_id,descriptor_id,descriptor_id=value,
+    """
+    print "Actualizando descriptores de Artworks"
+    admin_user = User.objects.get(id=1)
+    f = open("migrations/artwork_descriptors.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'artworks': set(),
+        'descriptors': set(),
+    }
+    while line:
+        artwork_id, descriptors = line.strip().split(":")
+        try:
+            artwork = Artwork.objects.get(id=int(artwork_id))
+            descriptor_tuples = descriptors.split(",")
+            for descriptor_tuple in descriptor_tuples:
+                if descriptor_tuple:
+                    if "=" in descriptor_tuple:
+                        descriptor_id, value = descriptor_tuple.split("=")
+                    else:
+                        descriptor_id, value = int(descriptor_tuple), u""
+                    try:
+                        descriptor = Descriptor.objects.get(id=descriptor_id)
+                    except Descriptor.DoesNotExist:
+                        errors['descriptors'].add(descriptor_id)
+                    di = DescribedItem()
+                    di.content_object = artwork
+                    di.descriptor = descriptor
+                    di.value = value[:250]
+                    di.user = admin_user
+                    di.save()
+                    count += 1
+        except Artwork.DoesNotExist:
+            errors['artworks'].add(creator_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def update_creators_decriptors():
+    """
+    creator_id:descriptor_id,descriptor_id,descriptor_id=value,
+    """
+    print "Actualizando descriptores de Creators"
+    admin_user = User.objects.get(id=1)
+    f = open("migrations/creator_descriptors.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'creators': set(),
+        'descriptors': set(),
+    }
+    while line:
+        creator_id, descriptors = line.strip().split(":")
+        try:
+            creator = Creator.objects.get(id=int(creator_id))
+            descriptor_tuples = descriptors.split(",")
+            for descriptor_tuple in descriptor_tuples:
+                if descriptor_tuple:
+                    if "=" in descriptor_tuple:
+                        descriptor_id, value = descriptor_tuple.split("=")
+                    else:
+                        descriptor_id, value = int(descriptor_tuple), u""
+                    try:
+                        descriptor = Descriptor.objects.get(id=descriptor_id)
+                    except Descriptor.DoesNotExist:
+                        errors['descriptors'].add(descriptor_id)
+                    di = DescribedItem()
+                    di.content_object = creator
+                    di.descriptor = descriptor
+                    di.value = value[:250]
+                    di.user = admin_user
+                    di.save()
+                    count += 1
+        except Creator.DoesNotExist:
+            errors['creators'].add(creator_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def update_artwork_original_places_geos():
+    """
+    geos_id:artwork_id,artwork_id,
+    """
+    print "Actualizando referencias geoespaciales de Artworks__original_place"
+    f = open("migrations/geospatialreference_artwork_original_places.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'geos': set(),
+        'artworks': set(),
+    }
+    while line:
+        geos_id, artworks = line.strip().split(":")
+        try:
+            geos = GeospatialReference.objects.get(id=int(geos_id))
+            for artwork_id in artworks.split(","):
+                if artwork_id:
+                    artwork_id = int(artwork_id)
+                    try:
+                        artwork = Artwork.objects.get(id=artwork_id)
+                    except Artwork.DoesNotExist:
+                        errors['artworks'].add(artwork_id)
+                    artwork.original_place = geos
+                    artwork.save()
+                    count += 1
+        except GeospatialReference.DoesNotExist:
+            errors['geos'].add(geos_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def update_artwork_current_places_geos():
+    """
+    geos_id:artwork_id,artwork_id,
+    """
+    print "Actualizando referencias geoespaciales de Artworks__current_place"
+    f = open("migrations/geospatialreference_artwork_current_places.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'geos': set(),
+        'artworks': set(),
+    }
+    while line:
+        geos_id, artworks = line.strip().split(":")
+        try:
+            geos = GeospatialReference.objects.get(id=int(geos_id))
+            for artwork_id in artworks.split(","):
+                if artwork_id:
+                    artwork_id = int(artwork_id)
+                    try:
+                        artwork = Artwork.objects.get(id=artwork_id)
+                    except Artwork.DoesNotExist:
+                        errors['artworks'].add(artwork_id)
+                    artwork.current_place = geos
+                    artwork.save()
+                    count += 1
+        except GeospatialReference.DoesNotExist:
+            errors['geos'].add(geos_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def update_creator_death_places_geos():
+    """
+    geos_id:creator_id,creator_id,
+    """
+    print "Actualizando referencias geoespaciales de Creators__death_place"
+    f = open("migrations/geospatialreference_creator_death_places.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'geos': set(),
+        'creators': set(),
+    }
+    while line:
+        geos_id, creators = line.strip().split(":")
+        try:
+            geos = GeospatialReference.objects.get(id=int(geos_id))
+            for creator_id in creators.split(","):
+                if creator_id:
+                    creator_id = int(creator_id)
+                    try:
+                        creator = Creator.objects.get(id=creator_id)
+                    except Creator.DoesNotExist:
+                        errors['creators'].add(creator_id)
+                    creator.death_place = geos
+                    creator.save()
+                    count += 1
+        except GeospatialReference.DoesNotExist:
+            errors['geos'].add(geos_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def update_creator_birth_places_geos():
+    """
+    geos_id:creator_id,creator_id,
+    """
+    print "Actualizando referencias geoespaciales de Creators__birth_place"
+    f = open("migrations/geospatialreference_creator_birth_places.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'geos': set(),
+        'creators': set(),
+    }
+    while line:
+        geos_id, creators = line.strip().split(":")
+        try:
+            geos = GeospatialReference.objects.get(id=int(geos_id))
+            for creator_id in creators.split(","):
+                if creator_id:
+                    creator_id = int(creator_id)
+                    try:
+                        creator = Creator.objects.get(id=creator_id)
+                    except Creator.DoesNotExist:
+                        errors['creators'].add(creator_id)
+                    creator.birth_place = geos
+                    creator.save()
+                    count += 1
+        except GeospatialReference.DoesNotExist:
+            errors['geos'].add(geos_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def update_workinghistory_geos():
+    """
+    workinghistory_id:geos_id,
+    """
+    print "Actualizando referencias geoespaciales de WorkingHostory"
+    f = open("migrations/workinghistory_geospatialreferences.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'workinghistories': set(),
+        'geos': set(),
+    }
+    while line:
+        workinghistory_id, geos_list = line.strip().split(":")
+        try:
+            workinghistory = WorkingHistory.objects.get(
+                id=int(workinghistory_id)
+            )
+            for geos_id in geos_list.split(","):
+                if geos_id:
+                    geos_id = int(geos_id)
+                    try:
+                        geos = GeospatialReference.objects.get(id=geos_id)
+                    except GeospatialReference.DoesNotExist:
+                        errors['geos'].add(geos_id)
+                    workinghistory.place = geos
+                    workinghistory.save()
+                    count += 1
+        except WorkingHistory.DoesNotExist:
+            errors['workinghistories'].add(workinghistory_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def update_all():
+    print "Comenzando actualización..."
+    c1, e1 = update_artworks_decriptors()
+    print "- Relaciones: %s, Errores: %s" % (c1, e1)
+    c2, e2 = update_creators_decriptors()
+    print "- Relaciones: %s, Errores: %s" % (c2, e2)
+    c3, e3 = update_artwork_original_places_geos()
+    print "- Relaciones: %s, Errores: %s" % (c3, e3)
+    c4, e4 = update_artwork_current_places_geos()
+    print "- Relaciones: %s, Errores: %s" % (c4, e4)
+    c5, e5 = update_creator_death_places_geos()
+    print "- Relaciones: %s, Errores: %s" % (c5, e5)
+    c6, e6 = update_creator_birth_places_geos()
+    print "- Relaciones: %s, Errores: %s" % (c6, e6)
+    c7, e7 = update_workinghistory_geos()
+    print "- Relaciones: %s, Errores: %s" % (c7, e7)
+    print "Completado (%s relaciones)" % reduce(lambda x, y: x + y,
+                                                [c1, c2, c3, c4, c5, c6, c7])
