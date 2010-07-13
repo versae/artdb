@@ -50,6 +50,11 @@ class ArtworkCreatorInline(admin.StackedInline):
     raw_id_fields = ('artwork', 'creator')
 
 
+class ArtworkBibliographyInline(admin.TabularInline):
+    model = Artwork.references.through
+    extra = 1
+    raw_id_fields = ('artwork', 'bibliography')
+
 class ArtworkAdminForm(forms.ModelForm):
 
     class Meta:
@@ -59,7 +64,7 @@ class ArtworkAdminForm(forms.ModelForm):
 class ArtworkAdmin(AutocompleteAdmin):
 
     form = ArtworkAdminForm
-    inlines = (ArtworkVirginInline, DescribedItemInline)
+    inlines = (ArtworkVirginInline, ArtworkBibliographyInline, DescribedItemInline)
 #    inlines = (ArtworkCreatorInline, ArtworkVirginInline)
     fieldsets = (
             (None, {
@@ -72,12 +77,12 @@ class ArtworkAdmin(AutocompleteAdmin):
             }),
             (_(u'More info'), {
                 'classes': ('collapse', ),
-                'fields': ('size', 'images', 'references', 'notes'),
+                'fields': ('size', 'images', 'notes'),
             }),
     )
     readonly_fields = ('fm_original_place', 'fm_current_place',
                        'fm_inventory', 'fm_descriptors')
-    exclude = ('user', )
+    exclude = ('user', 'references')
     search_fields = ('title', 'creation_year_start', 'creation_year_end',
                      'inscription', 'notes', 'size', 'serie__title')
     related_search_fields = {

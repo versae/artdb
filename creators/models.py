@@ -52,6 +52,7 @@ class Creator(models.Model):
     masters = models.ManyToManyField('self', verbose_name=_(u'masters'),
                                      symmetrical=False, blank=True, null=True)
     references = models.ManyToManyField(BibliographicReference,
+                                        through='CreatorBibliography',
                                         verbose_name=_(u"references"),
                                         blank=True, null=True)
     images = models.ManyToManyField(Image, verbose_name=_(u"images"),
@@ -102,3 +103,17 @@ class WorkingHistory(models.Model):
             return _(u"%s at %s") % (self.creator.name, self.place.title)
         else:
             return _(u"%s") % self.creator.name
+
+
+class CreatorBibliography(models.Model):
+    creator = models.ForeignKey(Creator, verbose_name=_(u'creator'))
+    bibliography = models.ForeignKey(BibliographicReference,
+        verbose_name=_(u'bibliographic reference'))
+    source = models.CharField(_(u'Source'), max_length=250, blank=True,
+                              null=True)
+
+    class Meta:
+        verbose_name_plural = _(u'Creators bibliographic references')
+
+    def __unicode__(self):
+        return _(u"%s @ %s") % (self.creator.name, self.bibliography.title)

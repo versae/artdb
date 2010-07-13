@@ -69,6 +69,7 @@ class Artwork(models.Model):
     images = models.ManyToManyField(Image, verbose_name=_(u'images'),
                                     blank=True, null=True)
     references = models.ManyToManyField(BibliographicReference,
+                                        through='ArtworkBibliography',
                                         verbose_name=_(u'references'),
                                         blank=True, null=True)
     size = models.CharField(_(u'Size'), max_length=150, blank=True, null=True)
@@ -114,12 +115,15 @@ class ArtworkVirgin(models.Model):
         return _(u"%s in %s") % (self.virgin.name, self.artwork.title)
 
 
-#class ArtworkCreator(models.Model):
-#    artwork = models.ForeignKey(Artwork, verbose_name=_(u'artwork'))
-#    creator = models.ForeignKey(Creator, verbose_name=_(u'creator'))
+class ArtworkBibliography(models.Model):
+    artwork = models.ForeignKey(Artwork, verbose_name=_(u'artwork'))
+    bibliography = models.ForeignKey(BibliographicReference,
+        verbose_name=_(u'bibliographic reference'))
+    source = models.CharField(_(u'Source'), max_length=250, blank=True,
+                              null=True)
 
-#    class Meta:
-#        verbose_name_plural = _(u'Artworks by creators')
+    class Meta:
+        verbose_name_plural = _(u'Artworks bibliographic references')
 
-#    def __unicode__(self):
-#        return _(u"%s by %s") % (self.artwork.title, self.creator.name)
+    def __unicode__(self):
+        return _(u"%s @ %s") % (self.artwork.title, self.bibliography.title)

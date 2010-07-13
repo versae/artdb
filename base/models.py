@@ -17,6 +17,7 @@ class Image(models.Model):
 
 class BibliographicReference(models.Model):
     title = models.TextField(_(u'Title'))
+    authors = models.TextField(_(u'Authors'))
     url = models.URLField(_(u'URL'), verify_exists=False, blank=True,
                           null=True)
     isbn = models.CharField(_(u'ISBN'), max_length=30, blank=True,

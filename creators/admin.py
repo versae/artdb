@@ -12,9 +12,16 @@ from artworks.admin import ArtworkCreatorInline
 from creators.models import Creator
 
 
+class CreatorBibliographyInline(admin.TabularInline):
+    model = Creator.references.through
+    extra = 1
+    raw_id_fields = ('creator', 'bibliography')
+
+
 class CreatorAdmin(AutocompleteAdmin):
 
-    inlines = (ArtworkCreatorInline, DescribedItemInline)
+    inlines = (ArtworkCreatorInline, CreatorBibliographyInline,
+               DescribedItemInline)
     fieldsets = (
             (None, {
                 'fields': ('name', 'gender',
@@ -27,12 +34,12 @@ class CreatorAdmin(AutocompleteAdmin):
             (_(u'More info'), {
                 'classes': ('collapse', ),
                 'fields': ('masters', 'images', 'fm_bibliography',
-                           'references', 'notes'),
+                           'notes'),
             }),
     )
     readonly_fields = ('fm_birth_place', 'fm_death_place',
                        'fm_bibliography', 'fm_descriptors')
-    exclude = ('user', )
+    exclude = ('user', 'references')
     search_fields = ('name', 'school__name', 'birth_place__title',
                      'death_place__title')
     related_search_fields = {
