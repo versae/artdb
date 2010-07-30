@@ -1,0 +1,254 @@
+/* public view css */
+
+
+#pvheader {
+height: 38px;
+width: 970px;
+margin: 0px auto;
+position: relative;
+}
+
+#logo {
+position: absolute;
+top: 0px;
+left: 0px;
+}
+
+ul#navBar {
+height: 37px;
+margin: 0px;
+padding: 0px;
+list-style-type: none;
+position: absolute;
+bottom: 0px;
+right: 10px;
+}
+
+ul#navBar li {
+float: left;
+display: block;
+width: auto;
+height: 37px;
+padding: 0px 0px 0px 1px;
+}
+ul#navBar li a:link, ul#navBar li a:visited {
+float: left;
+display: block;
+width: auto;
+margin: 0px;
+height: 25px;
+padding: 5px 8px 5px 8px;
+text-decoration: none;
+font-weight: normal;
+background: url(/media/img/nav_bg.png) repeat-x top left;
+font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+font-size: 1.1em;
+color: #ededed;
+border: none;
+}
+ul#navBar li.current a:link, ul#navBar li.current a:visited {
+background: url(/media/img/nav_hover.png) repeat-x top left;
+}
+ul#navBar li a:hover {
+color: #fff;
+text-decoration: none;
+background: url(/media/img/nav_hover.png) repeat-x top left;
+border: none;
+}
+
+#wrapper {
+width: 961px;
+margin: 0px auto;
+padding: 0px;
+background: url(/media/img/content_bg.png) repeat-y top left;
+}
+
+#secWrapper{
+width: 960px;
+margin: 0px auto;
+padding: 52px 0px 0px 0px;
+background: url(/media/img/content_top.png) no-repeat top left;
+}
+
+#container {
+width: 930px;
+margin: 0px auto;
+padding: 0px 15px 30px 15px;
+background: url(/media/img/content_bottom.png) no-repeat bottom left;
+}
+
+.pvtitle {
+	width: 950px;
+	padding: 5px;
+	text-decoration: none;
+    font-weight: normal;
+    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+    font-size: 1.2em;
+    color: #000000;
+	border-bottom: dashed 1px #504f4f;
+}
+
+#container td {
+    border: none;
+    text-decoration: none;
+    font-weight: normal;
+    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+    font-size: 1em;
+    color: #504f4f;
+}
+
+.hlink:link, .hlink:visited, .boldTxt{
+	color: #000;
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1.05em;
+	
+}
+
+.hlink:hover{
+	text-decoration: underline;
+}
+
+.imgBlock{
+	text-align: right;
+	padding-right: 35px;
+}
+
+#colHeader{
+	text-align: left;
+	border: 1px solid #e5f8aa;
+margin: 0px;
+padding: 6px;
+width: 625px;
+list-style-type: none;
+background: url(/media/img/main_col_bg.png) no-repeat top left #ffffff;
+}
+#colBody{
+	text-align: left;
+border: 1px solid #e5f8aa;
+margin: 0px;
+padding-left: 12px;
+width: 625px;
+list-style-type: none;
+background: #ebfbba;
+font-size: 0.9em;
+}
+#pvcopyright{
+	text-align:center;
+	width: 960px;
+	font-size: 0.7em;
+}
+#record td{
+	height: 30px;
+}
+
+.pvspace {
+	width: 940px;
+	height: 2px;
+    background: #fff;
+}
+
+.pvcolorspace {
+	width: 940px;
+	height: 5px;
+	padding-left: 20px;
+}
+
+.pvbreadcrumb, .pvfooter{
+	width: 940px;
+	height: 16px;
+	padding: 3px 0 3px 20px;
+	background: #504f4f;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 0.9em;
+	font-style: italic;
+	color: #fff;
+}
+
+.pvfooter{
+	width: 930px;
+	text-align: right;
+	padding-right: 10px;
+}
+
+.pvfooter a:link, a:visited{
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1em;
+	font-style: italic;
+	color: #fff;
+}
+
+.pvfooter a:hover{
+	text-decoration: underline;
+}
+
+.pvbreadcrumb a:link, a:visited{
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1em;
+	font-style: italic;
+	color: #fff;
+}
+
+.pvbreadcrumb a:hover{
+	text-decoration: underline;
+}
+
+#preview{
+	position:absolute;
+	border:1px solid #ccc;
+	background:#333;
+	padding:1px;
+	display:none;
+	color:#fff;
+	}
+
+#pvmain { 
+    width: 930px;
+    padding: 20px;
+    background: #fff;
+	border: solid 1px #f0f0f0;
+}
+
+#pvbanner {
+	background: url(/media/img/banner.png) no-repeat;
+	width: 970px;
+	height: 75px;
+	margin-left: 15px;
+}
+
+#pvouter{
+	margin-left: 15px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	width: 940px;
+	height: 25px;
+	background: #000000;
+}
+
+#pvmenu {
+	width: 940px;
+	height: 25px;
+	background: #90ac39;
+}
+
+#pvwrap {
+    width: 970px;
+    margin: 0 auto;
+    background: #fff;
+}
+
+
+#pvwrap h1 {
+	margin-left: 10px;
+	width: 930px;
+	font: 23px/1.6 Palatino, serif;
+    text-indent: 5px;
+    border-bottom: 1px dashed #ddd;
+}
+
+.pvArtImg {
+	height: 170px;
+	width: 150px;
+}

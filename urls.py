@@ -11,6 +11,9 @@ urlpatterns = patterns('',
 
     # artwork
     url(r'^artworks/', include('artworks.urls')),
+    
+    # creator
+    url(r'^creators/', include('creators.urls')),
 
     # map
     url(r'^map/$', direct_to_template, {'template': 'map.html'}, name="map"),
