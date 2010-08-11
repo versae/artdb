@@ -2,15 +2,31 @@
 from django.shortcuts import HttpResponse, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps
-
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from artworks.models import Artwork
+from django.core.urlresolvers import reverse
+
+def artworks_list(request):
+    orderby = None
+    artwork_list = None       
+    orderby = request.GET.get('orderby', None)
+    if orderby is None:
+            orderby = 'title'            
+    artwork_list = Artwork.objects.order_by(orderby)
+    paginator = Paginator(artwork_list, 10)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    artworks = paginator.page(page)
+    return render_to_response('artworks_list.html',
+                              {"artworks": artworks, "order": orderby}, context_instance=RequestContext(request))
 
 
-def artworks_record(request):
-    artwork_id = None
+def artworks_record(request, artwork_id):
+    request.breadcrumbs('Artworks', reverse('artworks_list'))
+    artwork_id = int(artwork_id)
     artwork = None
-    if request.GET and "id" in request.GET:
-        artwork_id = int(request.GET.get("id", 0))
     artwork = Artwork.objects.get(id=artwork_id)
     artwork.fm_descriptors = artwork.fm_descriptors.split(';')
     return render_to_response('artworks.html',

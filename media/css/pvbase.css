@@ -1,5 +1,122 @@
-/* public view css */
+/* CSS for Public View of ArtDB */
 
+.pvtitle {
+	width: 950px;
+	padding: 5px;
+	text-decoration: none;
+    font-weight: normal;
+    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+    font-size: 1.2em;
+    color: #000000;
+	border-bottom: dashed 1px #504f4f;
+}
+
+/* for dropdown in list pages*/
+#pvsort_span{
+	font-size: 0.8em;
+	padding: 5px;
+	float: right;
+ 	vertical-align: middle;	
+}
+
+#pvsort_select{
+	height: 22px;
+	float: right;
+ 	vertical-align: middle;
+	border: solid 1px #dbeca6;
+	background-color: #eef9ce;
+	color: #504f4f;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 0.8em;
+}
+
+
+.pvpagination{
+	padding: 0 20px 0 0;
+	text-align: right;
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 0.9em;
+	color: #504f4f;
+}
+
+.pvpagination a:link, .pvpagination a:visited{
+	text-decoration: none;
+	font-style: normal;
+	color: #504f4f;
+}
+
+
+#pvfooter_div{
+	padding: 10px 20px 0 0;
+}
+
+
+/* begin css for table showing list of objects  */
+
+#pvtable_div{
+	width: 955px;
+	text-decoration: none;
+    font-weight: normal;
+    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+    font-size: 1em;
+	border: solid 2px #dbeca6;
+	-moz-border-radius: 10px; 
+	-webkit-border-radius: 11px;
+	border-radius: 11px;
+	behavior: url(/media/htc/border-radius.htc)
+}
+
+#pvobject_list{
+	width: 100%;
+}
+
+#pvobject_list thead{
+	background-color: #dbeca6;
+}
+
+#pvobject_list tbody{
+	font-size: 0.9em;
+}
+
+#pvobject_list thead td{
+	height: 40px;
+	padding: 3px 0 3px 5px;	
+	overflow:auto;
+}
+
+#pvobject_list tbody td{
+	min-height: 40px;
+	height: 40px;
+	max-height: 40px;
+}
+
+.pvtr_odd{
+	background-color: #fff;
+}
+
+.pvtr_even{
+	background-color: #eef9ce;
+}
+
+.pvtr_highlight{
+	background-color: #cae184;	
+}
+
+.pvtd_a:link, .pvtd_a:visited, .pagination a:link, .pagination a:visited{
+	color: #504f4f;
+	font-style:normal;
+	text-decoration:none;
+}
+
+.pvtd_a:hover, .pagination a:hover{
+		color:#504f4f;
+	text-decoration: underline;
+}
+/* end table css */
+
+
+/* css for header - logo and navigation */
 
 #pvheader {
 height: 38px;
@@ -8,7 +125,7 @@ margin: 0px auto;
 position: relative;
 }
 
-#logo {
+#pvlogo {
 position: absolute;
 top: 0px;
 left: 0px;
@@ -31,6 +148,7 @@ width: auto;
 height: 37px;
 padding: 0px 0px 0px 1px;
 }
+
 ul#navBar li a:link, ul#navBar li a:visited {
 float: left;
 display: block;
@@ -40,21 +158,27 @@ height: 25px;
 padding: 5px 8px 5px 8px;
 text-decoration: none;
 font-weight: normal;
+font-style: normal;
 background: url(/media/img/nav_bg.png) repeat-x top left;
 font-family: Cambria, "Times New Roman", Georgia, Times, serif;
 font-size: 1.1em;
 color: #ededed;
 border: none;
 }
+
 ul#navBar li.current a:link, ul#navBar li.current a:visited {
 background: url(/media/img/nav_hover.png) repeat-x top left;
+font-style: normal;
 }
+
 ul#navBar li a:hover {
 color: #fff;
 text-decoration: none;
+font-style: normal;
 background: url(/media/img/nav_hover.png) repeat-x top left;
 border: none;
 }
+/* end header css */
 
 #wrapper {
 width: 961px;
@@ -73,20 +197,10 @@ background: url(/media/img/content_top.png) no-repeat top left;
 #container {
 width: 930px;
 margin: 0px auto;
-padding: 0px 15px 30px 15px;
+padding: 0px 15px 30px 20px;
 background: url(/media/img/content_bottom.png) no-repeat bottom left;
 }
 
-.pvtitle {
-	width: 950px;
-	padding: 5px;
-	text-decoration: none;
-    font-weight: normal;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1.2em;
-    color: #000000;
-	border-bottom: dashed 1px #504f4f;
-}
 
 #container td {
     border: none;
@@ -109,12 +223,12 @@ background: url(/media/img/content_bottom.png) no-repeat bottom left;
 	text-decoration: underline;
 }
 
-.imgBlock{
+.pvimage_block{
 	text-align: right;
 	padding-right: 35px;
 }
 
-#colHeader{
+.pvcolumn_header{
 	text-align: left;
 	border: 1px solid #e5f8aa;
 margin: 0px;
@@ -123,22 +237,25 @@ width: 625px;
 list-style-type: none;
 background: url(/media/img/main_col_bg.png) no-repeat top left #ffffff;
 }
-#colBody{
+
+#pvcolumn_body{
 	text-align: left;
 border: 1px solid #e5f8aa;
 margin: 0px;
 padding-left: 12px;
 width: 625px;
 list-style-type: none;
-background: #ebfbba;
+background: #dbeca6;
 font-size: 0.9em;
 }
+
 #pvcopyright{
 	text-align:center;
 	width: 960px;
 	font-size: 0.7em;
 }
-#record td{
+
+#pvrecord td{
 	height: 30px;
 }
 
@@ -248,7 +365,7 @@ font-size: 0.9em;
     border-bottom: 1px dashed #ddd;
 }
 
-.pvArtImg {
+.pvart_image {
 	height: 170px;
 	width: 150px;
 }

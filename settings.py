@@ -78,6 +78,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.breadcrumbs.middleware.BreadcrumbsMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -108,6 +109,10 @@ LOGIN_URL = "/admin/"
 OLWIDGET_MEDIA_URL = path.join(MEDIA_URL, "olwidget")
 GOOGLE_API_KEY = u"ABQIAAAAkXCmjf08FLp1fzy2qNzWThT7g5bZECU_gqoByQmzcFSTeCxKshQqEs1adBOA4YT_D2fzAaGvjbVtIA"
 GOOGLE_MAPS_API_KEY = GOOGLE_API_KEY
+
+BREADCRUMBS_AUTO_HOME = True
+
+
 
 try:
     from local_settings import *

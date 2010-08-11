@@ -1,0 +1,131 @@
+{% extends "pvbase.html" %}
+{% load i18n %}
+
+{% block more_scripts %}
+<script type='text/javascript'>
+	this.selectionChanged = function() {
+	$( '#pvsort_select' ).change( function() {
+		orderby = $("#pvsort_select option:selected"); 
+		window.location.href= '{{url}}?orderby=' + orderby.val();
+		});
+	};
+
+// starting the script on page load
+	$(document).ready(function(){
+		selectionChanged();
+	});
+	
+</script>
+{% endblock %}
+
+{% block title %}{% trans "Artwork" %}{% endblock %}
+
+{% block navigation_bar %}
+<li class="current">
+    <a href="{% url artworks_list %}">Artworks</a>
+</li>
+<li>
+    <a href="{% url creators_list %}">Creators</a>
+</li>
+<li>
+    <a href="#">Series</a>
+</li>
+<li>
+    <a href="#">Search</a>
+</li>
+{% endblock %}
+
+{% block current_crumb %}{% trans "Artworks" %}{% endblock %}
+
+{% block pv_page_body %}
+<div class="pvtitle">
+    Artworks
+    <select id="pvsort_select">
+        <option value="title">Title</option>
+        {% if order == "creator" %}<option value="title" selected='true'>Creator</option>
+        {% else %}<option value="title">Creator</option>
+        {% endif %}
+        {% if order == "creation_year_start" %}<option value="creation_year_start" selected='true'>Date</option>
+        {% else %}<option value="creation_year_start">Date</option>
+        {% endif %}
+        {% if order == "original_place" %}<option value="original_place" selected='true'>Original Location</option>
+        {% else %}<option value="original_place">Original Location</option>
+        {% endif %}
+        {% if order == "current_place" %}<option value="current_place" selected='true'>Current Location</option>
+        {% else %}<option value="current_place">Current Location</option>
+        {% endif %} 
+    </select>
+    <span id="pvsort_span">Sort By:</span>
+</div>
+    <div class="pvcolorspace" style="background-color: #ffffff;">
+    </div>
+    <div id="pvtable_div">
+                <table id="pvobject_list" cellpadding="5px">
+                    <thead>
+                        <tr>
+                            <td>
+                                Title
+                            </td>
+                            <td>
+                                Creator
+                            </td>
+                            <td>
+                                Date
+                            </td>
+                            <td>
+                                Original Location
+                            </td>
+                            <td>
+                                Current Location
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for artwork in artworks.object_list %}
+                        <tr class="{% cycle 'pvtr_odd' 'pvtr_even' %}" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className={% cycle '\'pvtr_odd\'' '\'pvtr_even\'' %}">
+                            <td width="28%">
+                                <a class="pvtd_a" href="{% url artworks_record artwork.id %}">{{ artwork.title }}</a>
+                            </td>
+                            <td width="22%">
+                                {% for creator in artwork.creators.all %} 
+                                {{ creator.name }} 
+                                {% endfor %}
+                            </td>
+                            <td width="10%">
+                                {{ artwork.creation_year_start }} - {{ artwork.creation_year_end }}
+                            </td>
+                            <td td width="15%">
+                                {{ artwork.original_place.title }}
+                            </td>
+                            <td td width="25%">
+                                {{  artwork.current_place.title }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+				        <div class="pvspace" style="height: 10px;">
+        </div>
+                <div class="pvpagination">
+                       	<a id="first" href="?orderby={{ order }}&page=1">First</a>
+						<<
+                    	{% if artworks.has_previous %}
+							<a href="?orderby={{ order }}&page={{ artworks.previous_page_number }}">Previous</a>
+						{% else %}
+						    <span style="color: #acb19e"> Previous </span>
+						{% endif %}
+						<span class="current">
+						  << Page {{ artworks.number }} of {{ artworks.paginator.num_pages }} >>
+						</span>
+						{% if artworks.has_next %}
+							<a href="?orderby={{ order }}&page={{ artworks.next_page_number }}">Next</a>
+						{% else %}
+						    <span style="color: #acb19e"> Next </span>
+						{% endif %}
+						>>
+						<a href="?orderby={{ order }}&page={{ artworks.paginator.num_pages }}">Last</a>
+                </div>
+				<div class="pvspace" style="height: 10px;">
+        </div>
+    </div>
+{% endblock %}

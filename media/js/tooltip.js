@@ -41,7 +41,6 @@ else
     });			
 };
 
-
 // starting the script on page load
 $(document).ready(function(){
 	imagePreview();

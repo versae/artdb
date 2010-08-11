@@ -1,0 +1,68 @@
+{% extends "pvbase.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Creators" %}{% endblock %}
+
+{% block navigation_bar %}
+<li>
+    <a href="{% url artworks_list %}">Artworks</a>
+</li>
+<li class="current">
+    <a href="{% url creators_list %}">Creators</a>
+</li>
+<li>
+    <a href="#">Series</a>
+</li>
+<li>
+    <a href="#">Search</a>
+</li>
+{% endblock %}
+
+{% block current_crumb %}{% trans "Creators" %}{% endblock %}
+
+{% block pv_page_body %} 
+<div class="pvtitle">
+    Creators
+    <select id="pvsort_select">
+        <option value="title">Name</option>
+        <option value="date">Date</option>
+        <option value="">Activity Period</option>
+        <option value="">Place of Birth</option>
+        <option value="">Place of Death</option>
+        <option value="">Number of Arts</option>
+    </select>
+    <span id="pvsort_span">Sort By:</span>
+</div>
+<div class="pvcolorspace" style="background-color: #ffffff;">
+</div>
+<div id="pvtable_div">
+    <table id="pvobject_list" cellpadding="5px">
+        <thead>
+            <tr>
+                <td>
+                    Name
+                </td>
+                <td>
+                    Date
+                </td>
+                <td>
+                    Activity Period
+                </td>
+                <td>
+                    Place of Birth
+                </td>
+                <td>
+                    Place of Death
+                </td>
+                <td>
+                    Number of Arts
+                </td>
+            </tr>
+        </thead>
+    </table>
+    <div class="pvspace" style="height: 10px;">
+    </div>
+    <div class="pvspace" style="height: 10px;">
+    </div>
+</div>
+{% endblock %}
