@@ -4,6 +4,8 @@ from django.shortcuts import HttpResponse, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps
 
+from django_descriptors.models import Descriptor
+
 from artworks.models import Artwork
 
 
@@ -33,6 +35,8 @@ def artworks_json(request):
         creators = [creator.name
                     for creator in artwork.creators.all()]
         images = [image for image in artwork.images.all()]
+        descriptors_objects = Descriptor.objects.get_for_object(artwork)
+        descriptors = [descriptor.path for descriptor in descriptors_objects]
         artwork_dic = {
             "identifier": artwork.id,
             "admin": reverse("admin:artworks_artwork_change",
@@ -40,15 +44,16 @@ def artworks_json(request):
             "type": artwork._meta.object_name,
             "label": artwork.title,
             "serie": artwork.serie and artwork.serie.title,
-            "size": artwork.size,
+#            "size": artwork.size,
             "creators": creators,
             "creation_year_start": artwork.creation_year_start,
             "creation_year_end": artwork.creation_year_end,
             "inscription": artwork.inscription,
-            "notes": artwork.notes,
+#            "notes": artwork.notes,
             "image": images,
             "current_place": (artwork.current_place
                               and artwork.current_place.title),
+            "descriptors": descriptors,
         }
         items.append(artwork_dic)
     data.update({
@@ -60,6 +65,9 @@ def artworks_json(request):
                 "valueType": "item",
             },
             "creators": {
+                "valueType": "item",
+            },
+            "descriptor": {
                 "valueType": "item",
             },
             "serie": {
