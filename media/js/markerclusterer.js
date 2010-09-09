@@ -87,20 +87,20 @@ function MarkerClusterer(map, opt_markers, opt_opts) {
   var mcfn_ = null;
 
   var i = 0;
-//  for (i = 1; i <= 5; ++i) {
-//    styles_.push({
-//      'url': "http://gmaps-utility-library.googlecode.com/svn/trunk/markerclusterer/images/m" + i + ".png",
-//      'height': sizes[i - 1],
-//      'width': sizes[i - 1]
-//    });
-//  }
   for (i = 1; i <= 5; ++i) {
     styles_.push({
-      'url': "http://www.internetpersona.com/map4/map_cluster_icon.png",
-      'height': 30,
-      'width': 30
+      'url': "http://gmaps-utility-library.googlecode.com/svn/trunk/markerclusterer/images/m" + i + ".png",
+      'height': sizes[i - 1],
+      'width': sizes[i - 1]
     });
   }
+//  for (i = 1; i <= 5; ++i) {
+//    styles_.push({
+//      'url': "http://www.internetpersona.com/map4/map_cluster_icon.png",
+//      'height': 30,
+//      'width': 30
+//    });
+//  }
 
   if (typeof opt_opts === "object" && opt_opts !== null) {
     if (typeof opt_opts.gridSize === "number" && opt_opts.gridSize > 0) {
