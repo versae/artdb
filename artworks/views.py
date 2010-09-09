@@ -36,26 +36,29 @@ def artworks_record(request, artwork_id):
 def in_range(request, year_from, year_to):
     year_from = int(year_from)
     year_to = int(year_to)
+    artworks_by = request.GET.get("filter", "artwork_current_place")
     dics = []
-#    artworks = Artwork.objects.in_range(year_from, year_to)
-#    for artwork in artworks:
-#        dic = {
-#            'identifier': artwork.id,
-#            'title': artwork.title,
-#        }
-#        place = None
-#        try:
-#            place_history = artwork.placeshistory_set.get(artwork=artwork,
-#                                                          place_type='L')
-#            place = place_history.place
-#            if hasattr(place.geometry, 'wkt'):
-#                dic.update({
-#                    'place': place.name,
-#                    'coordinates': place.geometry.wkt,
-#                })
-#                dics.append(dic)
-#        except PlacesHistory.DoesNotExist:
-#            pass
+    if artworks_by == "artwork_original_place":
+        place_field_name = "original_place"
+    else:
+        place_field_name = "current_place"
+    artworks = Artwork.objects.in_range(year_from, year_to)
+    points = set()
+    for artwork in artworks:
+        dic = {
+            'identifier': artwork.id,
+            'title': artwork.title,
+        }
+        place = None
+        place_field = getattr(artwork, place_field_name)
+        if (place_field and place_field.point
+            and place_field.point.wkt not in points):
+            points.add(place_field.point.wkt)
+            dic.update({
+                'place': place_field.title,
+                'coordinates': place_field.point.wkt,
+            })
+        dics.append(dic)
     print len(dics)
     return HttpResponse(dumps(dics), mimetype="application/json")
 
