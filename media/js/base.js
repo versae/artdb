@@ -1,6 +1,6 @@
 google.load('jquery', '1.4.2');
 google.load('jqueryui', '1.8.1');
-google.load('maps', '2.x', {"other_params": "sensor=true"});
+google.load('maps', '2.x', {"other_params": "sensor=false"});
 
 function loadLibraries() {
     var libs = [
@@ -27,10 +27,10 @@ function initialize() {
     }
     var markers = [];
     var polygons = [];
-    var markerClusterer = null;
     var dateSelectedRange = null;
     var artworkPlaceFilter = "artwork_current_place";
     var map = new google.maps.Map(document.getElementById('map'));
+    var markerClusterer = new MarkerClusterer(map, markers);
     var timeControlOptions = {
         css: 'slider',
         id: 'sliderTimeControl',
@@ -77,7 +77,7 @@ function initialize() {
         filterSelect.attr("id", "filterSelect");
         filterSelect.attr("name", "filterSelect");
         filterLabel.attr("for", "filterSelect");
-        filterLabel.html("Artworks by");
+        filterLabel.html("Artworks locations by");
         for(i=0; i<2; i++) {
             var filterOption = $("<OPTION>")
             filterOption.html(filterOptionsTexts[i]);
@@ -108,15 +108,27 @@ function initialize() {
     hierarchyControl.addRelationship(google.maps.SATELLITE_MAP, google.maps.HYBRID_MAP, null, false);
     map.addControl(hierarchyControl);
     map.setMapType(google.maps.PHYSICAL_MAP);
-    // Centered at client location with zoom level 4
     var center;
-    if (google.loader.ClientLocation) {
-        center = new google.maps.LatLng(google.loader.ClientLocation.latitude,
-                                        google.loader.ClientLocation.longitude);
-    } else {
-        center = new google.maps.LatLng(40.66397287638688, -3.71337890625);
+    // Centered at client location with zoom level 3
+    // Try W3C Geolocation (Preferred)
+    if (navigator.geolocation) {
+        browserSupportFlag = true;
+        navigator.geolocation.getCurrentPosition(function(position) {
+            center = new google.maps.LatLng(position.coords.latitude,
+                                            position.coords.longitude);
+            map.setCenter(center, 3);
+        }, function() {
+            // Try Google ClientLocation
+            if (google.loader.ClientLocation) {
+                center = new google.maps.LatLng(google.loader.ClientLocation.latitude,
+                                                google.loader.ClientLocation.longitude);
+            // Set middle of the Atlantic Ocean
+            } else {
+                center = new google.maps.LatLng(26.9, -35.5);
+            }
+            map.setCenter(center, 3);
+        });
     }
-    map.setCenter(center, 4);
     map.enableDragging();
     map.enableScrollWheelZoom();
     $(window).unload(function() {GUnload();});
@@ -145,36 +157,39 @@ function initialize() {
     }
 
     function drawClusters(data) {
-            $("#progress").progressbar('value', 1);
-            var parentMap = map;
-            var factor = (100-2) / data.length;
-            for(i=0; i<data.length; i++) {
-                var item = data[i];
-                if (parseInt(i*factor) != parseInt((i-1)*factor)) {
-                    $("#progress").progressbar('value', parseInt(i*factor));
-                }
-                if (item.coordinates) {
-                    var geometry = getGeometryFromWKT(item.coordinates, item.place);
-                    if (geometry instanceof google.maps.Marker) {
-                        geometry.identifier = item.identifier;
-                        google.maps.Event.addListener(geometry, "click", function(e) {
-                            var url = "/artworks/"+ this.identifier +"/";
-                            var parentMarker = this;
-                            $.getJSON(url, {}, function(data) {
-                                parentMarker.openInfoWindowHtml(data.title +"<br/>("+ data.place +")");
-                            });
+        if (markerClusterer && markerClusterer.clearMarkers) {
+            markerClusterer.clearMarkers();
+        }
+        markers = [];
+        polygons = [];
+        map.clearOverlays();
+        $("#progress").progressbar('value', 1);
+        var parentMap = map;
+        var factor = (100-2) / data.length;
+        for(i=0; i<data.length; i++) {
+            var item = data[i];
+            if (parseInt(i*factor) != parseInt((i-1)*factor)) {
+                $("#progress").progressbar('value', parseInt(i*factor));
+            }
+            if (item.coordinates) {
+                var geometry = getGeometryFromWKT(item.coordinates, item.place);
+                if (geometry instanceof google.maps.Marker) {
+                    geometry.identifier = item.identifier;
+                    google.maps.Event.addListener(geometry, "click", function(e) {
+                        var url = "/artworks/"+ this.identifier +"/";
+                        var parentMarker = this;
+                        $.getJSON(url, {}, function(data) {
+                            parentMarker.openInfoWindowHtml(data.title +"<br/>("+ data.place +")");
                         });
-                        markers.push(geometry);
-                    } else {
-                        polygons.push(geometry);
-                    }
+                    });
+                    markers.push(geometry);
+                } else {
+                    polygons.push(geometry);
                 }
             }
-            if (markerClusterer != null) {
-                markerClusterer.clearMarkers();
-            }
-            markerClusterer = new MarkerClusterer(map, markers);
-            $("#progress").hide();
+        }
+        markerClusterer.addMarkers(markers);
+        $("#progress").hide();
     }
 
     markerIcon = new google.maps.Icon();
