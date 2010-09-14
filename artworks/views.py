@@ -3,8 +3,11 @@ from django.shortcuts import HttpResponse, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from artworks.models import Artwork
 from django.core.urlresolvers import reverse
+from django.utils.translation import gettext as _
+
+from artworks.models import Artwork
+
 
 def artworks_list(request):
     orderby = None
@@ -39,27 +42,33 @@ def in_range(request, year_from, year_to):
     artworks_by = request.GET.get("filter", "artwork_current_place")
     dics = []
     if artworks_by == "artwork_original_place":
+        filter_args = {
+            'original_place__title__isnull': False,
+            'original_place__point__isnull': False,
+        }
         place_field_name = "original_place"
     else:
+        filter_args = {
+            'current_place__title__isnull': False,
+            'current_place__point__isnull': False,
+        }
         place_field_name = "current_place"
-    artworks = Artwork.objects.in_range(year_from, year_to)
-    points = set()
+    artworks = Artwork.objects.in_range(year_from,
+                                        year_to).filter(**filter_args)
     for artwork in artworks:
+        place_field = getattr(artwork, place_field_name)
+        if place_field.geometry:
+            place_title = u"%s (%s)" % (place_field.title, _("region"))
+            print place_title
+        else:
+            place_title = place_field.title
         dic = {
             'identifier': artwork.id,
             'title': artwork.title,
+            'place': place_title,
+            'coordinates': place_field.point.wkt,
         }
-        place = None
-        place_field = getattr(artwork, place_field_name)
-        if (place_field and place_field.point
-            and place_field.point.wkt not in points):
-            points.add(place_field.point.wkt)
-            dic.update({
-                'place': place_field.title,
-                'coordinates': place_field.point.wkt,
-            })
         dics.append(dic)
-    print len(dics)
     return HttpResponse(dumps(dics), mimetype="application/json")
 
 
