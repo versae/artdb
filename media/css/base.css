@@ -98,6 +98,29 @@ table tr td {
 }
 
 
+/* Filter by location map */
+
+.filterMapControl {
+    background-color: white;
+    border-color: #8B0000;
+    border-style: solid;
+    border-width: 1px 2px 2px 1px;
+    color: #8B0000;
+    cursor: pointer;
+    font-family: 'Arial';
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0px 1px 0px 5px;
+}
+
+.filterMapControl select {
+    border: 1px solid #000;
+    height: 13px;
+    font-size: 10px;
+    margin: 1px 1px 1px 4px;
+    padding: none;
+}
+
 /* Nav */
 
 #nav {
@@ -136,7 +159,7 @@ h2 {
 
 #sidebar {
     float: right;
-    width: 230px;
+    width: 230px;ex
     padding: 10px;
     background: #fff;
 }

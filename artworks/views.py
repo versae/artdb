@@ -3,8 +3,11 @@ from django.shortcuts import HttpResponse, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from artworks.models import Artwork
 from django.core.urlresolvers import reverse
+from django.utils.translation import gettext as _
+
+from artworks.models import Artwork
+
 
 def artworks_list(request):
     orderby = None
@@ -36,27 +39,36 @@ def artworks_record(request, artwork_id):
 def in_range(request, year_from, year_to):
     year_from = int(year_from)
     year_to = int(year_to)
+    artworks_by = request.GET.get("filter", "artwork_current_place")
     dics = []
-#    artworks = Artwork.objects.in_range(year_from, year_to)
-#    for artwork in artworks:
-#        dic = {
-#            'identifier': artwork.id,
-#            'title': artwork.title,
-#        }
-#        place = None
-#        try:
-#            place_history = artwork.placeshistory_set.get(artwork=artwork,
-#                                                          place_type='L')
-#            place = place_history.place
-#            if hasattr(place.geometry, 'wkt'):
-#                dic.update({
-#                    'place': place.name,
-#                    'coordinates': place.geometry.wkt,
-#                })
-#                dics.append(dic)
-#        except PlacesHistory.DoesNotExist:
-#            pass
-    print len(dics)
+    if artworks_by == "artwork_original_place":
+        filter_args = {
+            'original_place__title__isnull': False,
+            'original_place__point__isnull': False,
+        }
+        place_field_name = "original_place"
+    else:
+        filter_args = {
+            'current_place__title__isnull': False,
+            'current_place__point__isnull': False,
+        }
+        place_field_name = "current_place"
+    artworks = Artwork.objects.in_range(year_from,
+                                        year_to).filter(**filter_args)
+    for artwork in artworks:
+        place_field = getattr(artwork, place_field_name)
+        if place_field.geometry:
+            place_title = u"%s (%s)" % (place_field.title, _("region"))
+            print place_title
+        else:
+            place_title = place_field.title
+        dic = {
+            'identifier': artwork.id,
+            'title': artwork.title,
+            'place': place_title,
+            'coordinates': place_field.point.wkt,
+        }
+        dics.append(dic)
     return HttpResponse(dumps(dics), mimetype="application/json")
 
 

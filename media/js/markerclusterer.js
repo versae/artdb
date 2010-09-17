@@ -4,7 +4,7 @@
  * @author Xiaoxi Wu
  * @copyright (c) 2009 Xiaoxi Wu
  * @fileoverview
- * This javascript library creates and manages per-zoom-level 
+ * This javascript library creates and manages per-zoom-level
  * clusters for large amounts of markers (hundreds or thousands).
  * This library was inspired by the <a href="http://www.maptimize.com">
  * Maptimize</a> hosted clustering solution.
@@ -12,11 +12,11 @@
  * <b>How it works</b>:<br/>
  * The <code>MarkerClusterer</code> will group markers into clusters according to
  * their distance from a cluster's center. When a marker is added,
- * the marker cluster will find a position in all the clusters, and 
+ * the marker cluster will find a position in all the clusters, and
  * if it fails to find one, it will create a new cluster with the marker.
  * The number of markers in a cluster will be displayed
  * on the cluster marker. When the map viewport changes,
- * <code>MarkerClusterer</code> will destroy the clusters in the viewport 
+ * <code>MarkerClusterer</code> will destroy the clusters in the viewport
  * and regroup them into new clusters.
  *
  */
@@ -52,6 +52,18 @@
  * The array should be ordered according to increasing cluster size,
  * with the style for the smallest clusters first, and the style for the
  * largest clusters last.
+ * @property {Function} [calculator] A function to calculator what will be showed
+ * on cluster marker and what kind of style will cluster marker be.
+ * This function auto called by Cluster. The default calculator will show number
+ * of markers in a cluster. This function take one parm: markers.
+ * You can add some property to marker of this markers array to calculat values.
+ * This function returns an object:
+ * {
+ *   'text': 'The text to be showed on cluster marker',
+ *   'index': 'Style index in array of MarginStylesOptions user passed.'
+ * }
+ * @property {Boolean} [zoomOnClick=true] Whether default behaviour of zooming on a cluster
+ * upon clicking should be used.
  */
 
 /**
@@ -61,9 +73,10 @@
  * @property {String} [url] Image url.
  * @property {Number} [height] Image height.
  * @property {Number} [height] Image width.
- * @property {Array of Number} [opt_anchor] Anchor for label text, like [24, 12]. 
+ * @property {Array of Number} [opt_anchor] Anchor for label text, like [24, 12].
  *    If not set, the text will align center and middle.
  * @property {String} [opt_textColor="black"] Text color.
+ * @property {Number} [opt_textSize=11] Text size in px.
  */
 
 /**
@@ -85,34 +98,93 @@ function MarkerClusterer(map, opt_markers, opt_opts) {
   var styles_ = [];
   var leftMarkers_ = [];
   var mcfn_ = null;
+  var zoomOnClick_ = true;
+
+  // Support for lazy loading setups:
+  if (ClusterMarker_.instanceOfGOverlay !== true) {
+    var prot = ClusterMarker_.prototype; 
+    ClusterMarker_.prototype = new GOverlay(); 
+    for (var p in prot)
+      ClusterMarker_.prototype[p] = prot[p];
+    ClusterMarker_.instanceOfGOverlay = true; 
+  }
+
+  // default calculator function
+  var calculator_ = function (markers) {
+    var index = 0;
+    var count = markers.length;
+    var dv = count;
+    while (dv !== 0) {
+      dv = parseInt(dv / 10, 10);
+      index ++;
+    }
+    var stylesCount = this.getStyles().length;
+    if (stylesCount < index) {
+      index = stylesCount;
+    }
+    return {
+      'text': count,
+      'index': index
+    };
+  };
 
   var i = 0;
-//  for (i = 1; i <= 5; ++i) {
-//    styles_.push({
-//      'url': "http://gmaps-utility-library.googlecode.com/svn/trunk/markerclusterer/images/m" + i + ".png",
-//      'height': sizes[i - 1],
-//      'width': sizes[i - 1]
-//    });
-//  }
   for (i = 1; i <= 5; ++i) {
     styles_.push({
-      'url': "http://www.internetpersona.com/map4/map_cluster_icon.png",
-      'height': 30,
-      'width': 30
+      'url': 'http://gmaps-utility-library.googlecode.com/svn/trunk/markerclusterer/images/m' + i + '.png',
+      'height': sizes[i - 1],
+      'width': sizes[i - 1]
     });
   }
+//  for (i = 1; i <= 5; ++i) {
+//    styles_.push({
+//      'url': "http://www.internetpersona.com/map4/map_cluster_icon.png",
+//      'height': 30,
+//      'width': 30
+//    });
+//  }
 
-  if (typeof opt_opts === "object" && opt_opts !== null) {
-    if (typeof opt_opts.gridSize === "number" && opt_opts.gridSize > 0) {
+  if (typeof opt_opts === 'object' && opt_opts !== null) {
+    if (typeof opt_opts.gridSize === 'number' && opt_opts.gridSize > 0) {
       gridSize_ = opt_opts.gridSize;
     }
-    if (typeof opt_opts.maxZoom === "number") {
+    if (typeof opt_opts.maxZoom === 'number') {
       maxZoom_ = opt_opts.maxZoom;
     }
-    if (typeof opt_opts.styles === "object" && opt_opts.styles !== null && opt_opts.styles.length !== 0) {
+    if (typeof opt_opts.styles === 'object' && opt_opts.styles !== null && opt_opts.styles.length !== 0) {
       styles_ = opt_opts.styles;
     }
+    if (typeof opt_opts.calculator === 'function') {
+      calculator_ = opt_opts.calculator;
+    }
+    if (typeof opt_opts.zoomOnClick === 'boolean') {
+      zoomOnClick_ = opt_opts.zoomOnClick;
+    }
   }
+
+  /**
+   * Set calculator function
+   * @param {Function} calculator calculator function.
+   */
+  this.setCalculator = function (calculator) {
+    calculator_ = calculator;
+  };
+
+  /**
+   * Get calculator function.
+   * @return {Object}
+   */
+  this.getCalculator = function () {
+    return GEvent.callback(this, calculator_);
+  };
+  
+  /**
+   * Get boolean value representing whether default behaviour of zooming on cluster upon clicking should be used.
+   * @return {Boolean}
+   */
+  this.isZoomOnClick = function() {
+    return zoomOnClick_;
+  };
 
   /**
    * When we add a marker, the marker may not in the viewport of map, then we don't deal with it, instead
@@ -124,18 +196,22 @@ function MarkerClusterer(map, opt_markers, opt_opts) {
       return;
     }
     var leftMarkers = [];
+
     for (i = 0; i < leftMarkers_.length; ++i) {
-      me_.addMarker(leftMarkers_[i], true, null, null, true);
+      if (isMarkerInViewport_(leftMarkers_[i])) {
+        me_.addMarker(leftMarkers_[i], true, null, null, true);
+      } else {
+        leftMarkers.push(leftMarkers_[i]);
+      }
     }
     leftMarkers_ = leftMarkers;
   }
 
   /**
    * Get cluster marker images of this marker cluster. Mostly used by {@link Cluster}
-   * @private
    * @return {Array of String}
    */
-  this.getStyles_ = function () {
+  this.getStyles = function () {
     return styles_;
   };
 
@@ -150,7 +226,7 @@ function MarkerClusterer(map, opt_markers, opt_opts) {
     }
     clusters_ = [];
     leftMarkers_ = [];
-    GEvent.removeListener(mcfn_);
+//    GEvent.removeListener(mcfn_);
   };
 
   /**
@@ -252,9 +328,20 @@ function MarkerClusterer(map, opt_markers, opt_opts) {
    */
 
   this.removeMarker = function (marker) {
+    for (var i = 0; i < leftMarkers_.length; ++i) {
+      if (marker === leftMarkers_[i]) {
+        leftMarkers_.splice(i, 1);
+        return;
+      }
+    }
     for (var i = 0; i < clusters_.length; ++i) {
-      if (clusters_[i].remove(marker)) {
-        clusters_[i].redraw_();
+      if (clusters_[i] && clusters_[i].removeMarker(marker)) {
+        if (clusters_[i].getTotalMarkers() == 0) {
+            clusters_[i].clearMarkers();
+            clusters_.splice(i, 1);
+        } else {
+            clusters_[i].redraw_();
+        }
         return;
       }
     }
@@ -387,6 +474,18 @@ function MarkerClusterer(map, opt_markers, opt_opts) {
     this.redraw_();
   };
 
+  
+  /**   
+    * Returns the cluster containing this marker, if any.   
+    *   
+    * @param {GMarker} marker The marker whose containing cluster is to be returned.   
+    * @return {Cluster}   
+    */  
+  this.getParentCluster = function(marker) {
+    return marker.parentCluster_;
+  };
+
+  
   // initialize
   if (typeof opt_markers === "object" && opt_markers !== null) {
     this.addMarkers(opt_markers);
@@ -397,7 +496,6 @@ function MarkerClusterer(map, opt_markers, opt_opts) {
     me_.resetViewport();
   });
 }
-
 /**
  * Create a cluster to collect markers.
  * A cluster includes some markers which are in a block of area.
@@ -416,7 +514,8 @@ function Cluster(markerClusterer) {
   var map_ = markerClusterer.getMap_();
   var clusterMarker_ = null;
   var zoom_ = map_.getZoom();
-
+  var this_ = this;
+  
   /**
    * Get markers of this cluster.
    *
@@ -426,6 +525,15 @@ function Cluster(markerClusterer) {
     return markers_;
   };
 
+  /**
+   * Get the marker clusterer handling this cluster
+   *
+   * @return {MarkerClusterer} The marker clusterer object
+   */
+  this.getMarkerClusterer = function() {
+    return markerClusterer_;
+  };
+  
   /**
    * If this cluster intersects certain bounds.
    *
@@ -484,6 +592,7 @@ function Cluster(markerClusterer) {
        center = map.fromContainerPixelToLatLng(pos);*/
       center_ = marker.marker.getLatLng();
     }
+    marker.marker.parentCluster_ = this_;     
     markers_.push(marker);
   };
 
@@ -499,6 +608,7 @@ function Cluster(markerClusterer) {
         if (markers_[i].isAdded) {
           map_.removeOverlay(markers_[i].marker);
         }
+        delete markers_[i].marker.parentCluster_;
         markers_.splice(i, 1);
         return true;
       }
@@ -534,7 +644,7 @@ function Cluster(markerClusterer) {
     if (mz === null) {
       mz = map_.getCurrentMapType().getMaximumResolution();
     }
-    if (zoom_ >= mz || this.getTotalMarkers() === 1) {
+    if (zoom_ > mz || this.getTotalMarkers() === 1) {
 
       // If current zoom level is beyond the max zoom level or the cluster
       // have only one marker, the marker(s) in cluster will be showed on map.
@@ -551,7 +661,7 @@ function Cluster(markerClusterer) {
       if (clusterMarker_ !== null) {
         clusterMarker_.hide();
       }
-    } else {
+    } else if (this.getTotalMarkers() > 1) {
       // Else add a cluster marker on map to show the number of markers in
       // this cluster.
       for (i = 0; i < markers_.length; ++i) {
@@ -559,13 +669,15 @@ function Cluster(markerClusterer) {
           markers_[i].marker.hide();
         }
       }
+      var sums = markerClusterer_.getCalculator()(this.getRealMarkers());
       if (clusterMarker_ === null) {
-        clusterMarker_ = new ClusterMarker_(center_, this.getTotalMarkers(), markerClusterer_.getStyles_(), markerClusterer_.getGridSize_());
+        clusterMarker_ = new ClusterMarker_(center_, sums, markerClusterer_.getStyles(), markerClusterer_.getGridSize_(), this_);
         map_.addOverlay(clusterMarker_);
       } else {
         if (clusterMarker_.isHidden()) {
           clusterMarker_.show();
         }
+        clusterMarker_.setSums(sums);
         clusterMarker_.redraw(true);
       }
     }
@@ -582,6 +694,7 @@ function Cluster(markerClusterer) {
       if (markers_[i].isAdded) {
         map_.removeOverlay(markers_[i].marker);
       }
+      delete markers_[i].marker.parentCluster_;    
     }
     markers_ = [];
   };
@@ -593,6 +706,18 @@ function Cluster(markerClusterer) {
   this.getTotalMarkers = function () {
     return markers_.length;
   };
+
+  /**
+   * Get all real markers by array.
+   * @return {GMarker}
+   */
+  this.getRealMarkers = function () {
+    var result = [];
+    for (var i = 0; i < markers_.length; ++i) {
+      result.push(markers_[i].marker);
+    }
+    return result;
+  };
 }
 
 /**
@@ -602,7 +727,9 @@ function Cluster(markerClusterer) {
  * @constructor
  * @private
  * @param {GLatLng} latlng Marker's lat and lng.
- * @param {Number} count Number to show.
+ * @param {Object} sums text and image to show:
+ *   {String} text Text to show.
+ *   {Number} index Image index by styles.
  * @param {Array of Object} styles The image list to be showed:
  *   {String} url Image url.
  *   {Number} height Image height.
@@ -610,9 +737,10 @@ function Cluster(markerClusterer) {
  *   {Array of Number} anchor Text anchor of image left and top.
  *   {String} textColor text color.
  * @param {Number} padding Padding of marker center.
+ * @param {Cluster} cluster Cluster object that corresponds to this marker.
  */
-function ClusterMarker_(latlng, count, styles, padding) {
-  var index = 0;
+function ClusterMarker_(latlng, sums, styles, padding, cluster) {
+/*  var index = 0;
   var dv = count;
   while (dv !== 0) {
     dv = parseInt(dv / 10, 10);
@@ -621,20 +749,36 @@ function ClusterMarker_(latlng, count, styles, padding) {
 
   if (styles.length < index) {
     index = styles.length;
-  }
-  this.url_ = styles[index - 1].url;
-  this.height_ = styles[index - 1].height;
-  this.width_ = styles[index - 1].width;
-  this.textColor_ = styles[index - 1].opt_textColor;
-  this.anchor_ = styles[index - 1].opt_anchor;
+  }*/
+  var index = sums.index;
+  this.useStyle(styles[index-1]);
+  this.styleDirty_ = false;
   this.latlng_ = latlng;
   this.index_ = index;
   this.styles_ = styles;
-  this.text_ = count;
+  this.text_ = sums.text;
   this.padding_ = padding;
+  this.sums_ = sums;
+  this.cluster_ = cluster;
 }
 
-ClusterMarker_.prototype = new GOverlay();
+if (typeof window['GOverlay'] === 'function') {
+  ClusterMarker_.prototype = new GOverlay();
+  ClusterMarker_.instanceOfGOverlay = true; 
+}
+
+/**
+ * Populates style dependant fields given a particular style.
+ * @private
+ */
+ClusterMarker_.prototype.useStyle = function(style) {
+  this.url_ = style.url;
+  this.height_ = style.height;
+  this.width_ = style.width;
+  this.textColor_ = style.opt_textColor;
+  this.anchor_ = style.opt_anchor;
+  this.textSize_ = style.opt_textSize;
+};
 
 /**
  * Initialize cluster marker.
@@ -643,10 +787,44 @@ ClusterMarker_.prototype = new GOverlay();
 ClusterMarker_.prototype.initialize = function (map) {
   this.map_ = map;
   var div = document.createElement("div");
-  var latlng = this.latlng_;
-  var pos = map.fromLatLngToDivPixel(latlng);
+  var latlng = this.latlng_;  
+  var pos = this.getPosFromLatLng(latlng);  
+  div.style.cssText = this.createCss(pos);
+  div.innerHTML = this.text_;
+  map.getPane(G_MAP_MAP_PANE).appendChild(div);
+  var padding = this.padding_;
+  var cluster = this.cluster_;
+  GEvent.addDomListener(div, "click", function () {
+    GEvent.trigger(cluster.getMarkerClusterer(), "clusterclick", cluster);
+    if (cluster.getMarkerClusterer().isZoomOnClick()) {
+      var pos = map.fromLatLngToDivPixel(latlng);
+      var sw = new GPoint(pos.x - padding, pos.y + padding);
+      sw = map.fromDivPixelToLatLng(sw);
+      var ne = new GPoint(pos.x + padding, pos.y - padding);
+      ne = map.fromDivPixelToLatLng(ne);
+      var zoom = map.getBoundsZoomLevel(new GLatLngBounds(sw, ne), map.getSize());
+      map.setCenter(latlng, zoom);
+    }
+  });
+  this.div_ = div;
+};
+
+/**
+ * Returns position to place the div depending on the latlong.
+ * @private
+ */
+ClusterMarker_.prototype.getPosFromLatLng = function(latlng) {
+  var pos = this.map_.fromLatLngToDivPixel(latlng);
   pos.x -= parseInt(this.width_ / 2, 10);
   pos.y -= parseInt(this.height_ / 2, 10);
+  return pos;
+};
+
+/**
+ * Returns the css style string to be applied to the div given its position.
+ * @private
+ */
+ClusterMarker_.prototype.createCss = function(pos) {
   var mstyle = "";
   if (document.all) {
     mstyle = 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="' + this.url_ + '");';
@@ -669,23 +847,11 @@ ClusterMarker_.prototype.initialize = function (map) {
     mstyle += 'width:' + this.width_ + 'px;text-align:center;';
   }
   var txtColor = this.textColor_ ? this.textColor_ : 'black';
-
-  div.style.cssText = mstyle + 'cursor:pointer;top:' + pos.y + "px;left:" +
-      pos.x + "px;color:" + txtColor +  ";position:absolute;font-size:11px;" +
+  var txtSize = this.textSize_ ? this.textSize_ : 11;
+  
+  return mstyle + 'cursor:pointer;top:' + pos.y + "px;left:" +
+      pos.x + "px;color:" + txtColor +  ";position:absolute;font-size:" + txtSize + "px;" +
       'font-family:Arial,sans-serif;font-weight:bold';
-  div.innerHTML = this.text_;
-  map.getPane(G_MAP_MAP_PANE).appendChild(div);
-  var padding = this.padding_;
-  GEvent.addDomListener(div, "click", function () {
-    var pos = map.fromLatLngToDivPixel(latlng);
-    var sw = new GPoint(pos.x - padding, pos.y + padding);
-    sw = map.fromDivPixelToLatLng(sw);
-    var ne = new GPoint(pos.x + padding, pos.y - padding);
-    ne = map.fromDivPixelToLatLng(ne);
-    var zoom = map.getBoundsZoomLevel(new GLatLngBounds(sw, ne), map.getSize());
-    map.setCenter(latlng, zoom);
-  });
-  this.div_ = div;
 };
 
 /**
@@ -701,7 +867,7 @@ ClusterMarker_.prototype.remove = function () {
  * @private
  */
 ClusterMarker_.prototype.copy = function () {
-  return new ClusterMarker_(this.latlng_, this.index_, this.text_, this.styles_, this.padding_);
+  return new ClusterMarker_(this.latlng_, this.sums_, this.text_, this.styles_, this.padding_, this.cluster_);
 };
 
 /**
@@ -712,11 +878,15 @@ ClusterMarker_.prototype.redraw = function (force) {
   if (!force) {
     return;
   }
-  var pos = this.map_.fromLatLngToDivPixel(this.latlng_);
-  pos.x -= parseInt(this.width_ / 2, 10);
-  pos.y -= parseInt(this.height_ / 2, 10);
-  this.div_.style.top =  pos.y + "px";
-  this.div_.style.left = pos.x + "px";
+  var pos = this.getPosFromLatLng(this.latlng_);
+  if (this.styleDirty_) {
+    this.styleDirty_ = false;
+    this.useStyle(this.styles_[this.index_-1]);
+    this.div_.style.cssText = this.createCss(pos);
+  } else {
+    this.div_.style.top =  pos.y + "px";
+    this.div_.style.left = pos.x + "px";
+  }
 };
 
 /**
@@ -741,3 +911,18 @@ ClusterMarker_.prototype.isHidden = function () {
   return this.div_.style.display === "none";
 };
 
+/**
+ * Sets this cluster marker sums value, updates its text and marks the style for updating on next redraw if necessary.
+ * @param {Object} sums text and image to show:
+ *   {String} text Text to show.
+ *   {Number} index Image index by styles.
+ */
+ClusterMarker_.prototype.setSums = function (sums) {
+  if (sums.index !== this.index_) {
+    this.styleDirty_ = true;
+  }
+  this.sums_ = sums;
+  this.text_ = sums.text;
+  this.index_ = sums.index;
+  this.div_.innerHTML = sums.text;
+};

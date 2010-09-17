@@ -2,7 +2,7 @@
 
 .ui-slider {
     width: 218px;
-    height: 22px;
+    height: 23px;
     position: absolute;
     background: url(/media/img/timecontrols3d.png) -97px;
     background-repeat: no-repeat;
@@ -179,7 +179,7 @@
 }
 
 .sliderSelected {
-    background: url("/media/img/timecontrols3d.png") no-repeat scroll -225px 0 transparent;
+    background: url("/media/img/timecontrols3d.png") no-repeat scroll -225px 1px transparent;
     color: #6688CC;
     display: inline-block;
     font-family: 'Arial';
