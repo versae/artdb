@@ -137,7 +137,7 @@ ul#navBar {
 ul#navBar li {
     float: left;
     display: block;
-    width: auto;
+    width: 87px;
     height: 37px;
     padding: 0px 0px 0px 1px;
 }
@@ -145,7 +145,7 @@ ul#navBar li {
 ul#navBar li a:link, ul#navBar li a:visited {
     float: left;
     display: block;
-    width: auto;
+    width: 70px;
     margin: 0px;
     height: 25px;
     padding: 5px 8px 5px 8px;
@@ -157,6 +157,7 @@ ul#navBar li a:link, ul#navBar li a:visited {
     font-size: 1.1em;
     color: #ededed;
     border: none;
+	text-align: center;
 }
 
 ul#navBar li.current a:link, ul#navBar li.current a:visited {
@@ -653,7 +654,7 @@ ul#navBar li a:hover {
 	-moz-border-radius: 10px;
 	width: 900px;
 	height: 180px;
-	padding: 10px;
+	padding: 10px 0 10px 10px;
 }
 
 .innermenu{
