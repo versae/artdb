@@ -1,6 +1,23 @@
 {% extends "pvbase.html" %}
 {% load i18n %}
 
+{% block more_scripts %}
+<script type='text/javascript'>
+	this.selectionChanged = function() {
+	$( '#pvsort_select' ).change( function() {
+		orderby = $("#pvsort_select option:selected"); 
+		window.location.href= '{{url}}?orderby=' + orderby.val();
+		});
+	};
+
+// starting the script on page load
+	$(document).ready(function(){
+		selectionChanged();
+	});
+	
+</script>
+{% endblock %}
+
 {% block title %}{% trans "Creators" %}{% endblock %}
 
 {% block navigation_bar %}
@@ -24,12 +41,22 @@
 <div class="pvtitle">
     Creators
     <select id="pvsort_select">
-        <option value="title">Name</option>
-        <option value="date">Date</option>
-        <option value="">Activity Period</option>
-        <option value="">Place of Birth</option>
-        <option value="">Place of Death</option>
-        <option value="">Number of Arts</option>
+    	 <option value="name">Name</option>
+        {% if order == "death_year" %}<option value="death_year" selected='true'>Date</option>
+        {% else %}<option value="death_year">Date</option>
+        {% endif %}
+        {% if order == "activity_start_year" %}<option value="activity_start_year" selected='true'>Activity Period</option>
+        {% else %}<option value="activity_start_year">Activity Period</option>
+        {% endif %}
+        {% if order == "birth_place" %}<option value="birth_place" selected='true'>Place of Birth</option>
+        {% else %}<option value="birth_place">Place of Birth</option>
+        {% endif %}
+        {% if order == "death_place" %}<option value="death_place" selected='true'>Place of Death</option>
+        {% else %}<option value="death_place">Place of Death</option>
+        {% endif %} 
+		{% if order == "no_of_arts" %}<option value="no_of_arts" selected='true'>Number of Arts</option>
+        {% else %}<option value="name">Number of Arts</option>
+        {% endif %} 
     </select>
     <span id="pvsort_span">Sort By:</span>
 </div>
@@ -39,29 +66,76 @@
     <table id="pvobject_list" cellpadding="5px">
         <thead>
             <tr>
-                <td>
+                <td style="width: 25%;">
                     Name
                 </td>
-                <td>
+                <td style="width: 8%;">
                     Date
                 </td>
-                <td>
+                <td style="width: 15%;">
                     Activity Period
                 </td>
-                <td>
+                <td style="width: 20%;">
                     Place of Birth
                 </td>
-                <td>
+                <td style="width: 20%;">
                     Place of Death
                 </td>
-                <td>
+                <td align="center" style="width: 7%;">
                     Number of Arts
                 </td>
             </tr>
         </thead>
+		<tbody>
+             {% for creator in creators.object_list %}
+                        <tr class="{% cycle 'pvtr_odd' 'pvtr_even' %}" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className={% cycle '\'pvtr_odd\'' '\'pvtr_even\'' %}">
+                            <td>
+                                <a class="pvtd_a" href="{% url creator_record creator.id %}">{{ creator.name }}</a>
+                            </td>
+                            <td>
+                            	{% if creator.death_year %}
+                                	{{ creator.death_year }} 
+								{% endif %}
+                            </td>
+                            <td>
+                            	{% if creator.activity_start_year and creator.activity_end_year %}
+                                	{{ creator.activity_start_year }} - {{ creator.activity_end_year }}
+								{% endif %}
+                            </td>
+                            <td>
+                                {{ creator.birth_place.title }}
+                            </td>
+                            <td>
+                                {{  creator.death_place.title }}
+                            </td>
+							<td>
+								{{ creator.artwork_set.count }}
+							</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
     </table>
     <div class="pvspace" style="height: 10px;">
     </div>
+	 <div class="pvpagination">
+                       	<a id="first" href="?orderby={{ order }}&page=1">First</a>
+						<<
+                    	{% if creators.has_previous %}
+							<a href="?orderby={{ order }}&page={{ creators.previous_page_number }}">Previous</a>
+						{% else %}
+						    <span style="color: #acb19e"> Previous </span>
+						{% endif %}
+						<span class="current">
+						  << Page {{ creators.number }} of {{ creators.paginator.num_pages }} >>
+						</span>
+						{% if creators.has_next %}
+							<a href="?orderby={{ order }}&page={{ creators.next_page_number }}">Next</a>
+						{% else %}
+						    <span style="color: #acb19e"> Next </span>
+						{% endif %}
+						>>
+						<a href="?orderby={{ order }}&page={{ creators.paginator.num_pages }}">Last</a>
+                </div>
     <div class="pvspace" style="height: 10px;">
     </div>
 </div>

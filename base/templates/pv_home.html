@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block extra_links %}
+<link rel="stylesheet" type="text/css" href="/media/css/pvbase.css" />
+{% endblock %}
+{% block extra_scripts %}
+<script type='text/javascript' src='/media/django_descriptors/js/jquery.js'>
+</script>
+<script type="text/javascript" src="http://cloud.github.com/downloads/malsup/cycle/jquery.cycle.all.2.74.js">
+</script>
+<script type="text/javascript">
+    
+    this.initialize_menu = function(div_name){
+        $(div_name).mouseenter(function(){
+            $(div_name).cycle('resume');
+        });
+        
+        $(div_name).mouseleave(function(){
+            $(div_name).cycle('pause');
+        });
+        
+        $(div_name).cycle({
+            fx: 'fade',
+            timeout: '500' // choose your transition type, ex: fade, scrollUp, shuffle, etc...
+        });
+        
+        $(div_name).cycle('pause');
+    }
+    
+    this.link_menu = function(){
+        $('.ss_artwork').click(function(){
+            window.location.href = '{% url artworks_list %}';
+        });
+        $('.ss_creator').click(function(){
+            window.location.href = '{% url creators_list %}';
+        });
+        $('.ss_series').click(function(){
+            window.location.href = '{{ url }}';
+        });
+        $('.ss_search').click(function(){
+            window.location.href = '{{ url }}';
+        });
+    }
+    
+    $(document).ready(function(){
+    
+        initialize_menu('.ss_artwork');
+        initialize_menu('.ss_creator');
+        initialize_menu('.ss_series');
+        initialize_menu('.ss_search');
+        link_menu();
+    });
+</script>
+{% block more_scripts %}{% endblock %}
+{% endblock %}
+{% block body %}
+<div id="pvbodywrap" align="center">
+    <div class="pvspace" style="padding: 10px 0 10px 20px;">
+    </div>
+    <div id="pvheader">
+        <img src="/media/img/banner1.png" id="pvlogo" alt="Logo" />
+    </div>
+    <div class="pvcolorspace" style="background-color: #90ac39;">
+    </div>
+    <div class="pvspace" style="height: 5px;">
+    </div>
+    <div class="menu">
+        <div class="innermenu">
+            <table>
+                <tr>
+                    <td style="border:0;">
+                        <div class="ss_artwork">
+                            <img src="/media/img/art2.png" /><img src="/media/img/art4.png" /><img src="/media/img/art1.png" /><img src="/media/img/art3.png" />
+                        </div>
+                    </td>
+                    <td style="border:0;">
+                        <div class="ss_creator">
+                            <img src="/media/img/artist1.png" /><img src="/media/img/artist2.png" /><img src="/media/img/artist3.png" /><img src="/media/img/artist4.png" />
+                        </div>
+                    </td>
+                    <td style="border:0;">
+                        <div class="ss_series">
+                            <img src="/media/img/serie1.png" /><img src="/media/img/serie2.png" />
+                        </div>
+                    </td>
+                    <td style="border:0;">
+                        <div class="ss_search">
+                            <img src="/media/img/search1.png" /><img src="/media/img/search2.png" /><img src="/media/img/search3.png" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="pvspace" style="height: 5px;">
+    </div>
+    <div id="smsecWrapper">
+        <div id="smwrapper">
+            <div id="smcontainer" align="left">
+                <div>
+                    <div id="right_div">
+                        <div id="firstCol">
+                            <h3>Pick of the Day: Artwork</h3>
+                                    <div>
+                                        <table>
+                                            <tr>
+                                                <td style="border: 0px; width: 40%; padding-left: 20px;">
+                                                    <img id="artwork_image" src="/media/img/arenoir.jpg">
+                                                </td>
+                                                <td align="left" style="border: 0px;">
+                                                    <div id="artdata">
+                                                        <h4>{{ artwork.title }}</h4>
+                                                        <p>
+                                                            Artist:	{% for creator in artwork.creators.all %}<span>{{ creator.name }}</span>
+                                                            {% endfor %}
+                                                            <br/>
+                                                            {% if artwork.creation_year_start and artwork.creation_year_end %} 
+                                                            Dated In: <span>{{ artwork.creation_year_start }} - {{ artwork.creation_year_end }}</span>
+                                                            {% else %} 
+                                                            Dated In: <span>n/a</span>
+                                                            {% endif%}
+                                                            <br/>
+                                                            {% if artwork.current_place %} 
+                                                            Current Location: <span>{{ artwork.current_place.title }}</span>
+                                                            {% else %} 
+                                                            Current Location: <span>n/a</span>
+                                                            {% endif%}
+                                                            <br/>
+                                                        </p>
+                                                        <a href="{% url artworks_record artwork.id %}">View More</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                        </div>
+                        <div id="firstCol_bottom">
+                            <h3>Pick of the Day: Artist</h3>
+                            <div style="padding-top: 40px;">
+                                <table>
+                                    <tr>
+                                        <td style="width: 40%; border: 0px; padding-left: 20px;">
+                                            <div id="artistdata">
+                                                <h4>{{ artist.name }}</h4>
+                                                <p>
+                                                    Lived:{% if artist.birth_year and artist.death_year %} <span>{{ artist.birth_year }} - {{ artist.death_year }}</span>
+                                                    {% else %} <span>n/a</span>
+                                                    {% endif%}
+                                                    <br/>
+                                                    Masters: {% for master in artist.masters.all %}<span>{{ master.name }}</span>
+                                                    {% if not forloop.last %}
+                                                    ;
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    <br/>
+                                                    Place of birth: <span>{{ artist.birth_place.title }}</span>
+                                                    <br/>
+                                                    Place of death: <span>{{ artist.death_place.title }}</span>
+                                                    <br/>
+                                                </p>
+                                                <a href="{% url creator_record artist.id %}">View More</a>
+                                            </div>
+                                        </td>
+                                        <td style="border: 0px; padding-left: 20px;">
+                                            <div id="work_history">
+                                                Working History:
+                                                <br/>
+                                                <textarea rows="20" style="height: 190px; width: 210px;">
+                                                </textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="float: left;">
+                        <div id="sec_col_top">
+                        </div>
+                        <div id="secCol">
+                            <div id="login">
+                                <h4>Members login</h4>
+                                <form action="#">
+                                    <p class="clearfix">
+                                        <label for="username" id="uname">
+                                            Username
+                                        </label>
+                                        <input name="username" id="username" type="text" value="" />
+                                    </p>
+                                    <br/>
+                                    <p class="clearfix">
+                                        <label for="password">
+                                            Password
+                                        </label>
+                                        <input name="password" id="password" type="text" value="" />
+                                    </p>
+                                    <p class="clearfix check">
+                                        <input type="checkbox" id="remember" name="remember" />
+                                        <label for="remember" id="remlabel">
+                                            Remember me
+                                        </label>
+                                        <input name="submit" id="submit" type="submit" value="" />
+                                    </p>
+                                </form>
+                                <p class="member">
+                                    <a href="#">Lost your Password?</a>
+                                    <br/>
+                                    Not a member yet? <a href="#">Register now!</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="pvfooter_div">
+        <div class="pvspace" height="100px">
+        </div>
+        <div class="pvcolorspace" style="background-color: #90ac39;">
+        </div>
+        <div class="pvspace">
+        </div>
+        <div class="pvfooter">
+            <a href="#">Contact Us</a>
+            | <a href="#">Help</a>
+        </div>
+        <div id="pvcopyright" style="position: relative; left: -200px;">
+            &copy; University of Western Ontario
+        </div>
+    </div>
+</div>
+{% endblock %}

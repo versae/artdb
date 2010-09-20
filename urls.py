@@ -22,7 +22,7 @@ urlpatterns = patterns('',
     url(r'^exhibit/', include('exhibit.urls')),
 
     # base
-    url(r'^$', direct_to_template, {'template': 'map.html'}),
+    url(r'^$', include('base.urls')),
 
     # admin
     url(r'^admin/', include(admin_site.urls)),
