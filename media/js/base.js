@@ -116,7 +116,7 @@ function initialize() {
         navigator.geolocation.getCurrentPosition(function(position) {
             center = new google.maps.LatLng(position.coords.latitude,
                                             position.coords.longitude);
-            map.setCenter(center, 3);
+            map.setCenter(center, 4);
         }, function() {
             // Try Google ClientLocation
             if (google.loader.ClientLocation) {
@@ -126,12 +126,14 @@ function initialize() {
             } else {
                 center = new google.maps.LatLng(26.9, -35.5);
             }
-            map.setCenter(center, 3);
+            map.setCenter(center, 4);
         });
     }
     map.enableDragging();
     map.enableScrollWheelZoom();
-    $(window).unload(function() {GUnload();});
+    $(window).unload(function() {
+        google.maps.Unload();
+    });
 
     function onTimeChange(selected, range) {
         if (range) {
