@@ -28,7 +28,7 @@
     <a href="{% url creators_list %}">Creators</a>
 </li>
 <li>
-    <a href="#">Series</a>
+    <a href="{% url series_list %}">Series</a>
 </li>
 <li>
     <a href="{% url map %}">Map</a>
@@ -42,8 +42,8 @@
     Artworks
     <select id="pvsort_select">
         <option value="title">Title</option>
-        {% if order == "creator" %}<option value="title" selected='true'>Creator</option>
-        {% else %}<option value="title">Creator</option>
+        {% if order == "creator" %}<option value="creators__name" selected='true'>Creator</option>
+        {% else %}<option value="creators__name">Creator</option>
         {% endif %}
         {% if order == "creation_year_start" %}<option value="creation_year_start" selected='true'>Date</option>
         {% else %}<option value="creation_year_start">Date</option>
@@ -107,6 +107,7 @@
 				        <div class="pvspace" style="height: 10px;">
         </div>
                 <div class="pvpagination">
+                	<button id="fview_button"> Faceted View </button>                	
                        	<a id="first" href="?orderby={{ order }}&page=1">First</a>
 						<<
                     	{% if artworks.has_previous %}

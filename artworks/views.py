@@ -3,19 +3,58 @@ from django.shortcuts import HttpResponse, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.db.models import Count
 from django.core.urlresolvers import reverse
 from django.utils.translation import gettext as _
+from artworks.models import Artwork, Serie
 
-from artworks.models import Artwork
-
-
-def artworks_list(request):
+def series_list(request):
     orderby = None
-    artwork_list = None       
+    serie_list = None
     orderby = request.GET.get('orderby', None)
     if orderby is None:
-            orderby = 'title'            
-    artwork_list = Artwork.objects.order_by(orderby)
+        orderby = 'title'
+    if orderby == 'no_of_artworks':
+        serie_list = Serie.objects.annotate(no_of_artwork=Count('artwork')).order_by('no_of_artwork')
+    else:
+        serie_list = Serie.objects.order_by(orderby)
+    paginator = Paginator(serie_list, 10)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    series = paginator.page(page)
+    return render_to_response('serie_list.html',
+                              {"series": series, "order": orderby}, context_instance=RequestContext(request))
+
+
+def series_record(request, serie_id):
+    request.breadcrumbs('Series', reverse('series_list'))
+    serie_id = int(serie_id)
+    serie = None
+    artworks = None
+    serie = Serie.objects.get(id=serie_id)
+    artworks_list = Artwork.objects.filter(serie=serie_id)
+    paginator = Paginator(artworks_list, 5)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    artworks = paginator.page(page)
+    return render_to_response('serie.html',
+                              {"serie": serie, "artworks": artworks}, context_instance=RequestContext(request))
+    
+    
+def artworks_list(request):
+    orderby = None
+    artwork_list = None
+    orderby = request.GET.get('orderby', None)
+    if orderby is None:
+        orderby = 'title'
+    if orderby == 'creation_year_start':
+        artwork_list = Artwork.objects.order_by('creation_year_start', 'creation_year_end')
+    else:
+        artwork_list = Artwork.objects.order_by(orderby)
     paginator = Paginator(artwork_list, 10)
     try:
         page = int(request.GET.get('page', '1'))
@@ -31,10 +70,9 @@ def artworks_record(request, artwork_id):
     artwork_id = int(artwork_id)
     artwork = None
     artwork = Artwork.objects.get(id=artwork_id)
-    artwork.fm_descriptors = artwork.fm_descriptors.split(';')
     return render_to_response('artworks.html',
                               {"artwork": artwork}, context_instance=RequestContext(request))
-    
+   
 
 def in_range(request, year_from, year_to):
     year_from = int(year_from)
@@ -97,3 +135,4 @@ def properties(request, artwork_id):
 #    except PlacesHistory.DoesNotExist:
 #        pass
     return HttpResponse(dumps(dic), mimetype="application/json")
+

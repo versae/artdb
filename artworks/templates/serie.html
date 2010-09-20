@@ -1,0 +1,110 @@
+{% extends "pvbase.html" %}
+{% load i18n %}
+
+{% block more_scripts %}
+<script type='text/javascript' src='/media/js/tooltip.js'></script>
+{% endblock %}
+
+{% block title %}{% trans "Serie" %}{% endblock %}
+
+{% block navigation_bar %}
+<li>
+    <a href="{% url artworks_list %}">Artworks</a>
+</li>
+<li>
+    <a href="{% url creators_list %}">Creators</a>
+</li>
+<li class="current">
+    <a href="{% url series_list %}">Series</a>
+</li>
+<li>
+    <a href="{% url map %}">Map</a>
+</li>
+{% endblock %}
+
+{% block current_crumb %}{{ serie.title }}{% endblock %}
+
+{% block pv_page_body %}
+<div class="pvtitle">
+    {{ serie.title }}
+</div>
+<div class="pvcolorspace" style="background-color: #ffffff;">
+</div>
+<div id="secWrapper">
+    <div id="wrapper">
+        <div id="container">   
+			<div id="serie_div">This serie has {{ serie.artwork_set.count }} artworks.</div>     	
+			<table>
+				<tr>
+					<td style="vertical-align:top; padding-top: 10px;">
+        				<div id="pvtable_div" style="width:100%;">
+                			<table id="pvobject_list" cellpadding="5px">
+                    			<thead>
+                        			<tr>
+                            			<td>Title</td>
+                            			<td>Creator</td>
+                            			<td>Date</td>
+                            			<td>Current Location</td>
+                        			</tr>
+                    			</thead>
+                    			<tbody>
+                        			{% for artwork in artworks.object_list %}
+                        			<tr class="{% cycle 'pvtr_odd' 'pvtr_even' %}" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className={% cycle '\'pvtr_odd\'' '\'pvtr_even\'' %}">
+                            			<td width="30%">
+                                			<a class="pvtd_a" href="{% url artworks_record artwork.id %}">{{ artwork.title }}</a>
+                            			</td>
+                            			<td width="25%">
+                                		{% for creator in artwork.creators.all %} 
+                                			{{ creator.name }} 
+                                		{% endfor %}
+                            			</td>
+                            			<td width="15%">
+                                			{{ artwork.creation_year_start }} - {{ artwork.creation_year_end }}
+                            			</td>
+                            			<td width="30%">
+                                			{{  artwork.current_place.title }}
+                            			</td>
+                        			</tr>
+                        			{% endfor %}
+                    			</tbody>
+			                </table>
+						<div class="pvspace" style="height: 10px; width: 99%;">
+					</div>
+                	<div class="pvpagination">   
+						{% if artworks.paginator.num_pages == 1 %}            	
+                       		<span style="color: #acb19e"> First </span>
+						{% else %}
+						    <a id="first" href="?page=1">First</a>
+						{% endif %}
+						<<
+                    	{% if artworks.has_previous %}
+							<a href="?page={{ artworks.previous_page_number }}">Previous</a>
+						{% else %}
+						    <span style="color: #acb19e"> Previous </span>
+						{% endif %}
+						<span class="current">
+						  << Page {{ artworks.number }} of {{ artworks.paginator.num_pages }} >>
+						</span>
+						{% if artworks.has_next %}
+							<a href="?page={{ artworks.next_page_number }}">Next</a>
+						{% else %}
+						    <span style="color: #acb19e"> Next </span>
+						{% endif %}
+						>>
+						{% if artworks.paginator.num_pages == 1 %}            	
+                       		<span style="color: #acb19e"> Last </span>
+						{% else %}
+						    <a href="?page={{ artworks.paginator.num_pages }}">Last</a>
+						{% endif %}						
+                	</div>
+					<div class="pvspace" style="height: 10px; width: 99%;">
+        			</div>
+    			</div>
+			</td>
+			<td style="width:30%; vertical-align: top; padding: 10px 0 0 30px; "><img id="artwork_image" src="/media/img/arenoir.jpg"></td>
+		</tr>
+	</table>
+</div>
+</div>
+</div>
+{% endblock %}
