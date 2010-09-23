@@ -1,12 +1,14 @@
 # -*-*- coding: utf-8 -*-
+from django.db.models import Q
 from django.shortcuts import HttpResponse, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.utils.translation import gettext as _
 
 from artworks.models import Artwork
+from base.models import GeospatialReference
 
 
 def artworks_list(request):
@@ -36,7 +38,7 @@ def artworks_record(request, artwork_id):
                               {"artwork": artwork}, context_instance=RequestContext(request))
     
 
-def in_range(request, year_from, year_to):
+def artworks_locations(request, year_from, year_to):
     year_from = int(year_from)
     year_to = int(year_to)
     artworks_by = request.GET.get("filter", "artwork_current_place")
@@ -47,32 +49,43 @@ def in_range(request, year_from, year_to):
             'original_place__point__isnull': False,
         }
         place_field_name = "original_place"
+        place_field = "original_places"
     else:
         filter_args = {
             'current_place__title__isnull': False,
             'current_place__point__isnull': False,
         }
         place_field_name = "current_place"
-    artworks = Artwork.objects.in_range(year_from,
-                                        year_to).filter(**filter_args)
-    for artwork in artworks:
-        place_field = getattr(artwork, place_field_name)
-        if place_field.geometry:
-            place_title = u"%s (%s)" % (place_field.title, _("region"))
-            print place_title
+        place_field = "current_places"
+    filter_params = ((
+        (Q(**{"%s__creation_year_start__lte" % place_field: year_from}) &
+         Q(**{"%s__creation_year_end__gte" % place_field: year_from})) |
+        (Q(**{"%s__creation_year_start__gte" % place_field: year_from}) &
+         Q(**{"%s__creation_year_end__lte" % place_field: year_to})) |
+        (Q(**{"%s__creation_year_start__lte" % place_field: year_from}) &
+         Q(**{"%s__creation_year_end__gte" % place_field: year_from}))) &
+        Q(**{"title__isnull": False}) &
+        Q(**{"point__isnull": False})
+    )
+    locations = GeospatialReference.objects.filter(filter_params).distinct()
+    for location in locations:
+        if location.geometry:
+            location_place = u"%s (%s)" % (location.title, _("region"))
+            location_coordinates = location.geometry.wkt
         else:
-            place_title = place_field.title
+            location_place = location.title
+            location_coordinates = location.point.wkt
         dic = {
-            'identifier': artwork.id,
-            'title': artwork.title,
-            'place': place_title,
-            'coordinates': place_field.point.wkt,
+            'identifier': location.id,
+            'place': location_place,
+            'title': location.address,
+            'coordinates': location_coordinates,
         }
         dics.append(dic)
     return HttpResponse(dumps(dics), mimetype="application/json")
 
 
-def properties(request, artwork_id):
+def artworks_properties(request, artwork_id):
     artworks = Artwork.objects.in_bulk([int(artwork_id)])
     dic = {}
 #    if artworks:
