@@ -79,34 +79,29 @@ def artworks_locations(request, year_from, year_to):
             'identifier': location.id,
             'place': location_place,
             'title': location.address,
-            'coordinates': location_coordinates,
+            'coordinates': location.point.wkt,
+            'geometry': (location.geometry and location.geometry.wkt) or "",
         }
         dics.append(dic)
     return HttpResponse(dumps(dics), mimetype="application/json")
 
 
-def artworks_properties(request, artwork_id):
-    artworks = Artwork.objects.in_bulk([int(artwork_id)])
-    dic = {}
-#    if artworks:
-#        artwork = artworks[int(artwork_id)]
-#        dic = {
-#            'identifier': artwork.id,
-#            'title': artwork.title,
-#            'size': artwork.size,
-#            'notes': artwork.notes,
-#            'inscription': artwork.inscription,
-#        }
-#    try:
-#        place_history = artwork.placeshistory_set.get(artwork=artwork,
-#                                                      place_type='L')
-#        place = place_history.place
-#        if hasattr(place.geometry, 'wkt'):
-#            dic.update({
-#                'place': place.name,
-#                'coordinates': place.geometry.wkt,
-#            })
-#            print dic
-#    except PlacesHistory.DoesNotExist:
-#        pass
-    return HttpResponse(dumps(dic), mimetype="application/json")
+def artworks_by_locations(request, geospatialreference_id):
+    location_type = request.GET.get("type", "artwork_original_place")
+    if location_type in ("artwork_current_place", "artwork_original_place"):
+        location_type = location_type[8:] # Removing "artwork_" prefix
+    else:
+        location_type = "original_place"
+    filter_args = {
+        "%s__id" % location_type: geospatialreference_id,
+    }
+    artworks = Artwork.objects.filter(**filter_args).distinct().order_by("title")
+    dics = []
+    for artwork in artworks:
+        dic = {
+            'title': artwork.title,
+            'creators': " / ".join([c.name for c in artwork.creators.all()]),
+            'url': artwork.get_absolute_url()
+        }
+        dics.append(dic)
+    return HttpResponse(dumps(dics), mimetype="application/json")

@@ -121,6 +121,22 @@ table tr td {
     padding: none;
 }
 
+/* Info window */
+#mapContainer .infoWindow {
+    overflow: auto;
+    font-size: 12px;
+}
+
+#mapContainer .infoWindow #artworkList {
+    max-height: 150px !important;
+    color: #555;
+}
+
+#mapContainer .infoWindow ol li a {
+    color: #8B0000;
+}
+
+
 /* Nav */
 
 #nav {

@@ -30,7 +30,7 @@ function initialize() {
     var dateSelectedRange = null;
     var artworkPlaceFilter = "artwork_original_place";
     var map = new google.maps.Map(document.getElementById('map'));
-    var markerClusterer = new MarkerClusterer(map, markers);
+    var markerClusterer = new MarkerClusterer(map, markers, {maxZoom: 10});
     var timeControlOptions = {
         css: 'slider',
         id: 'sliderTimeControl',
@@ -174,60 +174,70 @@ function initialize() {
                 $("#progress").progressbar('value', parseInt(i*factor));
             }
             if (item.coordinates) {
-                var geometry = getGeometryFromWKT(item.coordinates, item.place);
+                var geometry = getGeometryFromWKT(item.coordinates, item.geometry, item.place);
                 if (geometry instanceof google.maps.Marker) {
+                    var parentItem = item;
                     geometry.identifier = item.identifier;
+                    geometry.place = item.place;
                     google.maps.Event.addListener(geometry, "click", function(e) {
-                        var url = "/artworks/"+ this.identifier +"/properties/";
+                        var url = "/artworks/locations/"+ this.identifier +"/list/";
                         var parentMarker = this;
-                        $.getJSON(url, {}, function(data) {
-                            parentMarker.openInfoWindowHtml(data.title +"<br/>("+ data.place +")");
+                        $.getJSON(url, {"type": artworkPlaceFilter}, function(json_data) {
+                            var html = "";
+                            for(var j=0; j<json_data.length; j++) {
+                                var elto = json_data[j];
+                                html += "<li><a href='"+ elto.url +"'>"+ elto.title +"</a> ("+ elto.creators +")</li>";
+                            }
+                            parentMarker.openInfoWindowHtml(
+                                "<div class='infoWindow'>"+ parentMarker.place +" # "+ json_data.length +":<div id='artworkList'><ol>"+ html +"</ol></div></div>"
+                            );
                         });
                     });
                     markers.push(geometry);
-                } else if (geometry) {
-                    polygons.push(geometry);
-                    for(var ig=0; ig<geometry.length; ig++) {
-                        var polygon = geometry[ig];
-                        map.addOverlay(polygon);
-                    }
                 }
             }
         }
-//        for(var j=0; j<polygons.length; j++) {
-//            var polys = polygons[j];
-//            for(var i=0; i<polys.length; i++) {
-//                var polygon = polys[i];
-//                map.addOverlay(polygon);
-//            }
-//        }
         markerClusterer.addMarkers(markers);
         $("#progress").hide();
     }
 
-    markerIcon = new google.maps.Icon();
-    markerIcon.image = '/media/img/markers/image.png';
-    markerIcon.shadow = '/media/img/markers/shadow.png';
-    markerIcon.iconSize = new google.maps.Size(28,38);
-    markerIcon.shadowSize = new google.maps.Size(47,38);
-    markerIcon.iconAnchor = new google.maps.Point(14,38);
-    markerIcon.infoWindowAnchor = new google.maps.Point(14,0);
-    markerIcon.printImage = '/media/img/markers/printImage.gif';
-    markerIcon.mozPrintImage = '/media/img/markers/mozPrintImage.gif';
-    markerIcon.printShadow = '/media/img/markers/printShadow.gif';
-    markerIcon.transparent = '/media/img/markers/transparent.png';
-    markerIcon.imageMap = [19,0,21,1,22,2,23,3,24,4,25,5,26,6,26,7,27,8,27,9,27,10,27,11,27,12,27,13,27,14,27,15,27,16,27,17,27,18,27,19,27,20,26,21,25,22,25,23,24,24,23,25,21,26,20,27,19,28,18,29,17,30,17,31,16,32,16,33,16,34,16,35,15,36,15,37,9,37,8,36,8,35,7,34,6,33,5,32,5,31,5,30,5,29,5,28,5,27,6,26,5,25,4,24,3,23,2,22,1,21,1,20,0,19,0,18,0,17,0,16,0,15,0,14,0,13,0,12,0,11,0,10,0,9,0,8,1,7,1,6,2,5,3,4,4,3,5,2,6,1,8,0];
+    markerArtwork = new google.maps.Icon();
+    markerArtwork.image = '/media/img/markers/image.png';
+    markerArtwork.shadow = '/media/img/markers/shadow.png';
+    markerArtwork.iconSize = new google.maps.Size(28,38);
+    markerArtwork.shadowSize = new google.maps.Size(47,38);
+    markerArtwork.iconAnchor = new google.maps.Point(14,38);
+    markerArtwork.infoWindowAnchor = new google.maps.Point(14,0);
+    markerArtwork.printImage = '/media/img/markers/printImage.gif';
+    markerArtwork.mozPrintImage = '/media/img/markers/mozPrintImage.gif';
+    markerArtwork.printShadow = '/media/img/markers/printShadow.gif';
+    markerArtwork.transparent = '/media/img/markers/transparent.png';
+    markerArtwork.imageMap = [19,0,21,1,22,2,23,3,24,4,25,5,26,6,26,7,27,8,27,9,27,10,27,11,27,12,27,13,27,14,27,15,27,16,27,17,27,18,27,19,27,20,26,21,25,22,25,23,24,24,23,25,21,26,20,27,19,28,18,29,17,30,17,31,16,32,16,33,16,34,16,35,15,36,15,37,9,37,8,36,8,35,7,34,6,33,5,32,5,31,5,30,5,29,5,28,5,27,6,26,5,25,4,24,3,23,2,22,1,21,1,20,0,19,0,18,0,17,0,16,0,15,0,14,0,13,0,12,0,11,0,10,0,9,0,8,1,7,1,6,2,5,3,4,4,3,5,2,6,1,8,0];
 
-    function getGeometryFromWKT(wkt, title) {
+    markerWorld = new google.maps.Icon();
+    markerWorld.image = '/media/img/markers/world.png';
+    markerWorld.shadow = '/media/img/markers/shadow.png';
+    markerWorld.iconSize = new google.maps.Size(28,38);
+    markerWorld.shadowSize = new google.maps.Size(47,38);
+    markerWorld.iconAnchor = new google.maps.Point(14,38);
+    markerWorld.infoWindowAnchor = new google.maps.Point(14,0);
+    markerWorld.printImage = '/media/img/markers/printWorld.gif';
+    markerWorld.mozPrintImage = '/media/img/markers/mozPrintWorld.gif';
+    markerWorld.printShadow = '/media/img/markers/printShadow.gif';
+    markerWorld.transparent = '/media/img/markers/transparent.png';
+    markerWorld.imageMap = [19,0,21,1,22,2,23,3,24,4,25,5,26,6,26,7,27,8,27,9,27,10,27,11,27,12,27,13,27,14,27,15,27,16,27,17,27,18,27,19,27,20,26,21,25,22,25,23,24,24,23,25,21,26,20,27,19,28,18,29,17,30,17,31,16,32,16,33,16,34,16,35,15,36,15,37,9,37,8,36,8,35,7,34,6,33,5,32,5,31,5,30,5,29,5,28,5,27,6,26,5,25,4,24,3,23,2,22,1,21,1,20,0,19,0,18,0,17,0,16,0,15,0,14,0,13,0,12,0,11,0,10,0,9,0,8,1,7,1,6,2,5,3,4,4,3,5,2,6,1,8,0];
+
+
+    function getGeometryFromWKT(wkt_point, wkt_geometry, title) {
         multipolygonRegExp = /^MULTIPOLYGON\s*\(\(\((([+-]?\d+(\.\d+)? [+-]?\d+(\.\d+)?,\s*)+([+-]?\d+(\.\d+)? [+-]?\d+(\.\d+)?){1})\)\)(,\s*\(\((([+-]?\d+(\.\d+)? [+-]?\d+(\.\d+)?,\s*)+([+-]?\d+(\.\d+)? [+-]?\d+(\.\d+)?){1})\)\))*\)$/;
-        multipolygonMatch = wkt.match(multipolygonRegExp);
+        multipolygonMatch = wkt_geometry.match(multipolygonRegExp);
         polygonRegExp = /^POLYGON\s*\(\((([+-]?\d+(\.\d+)? [+-]?\d+(\.\d+)?,\s*)+([+-]?\d+(\.\d+)? [+-]?\d+(\.\d+)?){1})\)\)$/;
-        polygonMatch = wkt.match(polygonRegExp);
+        polygonMatch = wkt_geometry.match(polygonRegExp);
         pointRegExp = /^POINT\s*\(([+-]?\d+(\.\d+)? [+-]?\d+(\.\d+)?){1}\)$/;
-        pointMatch = wkt.match(pointRegExp);
+        pointMatch = wkt_point.match(pointRegExp);
         if (multipolygonMatch || polygonMatch) {
             if (multipolygonMatch) {
-                polygonsList = wkt.split(/MULTIPOLYGON\s*\(\s*\(\s*\(\s*(.*)\s*\)\s*\)\s*\)/i)[1].split(/\s*\)\s*\)\s*,\s*\(\s*\(\s*/);
+                polygonsList = wkt_geometry.split(/MULTIPOLYGON\s*\(\s*\(\s*\(\s*(.*)\s*\)\s*\)\s*\)/i)[1].split(/\s*\)\s*\)\s*,\s*\(\s*\(\s*/);
             } else {
                 polygonsList = [polygonMatch[1]];
             }
@@ -243,15 +253,38 @@ function initialize() {
                 }
                 polygonsObjects[polygonsObjects.length] = new google.maps.Polygon(points, "#FF8000", 2, undefined, "#FF8000", 0.25);
             }
-            return polygonsObjects;
-        } else if (pointMatch) {
+        }
+        if (pointMatch) {
             var wktPoint = pointMatch[1].split(" ");
             var point = new google.maps.LatLng(wktPoint[1], wktPoint[0]);
-            var markerOptions = {
-                icon: markerIcon,
-                title: title
+            var marker, markerOptions;
+            if (multipolygonMatch || polygonMatch) {
+                markerOptions = {
+                    icon: markerWorld,
+                    title: title
+                }
+                marker = new google.maps.Marker(point, markerOptions);
+                google.maps.Event.addListener(marker, "mouseover", function(e) {
+                    var parentMarker = this;
+                    for(var ig=0; ig<polygonsObjects.length; ig++) {
+                        var polygon = polygonsObjects[ig];
+                        map.addOverlay(polygon);
+                    }
+                });
+                google.maps.Event.addListener(marker, "mouseout", function(e) {
+                    var parentMarker = this;
+                    for(var ig=0; ig<polygonsObjects.length; ig++) {
+                        var polygon = polygonsObjects[ig];
+                        map.removeOverlay(polygon);
+                    }
+                });
+            } else {
+                markerOptions = {
+                    icon: markerArtwork,
+                    title: title
+                }
+                marker = new google.maps.Marker(point, markerOptions);
             }
-            var marker = new google.maps.Marker(point, markerOptions);
             return marker;
         }
     }
