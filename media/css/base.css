@@ -121,15 +121,25 @@ table tr td {
     padding: none;
 }
 
-/* Info window */
-#mapContainer .infoWindow {
-    overflow: auto;
-    font-size: 12px;
+.filterMapControl span {
+    border-right: 1px solid #000;
+    margin: 0px 4px 0px 0px;
+    padding: 0px 4px 0px 0px;
 }
 
-#mapContainer .infoWindow #artworkList {
-    max-height: 150px !important;
-    color: #555;
+/* Info window */
+#mapContainer .infoWindow {
+    font: 12px/1.6 Arial, sans-serif;
+}
+
+#mapContainer .infoWindow .artworkTitle {
+    font-weight: bold;
+}
+
+#mapContainer .infoWindow .artworkList {
+    overflow: auto;
+    max-height: 135px !important;
+    color: #888;
 }
 
 #mapContainer .infoWindow ol li a {
