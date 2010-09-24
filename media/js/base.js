@@ -44,31 +44,33 @@ function initialize() {
         onTimeChange: onTimeChange
     };
     var timeControl = new TimeControl(timeControlOptions);
-    function ExhibitControl() {};
-    ExhibitControl.prototype = new google.maps.Control();
-    ExhibitControl.prototype.initialize = function(map) {
-        var container = document.createElement("div");
-        var exhibitDiv = $("<DIV>");
-        exhibitDiv.html("Exhibit");
-        exhibitDiv.attr("href", "javascript:void(0);");
-        exhibitDiv.addClass("exhibitMapControl");
-        $(container).append(exhibitDiv);
-        exhibitDiv.click(function() {
-            location.href = "/exhibit/artworks/?"+ dateSelectedRange;
-            return false;
-        });
-        map.getContainer().appendChild(container);
-        return container;
-    }
-    ExhibitControl.prototype.getDefaultPosition = function() {
-      return new google.maps.ControlPosition(google.maps.ANCHOR_TOP_RIGHT, new google.maps.Size(214, 7));
-    }
+//    function ExhibitControl() {};
+//    ExhibitControl.prototype = new google.maps.Control();
+//    ExhibitControl.prototype.initialize = function(map) {
+//        var container = document.createElement("div");
+//        var exhibitDiv = $("<DIV>");
+//        exhibitDiv.html("Exhibit");
+//        exhibitDiv.attr("href", "javascript:void(0);");
+//        exhibitDiv.addClass("exhibitMapControl");
+//        $(container).append(exhibitDiv);
+//        exhibitDiv.click(function() {
+//            location.href = "/exhibit/artworks/?"+ dateSelectedRange;
+//            return false;
+//        });
+//        map.getContainer().appendChild(container);
+//        return container;
+//    }
+//    ExhibitControl.prototype.getDefaultPosition = function() {
+//      return new google.maps.ControlPosition(google.maps.ANCHOR_TOP_RIGHT, new google.maps.Size(214, 7));
+//    }
     function FilterControl() {};
     FilterControl.prototype = new google.maps.Control();
     FilterControl.prototype.initialize = function(map) {
         var container = document.createElement("div");
         var filterDiv = $("<DIV>");
         var filterLabel = $("<LABEL>");
+        var filterSpanHome = $("<SPAN>");
+        var filterSpanExhibit = $("<SPAN>");
         var filterSelect = $("<SELECT>");
         var filterOptionsValues = ["artwork_original_place",
                                    "artwork_current_place"];
@@ -76,14 +78,28 @@ function initialize() {
                                   "current location"];
         filterSelect.attr("id", "filterSelect");
         filterSelect.attr("name", "filterSelect");
-        filterLabel.attr("for", "filterSelect");
-        filterLabel.html("Artworks locations by");
         for(i=0; i<2; i++) {
             var filterOption = $("<OPTION>")
             filterOption.html(filterOptionsTexts[i]);
             filterOption.attr("value", filterOptionsValues[i]);
             filterSelect.append(filterOption);
         }
+        filterLabel.attr("for", "filterSelect");
+        filterLabel.html("Artworks locations by");
+        filterSpanHome.attr("href", "javascript:void(0);");
+        filterSpanHome.html("Home");
+        filterDiv.append(filterSpanHome);
+        filterSpanHome.click(function() {
+            location.href = "/";
+            return false;
+        });
+        filterSpanExhibit.attr("href", "javascript:void(0);");
+        filterSpanExhibit.html("Exhibit");
+        filterDiv.append(filterSpanExhibit);
+        filterSpanExhibit.click(function() {
+            location.href = "/exhibit/artworks/?"+ dateSelectedRange;
+            return false;
+        });
         filterDiv.append(filterLabel);
         filterDiv.append(filterSelect);
         filterSelect.change(function() {
@@ -97,10 +113,10 @@ function initialize() {
         return container;
     }
     FilterControl.prototype.getDefaultPosition = function() {
-      return new google.maps.ControlPosition(google.maps.ANCHOR_TOP_RIGHT, new google.maps.Size(305, 7));
+      return new google.maps.ControlPosition(google.maps.ANCHOR_TOP_RIGHT, new google.maps.Size(212, 7)); // 305
     }
     map.addControl(timeControl);
-    map.addControl(new ExhibitControl());
+//    map.addControl(new ExhibitControl());
     map.addControl(new FilterControl());
     map.addControl(new google.maps.LargeMapControl3D());
     map.addMapType(google.maps.PHYSICAL_MAP);
@@ -189,8 +205,8 @@ function initialize() {
                                 html += "<li><a href='"+ elto.url +"'>"+ elto.title +"</a> ("+ elto.creators +")</li>";
                             }
                             parentMarker.openInfoWindowHtml(
-                                "<div class='infoWindow'>"+ parentMarker.place +" # "+ json_data.length +":<div id='artworkList'><ol>"+ html +"</ol></div></div>"
-                            );
+                                "<span class='infoWindow'><div class='artworkTitle'>"+ parentMarker.place +" ["+ json_data.length +"]</div><div class='artworkList'><ol>"+ html +"</ol></div></span>"
+                            , {maxHeight: 150, maxWidth: 500});
                         });
                     });
                     markers.push(geometry);
