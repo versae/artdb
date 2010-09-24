@@ -28,9 +28,11 @@
 <div id="pvwrap">
 <div class="pvspace" style="padding: 10px 0 10px 20px;"></div>
 	<div id="pvheader">
-		<a href="{% url public_view %}"><img src="/media/img/baroqueart.png" id="public_view_logo" alt="Logo" /></a>
-		<div style="height: 23px; padding: 5px 5px 7px 5px;">
+    	<a href="{% url public_view %}"><img src="/media/img/baroqueart.png" id="public_view_logo" alt="Logo" /></a>
+		<div style=" height: 23px; padding: 5px 5px 7px 5px;">
+		    {% block search_box %}
 			<input type="text" id="pv_search_text"/>
+			{% endblock %}
     		<input type="button" id="pv_search_button"/>
 		</div>
 		<ul id="navBar">

@@ -143,8 +143,18 @@
 	right: 385px;
 }
 
-#advanced_search_button:hover,#search_button:hover,#pv_search_button:hover
-	{
+#pvheader #exhibitSearch input[type="text"] {
+    height: 23px;
+    width: 160px;
+    background: url(/media/img/search_box.png);
+    border: none;
+    float: right;
+    position: relative;
+    top: 5px;
+    right: 390px;
+}
+
+#advanced_search_button:hover,#search_button:hover,#pv_search_button:hover {
 	cursor: pointer;
 }
 
@@ -158,6 +168,32 @@
 	color: #000000;
 	border-bottom: dashed 1px #504f4f;
 }
+
+#exhibitFiltersContainer {
+    font-size: 0.75em;
+    height: 200px;
+/*    overflow: auto;*/
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#exhibitFilters {
+    width: 1780px;
+}
+
+#exhibitFilters span {
+    float: left;
+}
+
+#exhibitFilters span div.exhibit-facet-header {
+    width: 250px;
+}
+
+#exhibitFilters span div.exhibit-facet-body-frame {
+    width: 250px;
+    height: 250px;
+}
+
 
 /* for dropdown in list pages*/
 #pvsort_span {
@@ -405,6 +441,10 @@ ul#navBar li a:hover {
 }
 
 .pvimage_block {
+<<<<<<< HEAD
+=======
+	text-align: right;
+>>>>>>> Improved the Exhibit vew with the style of the site.
 	padding-right: 35px;
 }
 
@@ -553,6 +593,11 @@ ul#navBar li a:hover {
 	font: 23px/ 1.6 Palatino, serif;
 	text-indent: 5px;
 	border-bottom: 1px dashed #ddd;
+}
+
+.pvart_image {
+	height: 170px;
+	width: 150px;
 }
 
 #secCol {
