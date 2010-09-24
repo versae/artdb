@@ -30,7 +30,9 @@
 	<div id="pvheader">
     	<img src="/media/img/banner1.png" id="pvlogo" alt="Logo" />
 		<div style=" height: 23px; padding: 5px 5px 7px 5px;">
+		    {% block search_box %}
 			<input type="text" id="pv_search_text"/>
+			{% endblock %}
     		<input type="button" id="pv_search_button"/>
 		</div>
         <ul id="navBar">
