@@ -1,671 +1,803 @@
 /* CSS for Public View of ArtDB */
+#serie_div {
+	border-bottom: solid 1px #f0f0f0;
+	font-family: "Times New Roman";
+	font-size: 1em;
+	line-height: 22px;
+	width: 98%;
+}
+
+#result_text {
+	font-family: "Times New Roman";
+	font-size: 1.05em;
+	line-height: 25px;
+}
+
+.text_search {
+	border: solid 1px #dbeca6;
+}
+
+.td_height{
+	line-height: 30px;
+}
+
+.search_select, .pv_search_select {
+	height: 25px;
+	width: 180px;
+	vertical-align: middle;
+	border: solid 1px #dbeca6;
+	background-color: #eef9ce;
+	color: #504f4f;
+	font-family: "Times New Roman";
+	font-size: 1em;
+}
+
+.pv_search_select {
+	position: relative;
+	right: -30px;
+	width: 225px;
+}
+
+#table_search {
+	border: solid 1px #f0f0f0;
+	width: 90%;
+	text-align: center;
+	font-family: "Times New Roman";
+	font-size: 1em;
+	padding: 10px;
+}
+
+#qbuilder {
+	vertical-align: top;
+	height: 22px;
+	width: 115px;
+	background: url(/media/img/qbuilder.png);
+	border: none;
+	float: right;
+	position: relative;
+	right: 15px;
+}
+
+#fview_button {
+	vertical-align: top;
+	height: 25px;
+	width: 131px;
+	border: solid 2px #dbeca6;
+	background-color: #eef9ce;
+	color: #504f4f;
+	font-family: "Times New Roman";
+	font-size: 1em;
+	font-weight: bold;
+	float: left;
+	position: relative;
+	left: 15px;
+	top: -5px;
+}
+
+#fview_button:hover {
+	cursor: pointer;
+}
+
+#advanced_search_button {
+	vertical-align: top;
+	height: 25px;
+	width: 131px;
+	background: url(/media/img/asearch.png);
+	border: none;
+	float: right;
+	position: relative;
+	top: 8px;
+	right: 35px;
+}
+
+#search_button,#pv_search_button {
+	vertical-align: top;
+	height: 25px;
+	width: 23px;
+	background: url(/media/img/sicon.png);
+	border: none;
+	float: right;
+	position: relative;
+}
+
+#search_button {
+	top: 8px;
+	right: 40px;
+}
+
+#pv_search_button {
+	top: 5px;
+	right: 205px;
+}
+
+#search_text {
+	height: 23px;
+	width: 160px;
+	background: url(/media/img/search_box.png);
+	border: none;
+	float: right;
+	position: relative;
+	top: 8px;
+	right: 45px;
+}
+
+#pv_search_text {
+	height: 23px;
+	width: 160px;
+	background: url(/media/img/search_box.png);
+	border: none;
+	float: right;
+	position: relative;
+	top: 5px;
+	right: 390px;
+}
+
+#advanced_search_button:hover,#search_button:hover {
+	cursor: pointer;
+}
+
 .pvtitle {
-    width: 950px;
-    padding: 5px;
-    text-decoration: none;
-    font-weight: normal;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1.2em;
-    color: #000000;
-    border-bottom: dashed 1px #504f4f;
+	width: 950px;
+	padding: 5px;
+	text-decoration: none;
+	font-weight: normal;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1.2em;
+	color: #000000;
+	border-bottom: dashed 1px #504f4f;
 }
 
 /* for dropdown in list pages*/
 #pvsort_span {
-    font-size: 0.8em;
-    padding: 5px;
-    float: right;
-    vertical-align: middle;
+	font-size: 0.8em;
+	padding: 5px;
+	float: right;
+	vertical-align: middle;
 }
 
 #pvsort_select {
-    height: 22px;
-    float: right;
-    vertical-align: middle;
-    border: solid 1px #dbeca6;
-    background-color: #eef9ce;
-    color: #504f4f;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 0.8em;
+	height: 22px;
+	float: right;
+	vertical-align: middle;
+	border: solid 1px #dbeca6;
+	background-color: #eef9ce;
+	color: #504f4f;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 0.8em;
 }
 
 .pvpagination {
-    padding: 0 20px 0 0;
-    text-align: right;
-    text-decoration: none;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 0.9em;
-    color: #504f4f;
+	padding: 0 20px 0 0;
+	text-align: right;
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 0.9em;
+	color: #504f4f;
 }
 
-.pvpagination a:link, .pvpagination a:visited {
-    text-decoration: none;
-    font-style: normal;
-    color: #504f4f;
+.pvpagination a:link,.pvpagination a:visited {
+	text-decoration: none;
+	font-style: normal;
+	color: #504f4f;
 }
 
 #pvfooter_div {
-    padding: 10px 20px 0 0;
+	padding: 10px 20px 0 0;
 }
 
 /* begin css for table showing list of objects  */
 #pvtable_div {
-    width: 955px;
-    text-decoration: none;
-    font-weight: normal;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1em;
-    border: solid 2px #dbeca6;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 11px;
-    border-radius: 11px;
-    behavior: url(/media/htc/border-radius.htc)
+	width: 955px;
+	text-decoration: none;
+	font-weight: normal;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1em;
+	border: solid 2px #dbeca6;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 11px;
+	border-radius: 11px;
+	behavior: url(/media/htc/border-radius.htc)
 }
 
 #pvobject_list {
-    width: 100%;
+	width: 100%;
 }
 
 #pvobject_list thead {
-    background-color: #dbeca6;
+	background-color: #dbeca6;
 }
 
 #pvobject_list tbody {
-    font-size: 0.9em;
+	font-size: 0.9em;
 }
 
 #pvobject_list thead td {
-    height: 40px;
-    padding: 3px 0 3px 5px;
-    overflow: auto;
+	height: 40px;
+	padding: 3px 0 3px 5px;
+	overflow: auto;
+	border-right: solid 1px #f0f0f0;
+	border-bottom: solid 1px #f0f0f0;
 }
 
 #pvobject_list tbody td {
-    min-height: 40px;
-    height: 40px;
-    max-height: 40px;
+	min-height: 40px;
+	height: 40px;
+	max-height: 40px;
+	border-right: solid 1px #f0f0f0;
+	border-bottom: solid 1px #f0f0f0;
 }
 
 .pvtr_odd {
-    background-color: #fff;
+	background-color: #fff;
 }
 
 .pvtr_even {
-    background-color: #eef9ce;
+	background-color: #eef9ce;
 }
 
 .pvtr_highlight {
-    background-color: #cae184;
+	background-color: #cae184;
 }
 
-.pvtd_a:link, .pvtd_a:visited, .pagination a:link, .pagination a:visited {
-    color: #504f4f;
-    font-style: normal;
-    text-decoration: none;
+.pvtd_a:link,.pvtd_a:visited,.pagination a:link,.pagination a:visited {
+	color: #504f4f;
+	font-style: normal;
+	text-decoration: none;
 }
 
-.pvtd_a:hover, .pagination a:hover {
-    color: #504f4f;
-    text-decoration: underline;
+.pvtd_a:hover,.pagination a:hover {
+	color: #504f4f;
+	text-decoration: underline;
 }
 
-/* end table css */
-/* css for header - logo and navigation */
+/* end table css */ /* css for header - logo and navigation */
 #pvheader {
-    height: 38px;
-    width: 970px;
-    margin: 0px auto;
-    position: relative;
+	height: 38px;
+	width: 970px;
+	margin: 0px auto;
+	position: relative;
 }
 
 #pvlogo {
-    position: absolute;
-    top: 0px;
-    left: 0px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
 }
 
 ul#navBar {
-    height: 37px;
-    margin: 0px;
-    padding: 0px;
-    list-style-type: none;
-    position: absolute;
-    bottom: 0px;
-    right: 10px;
+	height: 37px;
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;
+	position: absolute;
+	bottom: 0px;
+	right: 10px;
 }
 
 ul#navBar li {
-    float: left;
-    display: block;
-    width: auto;
-    height: 37px;
-    padding: 0px 0px 0px 1px;
+	float: left;
+	display: block;
+	width: 87px;
+	height: 37px;
+	padding: 0px 0px 0px 1px;
 }
 
-ul#navBar li a:link, ul#navBar li a:visited {
-    float: left;
-    display: block;
-    width: auto;
-    margin: 0px;
-    height: 25px;
-    padding: 5px 8px 5px 8px;
-    text-decoration: none;
-    font-weight: normal;
-    font-style: normal;
-    background: url(/media/img/nav_bg.png) repeat-x top left;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1.1em;
-    color: #ededed;
-    border: none;
+ul#navBar li a:link,ul#navBar li a:visited {
+	float: left;
+	display: block;
+	width: 70px;
+	margin: 0px;
+	height: 25px;
+	padding: 5px 8px 5px 8px;
+	text-decoration: none;
+	font-weight: normal;
+	font-style: normal;
+	background: url(/media/img/nav_bg.png) repeat-x top left;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1.1em;
+	color: #ededed;
+	border: none;
+	text-align: center;
 }
 
-ul#navBar li.current a:link, ul#navBar li.current a:visited {
-    background: url(/media/img/nav_hover.png) repeat-x top left;
-    font-style: normal;
+ul#navBar li.current a:link,ul#navBar li.current a:visited {
+	background: url(/media/img/nav_hover.png) repeat-x top left;
+	font-style: normal;
 }
 
 ul#navBar li a:hover {
-    color: #fff;
-    text-decoration: none;
-    font-style: normal;
-    background: url(/media/img/nav_hover.png) repeat-x top left;
-    border: none;
+	color: #fff;
+	text-decoration: none;
+	font-style: normal;
+	background: url(/media/img/nav_hover.png) repeat-x top left;
+	border: none;
 }
 
 /* end header css */
 #wrapper {
-    width: 961px;
-    margin: 0px auto;
-    padding: 0px;
-    background: url(/media/img/content_bg.png) repeat-y top left;
+	width: 961px;
+	margin: 0px auto;
+	padding: 0px;
+	background: url(/media/img/content_bg.png) repeat-y top left;
 }
 
 #secWrapper {
-    width: 960px;
-    margin: 0px auto;
-    padding: 52px 0px 0px 0px;
-    background: url(/media/img/content_top.png) no-repeat top left;
+	width: 960px;
+	margin: 0px auto;
+	padding: 52px 0px 0px 0px;
+	background: url(/media/img/content_top.png) no-repeat top left;
 }
 
 #container {
-    width: 930px;
-    margin: 0px auto;
-    padding: 0px 15px 30px 20px;
-    background: url(/media/img/content_bottom.png) no-repeat bottom left;
+	width: 930px;
+	margin: 0px auto;
+	padding: 0px 15px 30px 20px;
+	background: url(/media/img/content_bottom.png) no-repeat bottom left;
 }
 
 #smwrapper {
-    width: 925px;
-    margin: 0px auto;
-    padding: 0px;
-    background: url(/media/img/sm_content_bg.png) repeat-y top left;
+	width: 925px;
+	margin: 0px auto;
+	padding: 0px;
+	background: url(/media/img/sm_content_bg.png) repeat-y top left;
 }
 
 #smsecWrapper {
-    width: 925px;
-    margin: 0px auto;
-    padding: 30px 0px 0px 0px;
-    background: url(/media/img/sm_content_top.png) no-repeat top left;
+	width: 925px;
+	margin: 0px auto;
+	padding: 30px 0px 0px 0px;
+	background: url(/media/img/sm_content_top.png) no-repeat top left;
 }
 
 #smcontainer {
-    width: 890px;
-    margin: 0px auto;
-    padding: 0px 15px 30px 20px;
-    background: url(/media/img/sm_content_bottom.png) no-repeat bottom left;
+	width: 890px;
+	margin: 0px auto;
+	padding: 0px 15px 30px 20px;
+	background: url(/media/img/sm_content_bottom.png) no-repeat bottom left;
 	height: 550px;
 }
 
 #container td {
-    border: none;
-    text-decoration: none;
-    font-weight: normal;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1em;
-    color: #504f4f;
+	border: none;
+	text-decoration: none;
+	font-weight: normal;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1em;
+	color: #504f4f;
 }
 
-.hlink:link, .hlink:visited, .boldTxt {
-    color: #000;
-    text-decoration: none;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1.05em;
+.hlink:link,.hlink:visited,.boldTxt {
+	color: #000;
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1.05em;
 }
 
 .hlink:hover {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 .pvimage_block {
-    text-align: right;
-    padding-right: 35px;
+	text-align: right;
+	padding-right: 35px;
 }
 
 .pvcolumn_header {
-    text-align: left;
-    border: 1px solid #e5f8aa;
-    margin: 0px;
-    padding: 6px;
-    width: 625px;
-    list-style-type: none;
-    background: url(/media/img/main_col_bg.png) no-repeat top left #ffffff;
+	text-align: left;
+	border: 1px solid #e5f8aa;
+	margin: 0px;
+	padding: 6px;
+	width: 625px;
+	list-style-type: none;
+	background: url(/media/img/main_col_bg.png) no-repeat top left #ffffff;
 }
 
 #pvcolumn_body {
-    text-align: left;
-    border: 1px solid #e5f8aa;
-    margin: 0px;
-    padding-left: 12px;
-    width: 625px;
-    list-style-type: none;
-    background: #dbeca6;
-    font-size: 0.9em;
+	text-align: left;
+	border: 1px solid #e5f8aa;
+	margin: 0px;
+	padding-left: 12px;
+	width: 625px;
+	list-style-type: none;
+	background: #dbeca6;
+	font-size: 0.9em;
 }
 
 #pvcopyright {
-    text-align: center;
-    width: 960px;
-    font-size: 0.7em;
+	text-align: center;
+	width: 960px;
+	font-size: 0.7em;
 }
 
 #pvrecord td {
-    height: 30px;
+	height: 30px;
 }
 
 .pvspace {
-    width: 940px;
-    height: 2px;
-    background: #fff;
+	width: 940px;
+	height: 2px;
+	background: #fff;
 }
 
 .pvcolorspace {
-    width: 940px;
-    height: 5px;
-    padding-left: 20px;
+	width: 940px;
+	height: 5px;
+	padding-left: 20px;
 }
 
-.pvbreadcrumb, .pvfooter {
-    width: 940px;
-    height: 16px;
-    padding: 3px 0 3px 20px;
-    background: #504f4f;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 0.9em;
-    font-style: italic;
-    color: #fff;
+.pvbreadcrumb,.pvfooter {
+	width: 940px;
+	height: 16px;
+	padding: 3px 0 3px 20px;
+	background: #504f4f;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 0.9em;
+	font-style: italic;
+	color: #fff;
 }
 
 .pvfooter {
-    width: 930px;
-    text-align: right;
-    padding-right: 10px;
+	width: 930px;
+	text-align: right;
+	padding-right: 10px;
 }
 
-.pvfooter a:link, a:visited {
-    text-decoration: none;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1em;
-    font-style: italic;
-    color: #fff;
+.pvfooter a:link,a:visited {
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1em;
+	font-style: italic;
+	color: #fff;
 }
 
 .pvfooter a:hover {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
-.pvbreadcrumb a:link, a:visited {
-    text-decoration: none;
-    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
-    font-size: 1em;
-    font-style: italic;
-    color: #fff;
+.pvbreadcrumb a:link,a:visited {
+	text-decoration: none;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 1em;
+	font-style: italic;
+	color: #fff;
 }
 
 .pvbreadcrumb a:hover {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 #preview {
-    position: absolute;
-    border: 1px solid #ccc;
-    background: #333;
-    padding: 1px;
-    display: none;
-    color: #fff;
+	position: absolute;
+	border: 1px solid #ccc;
+	background: #333;
+	padding: 1px;
+	display: none;
+	color: #fff;
 }
 
 #pvmain {
-    width: 930px;
-    padding: 20px;
-    background: #fff;
-    border: solid 1px #f0f0f0;
+	width: 930px;
+	padding: 20px;
+	background: #fff;
+	border: solid 1px #f0f0f0;
 }
 
 #pvbanner {
-    background: url(/media/img/banner.png) no-repeat;
-    width: 970px;
-    height: 75px;
-    margin-left: 15px;
+	background: url(/media/img/banner.png) no-repeat;
+	width: 970px;
+	height: 75px;
+	margin-left: 15px;
 }
 
 #pvouter {
-    margin-left: 15px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    width: 940px;
-    height: 25px;
-    background: #000000;
+	margin-left: 15px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	width: 940px;
+	height: 25px;
+	background: #000000;
 }
 
 #pvmenu {
-    width: 940px;
-    height: 25px;
-    background: #90ac39;
+	width: 940px;
+	height: 25px;
+	background: #90ac39;
 }
 
 #pvwrap {
-    width: 970px;
-    margin: 0 auto;
-    background: #fff;
+	width: 970px;
+	margin: 0 auto;
+	background: #fff;
 }
 
 #pvbodywrap {
-    width: 960px;
-    margin: 0 auto;
+	width: 960px;
+	margin: 0 auto;
 }
 
 #pvwrap h1 {
-    margin-left: 10px;
-    width: 930px;
-    font: 23px / 1.6 Palatino, serif;
-    text-indent: 5px;
-    border-bottom: 1px dashed #ddd;
+	margin-left: 10px;
+	width: 930px;
+	font: 23px/ 1.6 Palatino, serif;
+	text-indent: 5px;
+	border-bottom: 1px dashed #ddd;
 }
 
 .pvart_image {
-    height: 170px;
-    width: 150px;
+	height: 170px;
+	width: 150px;
 }
 
 #secCol {
-    width: 380px;
-    margin: 0px;
-    padding: 0px;
-    text-align: center;
-    position: relative;
-    left: -20px;
-	top: -520px;    
+	width: 380px;
+	position: relative;
+	left: -20px;
 }
 
-#sec_col_top{
+#sec_col_top {
 	width: 300px;
-	top: -545px;
-    text-align: center;
-    position: relative;
+	text-align: center;
 	border: dashed 1px #dbeca6;
 	height: 320px;
 	-moz-border-radius: 10px;
 }
 
 #login {
-    background: url(/media/img/login_bg.png) no-repeat top left;
-    margin: 0px auto;
-    padding: 5px 5px 5px 5px;
-    width: 320px;
-    height: 220px;
-    font-size: 1.4em;
-    border: none;
-
+	background: url(/media/img/login_bg.png) no-repeat top left;
+	margin: 0px auto;
+	padding: 5px 5px 5px 5px;
+	width: 320px;
+	height: 220px;
+	font-size: 1.4em;
+	border: none;
 }
 
 #login h4 {
-    font-size: 18px;
-    font-weight: normal;
-    font-family: "Times New Roman";
-    width: 246px;
-    height: 31px;
-    padding: 8px 0px 0px 35px;
-    margin: 0px;
-    text-align: left;
+	font-size: 18px;
+	font-weight: normal;
+	font-family: "Times New Roman";
+	width: 246px;
+	height: 31px;
+	padding: 8px 0px 0px 35px;
+	margin: 0px;
+	text-align: left;
 }
 
 #login form {
-    height: 95px;
-    width: 276px;
-    padding: 10px 0px 0px 0px;
-    margin: -2px;
+	height: 95px;
+	width: 276px;
+	padding: 10px 0px 0px 0px;
+	margin: -2px;
 }
 
 #login p {
-    width: 276px;
-    margin: 0px;
-    padding: 0px;
-    font-family: Arial, Helvetica, sans-serif;
-    vertical-align: middle;
+	width: 276px;
+	margin: 0px;
+	padding: 0px;
+	font-family: Arial, Helvetica, sans-serif;
+	vertical-align: middle;
 }
 
 #login form p label {
-    text-align: left;
-    margin-left: 0.5em;
-    margin-top: 0.4em;
-    float: left;
-    font-size: 14px;
+	text-align: left;
+	margin-left: 0.5em;
+	margin-top: 0.4em;
+	float: left;
+	font-size: 14px;
 }
 
 #uname {
-    margin-bottom: 12px;
+	margin-bottom: 12px;
 }
 
 #login form p.check {
-    padding-left: 77px;
-    width: 199px;
-    height: 23px;
+	padding-left: 77px;
+	width: 199px;
+	height: 23px;
 }
 
 #login #remlabel {
-    float: left;
-    font-size: 12px;
-    position: relative;
-    left: -3px;
+	float: left;
+	font-size: 12px;
+	position: relative;
+	left: -3px;
 }
 
 #login #remember {
-    float: left;
-    width: 14px;
-    height: 14px;
-    margin: 0px;
-    padding: 0px;
-    position: relative;
-    top: 5px;
+	float: left;
+	width: 14px;
+	height: 14px;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+	top: 5px;
 }
 
 #login #submit {
-    background: url(/media/img/login.png) no-repeat top left;
-    width: 77px;
-    height: 27px;
-    cursor: pointer;
-    border: none;
-    float: right;
+	background: url(/media/img/login.png) no-repeat top left;
+	width: 77px;
+	height: 27px;
+	cursor: pointer;
+	border: none;
+	float: right;
 }
 
-#login #username, #login #password {
-    background: url(/media/img/input_bg.png) no-repeat top left;
-    border: 1px solid #d0d0d0;
-    width: 192px;
-    height: 19px;
-    padding: 2px;
-    color: #222222;
-    font-size: 14px;
-    float: right;
-    margin-bottom: 10px;
+#login #username,#login #password {
+	background: url(/media/img/input_bg.png) no-repeat top left;
+	border: 1px solid #d0d0d0;
+	width: 192px;
+	height: 19px;
+	padding: 2px;
+	color: #222222;
+	font-size: 14px;
+	float: right;
+	margin-bottom: 10px;
 }
 
 #login p.member {
-    text-align: left;
-    width: 270px;
-    font-size: 11px;
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 2px 2px 0px 2px;
-    padding: 2px;
-    line-height: 18px;
+	text-align: left;
+	width: 270px;
+	font-size: 11px;
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 2px 2px 0px 2px;
+	padding: 2px;
+	line-height: 18px;
 }
 
-#login a:link, #login a:visited, #artdata a:link, #artdata a:visited, #artistdata a:link, #artistdata a:visited {
-    color: #006eab;
-    text-decoration: none;
-    border-bottom: 1px dotted #006eab;
+#login a:link,#login a:visited,#artdata a:link,#artdata a:visited,#artistdata a:link,#artistdata a:visited
+	{
+	color: #006eab;
+	text-decoration: none;
+	border-bottom: 1px dotted #006eab;
 	font-style: normal;
 	font-size: 1em;
 }
 
-#login a:link, #login a:visited{
+#login a:link,#login a:visited {
 	font-size: 1.1em;
 }
 
-#artdata a:link, #artdata a:visited {
+#artdata a:link,#artdata a:visited {
 	float: right;
 	font-style: normal;
 	font-size: 1em;
 }
 
 #login a:hover {
-    color: #0285cd;
-    text-decoration: none;
-    border-bottom: none;
+	color: #0285cd;
+	text-decoration: none;
+	border-bottom: none;
 }
 
-#right_div{
-	float: right;
+#right_div {
 	height: 550px;
 	width: 550px;
 	border: solid 1px #dbeca6;
 	-moz-border-radius: 10px;
 	position: relative;
-	left: -15px;
+	left: -55px;
 }
 
 #firstCol {
-    position: relative;
+	position: relative;
 	left: -8px;
-	top: 10px;
-    background: url(/media/img/latest_bg.png) no-repeat top left;
-    padding: 0px;
-    padding-top: 43px;
-    margin-bottom: 10px;
+	background: url(/media/img/latest_bg.png) no-repeat top left;
+	padding: 0px;
+	padding-top: 43px;
 	width: 600px;
 }
 
-#firstCol_bottom{
+#firstCol_bottom {
 	position: relative;
 	right: -8px;
 	top: 40px;
-    background: url(/media/img/artist_bg.png) no-repeat top left;
-    padding: 0px;
+	background: url(/media/img/artist_bg.png) no-repeat top left;
+	padding: 0px;
 	width: 600px;
 }
 
-#firstCol h3, #firstCol_bottom h3 {
-    font-size: 18px;
-    color: #fff;
-    font-weight: normal;
-    margin: 0px;
-    padding: 0px;
-    font-family: Cambria, Georgia, "Times New Roman", Times, serif;
-    position: absolute;
+#firstCol h3,#firstCol_bottom h3 {
+	font-size: 18px;
+	color: #fff;
+	font-weight: normal;
+	margin: 0px;
+	padding: 0px;
+	font-family: Cambria, Georgia, "Times New Roman", Times, serif;
+	position: absolute;
 }
 
-#firstCol h3{
-    top: 5px;
-    left: 20px;
+#firstCol h3 {
+	top: 5px;
+	left: 20px;
 }
 
-#firstCol_bottom h3{
+#firstCol_bottom h3 {
 	top: 5px;
 	right: 70px;
 }
 
 #firstCol ul {
-    list-style-type: none;
-    margin: 0px;
-    padding: 0px;
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
 }
 
 #firstCol ul li {
-    display: block;
-    width: 520px;
-    height: 120px;
-    padding: 5px;
-    margin: 0px 8px 0px 15px;
-    text-align: left;
+	display: block;
+	width: 520px;
+	height: 120px;
+	padding: 5px;
+	margin: 0px 8px 0px 15px;
+	text-align: left;
 }
 
-#firstCol ul li h4, #firstCol_bottom  h4{
-    font-size: 14px;
-    color: #112638;
-    font-weight: bold;
-    margin: 0px;
-    padding: 0px;
-    font-family: Cambria, Georgia, "Times New Roman", Times, serif;
+#firstCol h4,#firstCol_bottom  h4 {
+	font-size: 14px;
+	color: #112638;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+	font-family: Cambria, Georgia, "Times New Roman", Times, serif;
 	font-variant: small-caps;
 }
 
 #artdata {
-    color: #414141;
-    font-size: 12px;
-    margin: 2px;
-    padding-left: 10px;
-    text-align: left;
+	color: #414141;
+	font-size: 12px;
+	margin: 2px;
+	padding-left: 10px;
+	text-align: left;
 	font-weight: 500;
 	height: 180px;
 	width: 290px;
 	overflow-y: auto;
 }
 
-#artdata p{
+#artdata p {
 	line-height: 20px;
 	text-align: left;
 }
 
-#artistdata{
-	 color: #414141;
-    font-size: 12px;
-    margin: 2px;
-    padding-left: 10px;
-    text-align: left;
+#artistdata {
+	color: #414141;
+	font-size: 12px;
+	margin: 2px;
+	padding-left: 10px;
+	text-align: left;
 	line-height: 20px;
 	height: 220px;
 	overflow-y: auto;
 }
 
-#artistdata p span, #artdata p span{
+#artistdata p span,#artdata p span {
 	color: #6d6565;
 	font-weight: bold;
 }
 
-#work_history{
+#work_history {
 	font-size: 13px;
-    color: #414141;
-    font-family: Cambria, Georgia, "Times New Roman", Times, serif;
+	color: #414141;
+	font-family: Cambria, Georgia, "Times New Roman", Times, serif;
 }
 
-.menu{
+.menu {
 	background-color: #504f4f;
 	-moz-border-radius: 10px;
 	width: 900px;
 	height: 180px;
-	padding: 10px;
+	padding: 10px 0 10px 10px;
 }
 
-.innermenu{
+.innermenu {
 	height: 170px;
 	padding: 5px;
 }
 
-.innermenu img{
+.innermenu img {
 	width: 210px;
 	height: 170px;
 }
 
-.ss_artwork:hover, .ss_search:hover, .ss_creator:hover, .ss_series:hover{
+.ss_artwork:hover,.ss_search:hover,.ss_creator:hover,.ss_series:hover {
 	cursor: pointer;
 }

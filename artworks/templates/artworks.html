@@ -2,7 +2,8 @@
 {% load i18n %}
 
 {% block more_scripts %}
-<script type='text/javascript' src='/media/js/tooltip.js'></script>
+<script type='text/javascript' src='/media/js/tooltip.js'>
+</script>
 {% endblock %}
 
 {% block title %}{% trans "Artwork" %}{% endblock %}
@@ -15,16 +16,17 @@
     <a href="{% url creators_list %}">Creators</a>
 </li>
 <li>
-    <a href="#">Series</a>
+    <a href="{% url series_list %}">Series</a>
 </li>
 <li>
-    <a href="#">Search</a>
+    <a href="{% url map %}">Map</a>
 </li>
 {% endblock %}
 
 {% block current_crumb %}{{ artwork.title }}{% endblock %}
 
 {% block pv_page_body %}
+
 <div class="pvtitle">
     {{ artwork.title }}
 </div>
@@ -78,7 +80,7 @@
                             <tr>
                                 <td>
                                     {% if artwork.serie.id %} 
-                                    It belongs to series: <a class="hlink" href="{{ url }}">{{ artwork.serie }} </a>
+                                    It belongs to series: <a class="hlink" href="{% url series_record artwork.serie.id %}">{{ artwork.serie }} </a>
                                     {% else %} 
                                     It belongs to series: <span class="boldTxt">None</span>
                                     {% endif %}
@@ -105,11 +107,7 @@
                         <div class="pvcolumn_header">
                             General Description
                         </div>
-                        <div id="pvcolumn_body">
-                            {% for descriptor in artwork.fm_descriptors %}
-                            {{ descriptor }}
-                            <br/>
-                            {% endfor %}
+                        <div id="pvcolumn_body" style="height: 50px;">
                         </div>
                     </td>
                 </tr>

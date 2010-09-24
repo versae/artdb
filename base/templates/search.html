@@ -1,0 +1,118 @@
+{% extends "pvbase.html" %}
+{% load i18n %}
+
+{% block more_scripts %}
+{% endblock %}
+
+{% block title %}{% trans "Search" %}{% endblock %}
+
+{% block navigation_bar %}
+<li>
+    <a href="{% url artworks_list %}">Artworks</a>
+</li>
+<li>
+    <a href="{% url creators_list %}">Creators</a>
+</li>
+<li>
+    <a href="{% url series_list %}">Series</a>
+</li>
+<li>
+    <a href="{% url map %}">Map</a>
+</li>
+{% endblock %}
+
+{% block current_crumb %}{% trans "Search" %}{% endblock %}
+
+{% block pv_page_body %}
+<div class="pvtitle">
+    Search <input type="button" id="qbuilder" />
+</div>
+   <div class="pvcolorspace" style="background-color: #ffffff;">
+</div>
+<div id="secWrapper">
+    <div id="wrapper">
+        <div id="container" >
+        	<div align="center" style="padding-right: 20px;">
+          <div id="table_search">
+			<span style="position:relative; left: -30px;">Choose the type of data to search in:</span>			
+			<select class="pv_search_select">
+					<option value="">Pick ...</option>
+					<option value="Artwork">Artwork</option>
+					<option value="Creator">Creator</option>
+					<option value="Serie">Serie</option>
+				</select><br/><br /><br />
+				<table>
+					<tr>
+						<td class="td_height"><input type="text" class="text_search" /></td>
+						<td rowspan="3" style="width: 15%; vertical-align: middle;">
+							<select class="search_select" style="width:70px;">
+								<option>and/or</option>
+								<option value="and">and</option>
+								<option value="or">or</option>
+							</select>
+						</td>
+						<td class="td_height"><input type="text" class="text_search"/></td>
+						<td rowspan="3" style="width: 15%; vertical-align: middle;">
+							<select class="search_select" style="width:70px;">
+								<option value="">and/or</option>
+								<option value="and">and</option>
+								<option value="or">or</option>
+							</select>
+						</td>
+						<td class="td_height"><input type="text" class="text_search"/></td>
+					</tr>
+					<tr>
+						<td style="line-height: 12px;">in</td>
+						<td style="line-height: 12px;">in</td>
+						<td style="line-height: 12px;">in</td>
+					</tr>
+					<tr>
+						<td class="td_height"><select class="search_select"></select></td>
+						<td class="td_height"><select class="search_select"></select></td>
+						<td class="td_height"><select class="search_select"></select></td>
+					</tr>
+				</table>
+          </div>
+		  <br />
+		  <span id="result_text">Search Results:</span>
+    <div style="width:92%; border: solid 2px #f0f0f0 ;"> 
+		         <table id="pvobject_list" cellpadding="5px">
+                    <thead>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pvtr_even" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className='pvtr_even'">
+  							 <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+						<tr style="height:20px;" class="pvtr_odd" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className='pvtr_odd'">
+  							 <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+						<tr style="height:20px;" class="pvtr_even" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className='pvtr_even'">
+  							 <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+				</div>
+		  </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

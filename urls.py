@@ -17,6 +17,9 @@ urlpatterns = patterns('',
 
     # map
     url(r'^map/$', direct_to_template, {'template': 'map.html'}, name="map"),
+    
+    # advanced search 
+    url(r'^search/$', direct_to_template, {'template': 'search.html'}, name="search"),
 
     # exhibit
     url(r'^exhibit/', include('exhibit.urls')),
