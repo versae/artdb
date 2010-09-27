@@ -170,11 +170,23 @@
 }
 
 #exhibitFiltersContainer {
+    display: none;
     font-size: 0.75em;
-    height: 200px;
+    height: 185px;
 /*    overflow: auto;*/
     overflow-x: auto;
     overflow-y: hidden;
+}
+
+.exhibitMessages {
+    font-weight: normal;
+    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+    font-size: 0.75em;
+    color: #888;
+}
+
+.exhibitMessages a {
+    cursor: pointer;
 }
 
 #exhibitFilters {
@@ -194,6 +206,17 @@
     height: 250px;
 }
 
+#exhibitFiltersToggle {
+    font-weight: normal;
+    font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+    font-size: 0.75em;
+    color: #888;
+    float: right;
+}
+
+#exhibitFiltersToggle span {
+    cursor: pointer;
+}
 
 /* for dropdown in list pages*/
 #pvsort_span {

@@ -10,14 +10,18 @@ from artworks.models import Artwork
 
 
 def artworks_exhibit(request):
-    year_from = None
-    year_to = None
-    if request.GET and "from" in request.GET and "to" in request.GET:
-        year_from = int(request.GET.get("from", 0))
-        year_to = int(request.GET.get("to", 0))
+    year_from = 1675
+    year_to = 1700
+    try:
+        if request.GET and "from" in request.GET and "to" in request.GET:
+            year_from = int(request.GET.get("from", 0))
+            year_to = int(request.GET.get("to", 0))
+    except ValueError:
+        pass
     return render_to_response('exhibit.html',
                               {"year_from": year_from,
-                               "year_to": year_to},
+                               "year_to": year_to,
+                               "year_range": range(1600, 1801)},
                               context_instance=RequestContext(request))
 
 

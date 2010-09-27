@@ -31,12 +31,20 @@ function initialize() {
     var artworkPlaceFilter = "artwork_original_place";
     var map = new google.maps.Map(document.getElementById('map'));
     var markerClusterer = new MarkerClusterer(map, markers, {maxZoom: 10});
+    var yearFrom, yearTo;
+    var urlHash = (location.hash || location.search).substring(1).split("&");
+    yearFrom = parseInt(urlHash[0].split("=")[1]);
+    yearTo = parseInt(urlHash[1].split("=")[1]);
+    if (isNaN(yearFrom) || isNaN(yearTo)) {
+        yearFrom = 1675;
+        yearTo = 1725;
+    }
     var timeControlOptions = {
         css: 'slider',
         id: 'sliderTimeControl',
         start: new Date(1600, 1, 1),
         end: new Date(1800, 1, 1),
-        selected: [new Date(1675, 1, 1), new Date(1725, 1, 1)],
+        selected: [new Date(yearFrom, 1, 1), new Date(yearTo, 1, 1)],
         format: "yy",
         // There's really any other options for zoom yet.
         // zoom: TimeControl.YEAR,
