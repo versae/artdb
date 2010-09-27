@@ -31,10 +31,12 @@ function initialize() {
     var artworkPlaceFilter = "artwork_original_place";
     var map = new google.maps.Map(document.getElementById('map'));
     var markerClusterer = new MarkerClusterer(map, markers, {maxZoom: 10});
-    var yearFrom, yearTo;
-    var urlHash = (location.hash || location.search).substring(1).split("&");
-    yearFrom = parseInt(urlHash[0].split("=")[1]);
-    yearTo = parseInt(urlHash[1].split("=")[1]);
+    var yearFrom, yearTo, urlHash;
+    if (location.hash || location.search) {
+        urlHash = (location.hash || location.search).substring(1).split("&");
+        yearFrom = parseInt(urlHash[0].split("=")[1]);
+        yearTo = parseInt(urlHash[1].split("=")[1]);
+    }
     if (isNaN(yearFrom) || isNaN(yearTo)) {
         yearFrom = 1675;
         yearTo = 1725;
