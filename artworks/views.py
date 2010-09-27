@@ -1,13 +1,16 @@
 # -*-*- coding: utf-8 -*-
+from django.db.models import Q
 from django.shortcuts import HttpResponse, render_to_response
 from django.template import RequestContext
 from django.utils.simplejson import dumps
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.paginator import Paginator
 from django.db.models import Count
 from django.core.urlresolvers import reverse
 from django.utils.translation import gettext as _
 from artworks.models import Artwork, Serie
 from django_descriptors.models import Descriptor
+from base.models import GeospatialReference
+
 
 def series_list(request):
     orderby = None
@@ -16,7 +19,10 @@ def series_list(request):
     if orderby is None:
         orderby = 'title'
     if orderby == 'no_of_artworks':
-        serie_list = Serie.objects.annotate(no_of_artwork=Count('artwork')).order_by('no_of_artwork')
+        params = {
+            'no_of_artwork': Count('artwork'),
+        }
+        serie_list = Serie.objects.annotate(params).order_by('no_of_artwork')
     else:
         serie_list = Serie.objects.order_by(orderby)
     paginator = Paginator(serie_list, 10)
@@ -26,7 +32,8 @@ def series_list(request):
         page = 1
     series = paginator.page(page)
     return render_to_response('serie_list.html',
-                              {"series": series, "order": orderby}, context_instance=RequestContext(request))
+                              {"series": series, "order": orderby},
+                              context_instance=RequestContext(request))
 
 
 def series_record(request, serie_id):
@@ -43,9 +50,10 @@ def series_record(request, serie_id):
         page = 1
     artworks = paginator.page(page)
     return render_to_response('serie.html',
-                              {"serie": serie, "artworks": artworks}, context_instance=RequestContext(request))
-    
-    
+                              {"serie": serie, "artworks": artworks},
+                              context_instance=RequestContext(request))
+
+
 def artworks_list(request):
     orderby = None
     artwork_list = None
@@ -53,7 +61,8 @@ def artworks_list(request):
     if orderby is None:
         orderby = 'title'
     if orderby == 'creation_year_start':
-        artwork_list = Artwork.objects.order_by('creation_year_start', 'creation_year_end')
+        artwork_list = Artwork.objects.order_by('creation_year_start',
+                                                'creation_year_end')
     else:
         artwork_list = Artwork.objects.order_by(orderby)
     paginator = Paginator(artwork_list, 10)
@@ -63,7 +72,8 @@ def artworks_list(request):
         page = 1
     artworks = paginator.page(page)
     return render_to_response('artworks_list.html',
-                              {"artworks": artworks, "order": orderby}, context_instance=RequestContext(request))
+                              {"artworks": artworks, "order": orderby},
+                              context_instance=RequestContext(request))
 
 
 def artworks_record(request, artwork_id):
@@ -72,69 +82,63 @@ def artworks_record(request, artwork_id):
     artwork = None
     artwork = Artwork.objects.get(id=artwork_id)
     description = Descriptor.objects.get_for_object(artwork)   
-    return render_to_response('artworks.html',
-                              {"artwork": artwork, 'descriptor':description}, context_instance=RequestContext(request))
-   
+    return render_to_response('artworks.html', 
+                              {"artwork": artwork, "descriptor": description},
+                             context_instance=RequestContext(request))
 
-def in_range(request, year_from, year_to):
+
+def artworks_locations(request, year_from, year_to):
     year_from = int(year_from)
     year_to = int(year_to)
     artworks_by = request.GET.get("filter", "artwork_current_place")
     dics = []
     if artworks_by == "artwork_original_place":
-        filter_args = {
-            'original_place__title__isnull': False,
-            'original_place__point__isnull': False,
-        }
-        place_field_name = "original_place"
+        place_field = "original_places"
     else:
-        filter_args = {
-            'current_place__title__isnull': False,
-            'current_place__point__isnull': False,
-        }
-        place_field_name = "current_place"
-    artworks = Artwork.objects.in_range(year_from,
-                                        year_to).filter(**filter_args)
-    for artwork in artworks:
-        place_field = getattr(artwork, place_field_name)
-        if place_field.geometry:
-            place_title = u"%s (%s)" % (place_field.title, _("region"))
-            print place_title
+        place_field = "current_places"
+    filter_params = ((
+        (Q(**{"%s__creation_year_start__lte" % place_field: year_from}) &
+         Q(**{"%s__creation_year_end__gte" % place_field: year_from})) |
+        (Q(**{"%s__creation_year_start__gte" % place_field: year_from}) &
+         Q(**{"%s__creation_year_end__lte" % place_field: year_to})) |
+        (Q(**{"%s__creation_year_start__lte" % place_field: year_from}) &
+         Q(**{"%s__creation_year_end__gte" % place_field: year_from}))) &
+        Q(**{"title__isnull": False}) &
+        Q(**{"point__isnull": False}),
+    )
+    locations = GeospatialReference.objects.filter(*filter_params).distinct()
+    for location in locations:
+        if location.geometry:
+            location_place = u"%s (%s)" % (location.title, _("region"))
         else:
-            place_title = place_field.title
+            location_place = location.title
         dic = {
-            'identifier': artwork.id,
-            'title': artwork.title,
-            'place': place_title,
-            'coordinates': place_field.point.wkt,
+            'identifier': location.id,
+            'place': location_place,
+            'title': location.address,
+            'coordinates': location.point.wkt,
+            'geometry': (location.geometry and location.geometry.wkt) or "",
         }
         dics.append(dic)
     return HttpResponse(dumps(dics), mimetype="application/json")
 
 
-def properties(request, artwork_id):
-    artworks = Artwork.objects.in_bulk([int(artwork_id)])
-    dic = {}
-#    if artworks:
-#        artwork = artworks[int(artwork_id)]
-#        dic = {
-#            'identifier': artwork.id,
-#            'title': artwork.title,
-#            'size': artwork.size,
-#            'notes': artwork.notes,
-#            'inscription': artwork.inscription,
-#        }
-#    try:
-#        place_history = artwork.placeshistory_set.get(artwork=artwork,
-#                                                      place_type='L')
-#        place = place_history.place
-#        if hasattr(place.geometry, 'wkt'):
-#            dic.update({
-#                'place': place.name,
-#                'coordinates': place.geometry.wkt,
-#            })
-#            print dic
-#    except PlacesHistory.DoesNotExist:
-#        pass
-    return HttpResponse(dumps(dic), mimetype="application/json")
-
+def artworks_by_locations(request, geospatialreference_id):
+    location_type = request.GET.get("type", "artwork_original_place")
+    if location_type in ("artwork_current_place", "artwork_original_place"):
+        location_type = location_type[8:] # Removing "artwork_" prefix
+    else:
+        location_type = "original_place"
+    params = {
+        "%s__id" % location_type: geospatialreference_id,
+    }
+    artworks = Artwork.objects.filter(**params).distinct().order_by("title")
+    dics = []
+    for artwork in artworks:
+        dic = {
+            'title': artwork.title,
+            'creators': " / ".join([c.name for c in artwork.creators.all()]),
+            'url': artwork.get_absolute_url(),
+        }
+        dics.append(dic)
+    return HttpResponse(dumps(dics), mimetype="application/json")

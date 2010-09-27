@@ -97,6 +97,10 @@ class Artwork(models.Model):
     def __unicode__(self):
         return self.title
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('artworks.views.artworks_record', [str(self.id)])
+
 
 class ArtworkVirgin(models.Model):
     artwork = models.ForeignKey(Artwork, verbose_name=_(u'artwork'))
