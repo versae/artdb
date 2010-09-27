@@ -2,6 +2,37 @@
 {% load i18n %}
 
 {% block more_scripts %}
+<script type="text/javascript" src="/media/js/search.js"></script>
+<script type="text/javascript">
+    this.loadTable = function(){
+        var e, d = function(s){
+            return decodeURIComponent(s.replace(/\+/g, " "));
+        }, q = window.location.search.substring(1), r = /([^&=]+)=?([^&]*)/g;
+        
+        while (e = r.exec(q)) 
+            urlParams[d(e[1])] = d(e[2]);
+			
+		if(urlParams.data){
+			data = urlParams.data;
+			$.get('{% url search_view %}', { data: data }, function(result) {
+					$('#search_table_div').html("");
+					$('#search_table_div').append(result);
+    			});
+		}
+    };
+	
+	this.callAjax = function(object_name, queryparams, queryVals, operators){
+		$.ajax({
+			    url: '{% url search_view %}',
+    			data: { objectType:object_name, params:queryparams, vals:queryVals, ops:operators },
+    			traditional: true,
+    			success: function(result) {
+					$('#search_table_div').html("");
+					$('#search_table_div').append(result);
+    			}
+			});
+	}
+</script>
 {% endblock %}
 
 {% block title %}{% trans "Search" %}{% endblock %}
@@ -25,7 +56,7 @@
 
 {% block pv_page_body %}
 <div class="pvtitle">
-    Search <input type="button" id="qbuilder" />
+    Search
 </div>
    <div class="pvcolorspace" style="background-color: #ffffff;">
 </div>
@@ -36,30 +67,30 @@
           <div id="table_search">
 			<span style="position:relative; left: -30px;">Choose the type of data to search in:</span>			
 			<select class="pv_search_select">
-					<option value="">Pick ...</option>
+					<option value=''>Pick ...</option>
 					<option value="Artwork">Artwork</option>
 					<option value="Creator">Creator</option>
 					<option value="Serie">Serie</option>
 				</select><br/><br /><br />
 				<table>
 					<tr>
-						<td class="td_height"><input type="text" class="text_search" /></td>
+						<td class="td_height"><input type="text" id="text1" class="text_search" /></td>
 						<td rowspan="3" style="width: 15%; vertical-align: middle;">
-							<select class="search_select" style="width:70px;">
-								<option>and/or</option>
+							<select id="op1" class="search_select" style="width:70px;">
+								<option value="or">and/or</option>
 								<option value="and">and</option>
 								<option value="or">or</option>
 							</select>
 						</td>
-						<td class="td_height"><input type="text" class="text_search"/></td>
+						<td class="td_height"><input type="text" id="text2" class="text_search"/></td>
 						<td rowspan="3" style="width: 15%; vertical-align: middle;">
-							<select class="search_select" style="width:70px;">
-								<option value="">and/or</option>
+							<select id="op2" class="search_select" style="width:70px;">
+								<option value="or">and/or</option>
 								<option value="and">and</option>
 								<option value="or">or</option>
 							</select>
 						</td>
-						<td class="td_height"><input type="text" class="text_search"/></td>
+						<td class="td_height"><input type="text" id="text3" class="text_search"/></td>
 					</tr>
 					<tr>
 						<td style="line-height: 12px;">in</td>
@@ -67,49 +98,19 @@
 						<td style="line-height: 12px;">in</td>
 					</tr>
 					<tr>
-						<td class="td_height"><select class="search_select"></select></td>
-						<td class="td_height"><select class="search_select"></select></td>
-						<td class="td_height"><select class="search_select"></select></td>
+						<td class="td_height"><select id="field1" class="search_select"></select></td>
+						<td class="td_height"><select id="field2" class="search_select"></select></td>
+						<td class="td_height"><select id="field3" class="search_select"></select></td>
+					</tr>
+					<tr>
+						<td></td><td></td>
+						<td style="line-height: 60px;"><input type="button" class="search_fields_button" /></td>
+						<td></td><td></td>
 					</tr>
 				</table>
           </div>
 		  <br />
-		  <span id="result_text">Search Results:</span>
-    <div style="width:92%; border: solid 2px #f0f0f0 ;"> 
-		         <table id="pvobject_list" cellpadding="5px">
-                    <thead>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="pvtr_even" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className='pvtr_even'">
-  							 <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-						<tr style="height:20px;" class="pvtr_odd" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className='pvtr_odd'">
-  							 <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-						<tr style="height:20px;" class="pvtr_even" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className='pvtr_even'">
-  							 <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div id="search_table_div" style="width:92%; border: solid 1px #f0f0f0 ;"> 
 				</div>
 		  </div>
         </div>

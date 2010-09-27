@@ -1,13 +1,47 @@
 {% extends "pvbase.html" %}
 {% load i18n %}
-
+{% load convert_tags %}
 {% block more_scripts %}
 <script type='text/javascript' src='/media/js/tooltip.js'>
 </script>
+<script type="text/javascript" src="http://cloud.github.com/downloads/malsup/cycle/jquery.cycle.all.2.74.js">
+</script>
+<script type="text/javascript">
+    
+    this.searchClicked = function(){
+        $('#search_button').click(function(){
+            search_data = $('#search_text').val();
+            window.location.href = '{% url search %}?data=' + search_data;
+        });
+    };
+    
+    this.advancedSearch = function(){
+        $('#advanced_search_button').click(function(){
+            window.location.href = '{% url search %}';
+        });
+    };
+    
+    this.initialize_menu = function(div_name){
+        $(div_name).mouseenter(function(){
+            $(div_name).cycle('pause');
+        });
+        
+        $(div_name).mouseleave(function(){
+            $(div_name).cycle('resume');
+        });
+        
+        $(div_name).cycle({
+            fx: 'fade',
+            timeout: '500' // choose your transition type, ex: fade, scrollUp, shuffle, etc...
+        });
+        
+    }
+    $(document).ready(function(){
+        initialize_menu('.img_artwork');
+    });
+</script>
 {% endblock %}
-
 {% block title %}{% trans "Artwork" %}{% endblock %}
-
 {% block navigation_bar %}
 <li class="current">
     <a href="{% url artworks_list %}">Artworks</a>
@@ -22,11 +56,8 @@
     <a href="{% url map %}">Map</a>
 </li>
 {% endblock %}
-
 {% block current_crumb %}{{ artwork.title }}{% endblock %}
-
 {% block pv_page_body %}
-
 <div class="pvtitle">
     {{ artwork.title }}
 </div>
@@ -37,9 +68,19 @@
         <div id="container">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td class="pvimage_block" width="40%">
-                        <div>
-                            {% for artImg in artwork.images.all %}<img id="artwork_image" class="pvart_image" src="{{ artImg.url }}" />{% endfor %} 
+                    <td class="pvimage_block" width="40%" align="right">
+                        <div class="img_artwork">
+                            {% if artwork.images.count != 0 %}
+                            {% for artImg in artwork.images.all %} 
+                            {% if artImg.url %} 
+                            {% thumbnail artImg.url "190x190,crop" %}
+                            {% else %}
+                            {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
+                            {% endif %} 
+                            {% endfor %} 
+                            {% else %}
+                            {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
+                            {% endif %} 
                         </div>
                     </td>
                     <td id="pvrecord" width="60%">
@@ -107,7 +148,57 @@
                         <div class="pvcolumn_header">
                             General Description
                         </div>
-                        <div id="pvcolumn_body" style="height: 50px;">
+                        <div id="pvcolumn_body">
+                            <ul>
+                                <li>
+                                    Clasificación
+                                    <ul id="classify">
+                                        {% for d in descriptor %}
+                                        {% if "Clasificación" in d.path %}
+                                        {{ d.parent.name }}: {{ d.name }}
+                                        <br/>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                <li>
+                                    Contenido
+									<ul id="classify">
+                                        {% for d in descriptor %}
+                                        {% if "Contenido" in d.path %}
+                                        {{ d.parent.name }}: {{ d.name }}
+                                        <br/>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                <li>
+                                    Propiedades Físicas
+									<ul id="classify">
+                                        {% for d in descriptor %}
+                                        {% if "Propiedades Físicas" in d.path %}
+                                        {{ d.parent.name }}: {{ d.name }}
+                                        <br/>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+								{% for d in descriptor %}
+                                  {% if "Propiedades Físicas" in d.path %}
+                                  {% else %}
+								  	{% if "Contenido" in d.path %}
+									{% else %}        
+                                  		{% if "Clasificación" in d.path %}
+								  		{% else %}
+								  			<li>{{ d }}</li>
+								  		{% endif %}
+									{% endif %}
+								  {% endif %}
+                                {% endfor %}
+                            </ul>
+                            {% for d in descriptor %}
+                            {% endfor %}
+                            <br/>
                         </div>
                     </td>
                 </tr>

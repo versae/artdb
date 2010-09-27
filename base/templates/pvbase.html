@@ -7,6 +7,17 @@
 
 {% block extra_scripts %}
 <script type='text/javascript' src='/media/django_descriptors/js/jquery.js'></script>
+<script type='text/javascript'>
+    this.searchClicked = function(){
+        $('#pv_search_button').click(function(){
+            search_data = $('#pv_search_text').val();
+            window.location.href = '{% url search %}?data='+search_data;
+        });
+    };
+	$(document).ready(function(){
+        searchClicked();
+    });
+</script>
 {% block more_scripts %}
 {% endblock %}
 {% endblock %}

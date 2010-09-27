@@ -1,8 +1,30 @@
 {% extends "pvbase.html" %}
 {% load i18n %}
+{% load convert_tags %}
 
 {% block more_scripts %}
 <script type='text/javascript' src='/media/js/tooltip.js'></script>
+<script type="text/javascript" src="http://cloud.github.com/downloads/malsup/cycle/jquery.cycle.all.2.74.js"></script>
+<script type='text/javascript'>
+    this.initialize_menu = function(div_name){
+        $(div_name).mouseenter(function(){
+            $(div_name).cycle('pause');
+        });
+        
+        $(div_name).mouseleave(function(){
+            $(div_name).cycle('resume');
+        });
+        
+        $(div_name).cycle({
+            fx: 'fade',
+            timeout: '2000' // choose your transition type, ex: fade, scrollUp, shuffle, etc...
+        });
+        
+    }
+    $(document).ready(function(){ 
+        initialize_menu('.img_artwork');
+    });
+	</script>
 {% endblock %}
 
 {% block title %}{% trans "Serie" %}{% endblock %}
@@ -101,7 +123,23 @@
         			</div>
     			</div>
 			</td>
-			<td style="width:30%; vertical-align: top; padding: 10px 0 0 30px; "><img id="artwork_image" src="/media/img/arenoir.jpg"></td>
+			<td style="width:30%; vertical-align: top; padding: 10px 0 0 30px; ">
+				<div class="img_artwork" align="center">
+					{% for artwork in artworks.object_list %}
+						{% if artwork.images.count != 0 %}
+                            {% for artImg in artwork.images.all %}							
+								{% if artImg.url %}					
+									{% thumbnail artImg.url "215x175,crop" %}
+								{% else %}
+									{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "215x175,crop" %}
+								{% endif %}								
+							{% endfor %} 
+						{% else %}
+							{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "215x175,crop" %}
+						{% endif %}
+					{% endfor %}	
+                 </div>
+			</td>
 		</tr>
 	</table>
 </div>

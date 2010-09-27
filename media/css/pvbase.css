@@ -1,4 +1,15 @@
 /* CSS for Public View of ArtDB */
+.search_fields_button {
+	width: 50px;
+	height: 41px;
+	background: url(/media/img/search_mayb.png);
+	border: none;
+}
+
+.search_fields_button:hover{
+	cursor: pointer;
+}
+
 #serie_div {
 	border-bottom: solid 1px #f0f0f0;
 	font-family: "Times New Roman";
@@ -17,11 +28,11 @@
 	border: solid 1px #dbeca6;
 }
 
-.td_height{
+.td_height {
 	line-height: 30px;
 }
 
-.search_select, .pv_search_select {
+.search_select,.pv_search_select {
 	height: 25px;
 	width: 180px;
 	vertical-align: middle;
@@ -132,7 +143,7 @@
 	right: 390px;
 }
 
-#advanced_search_button:hover,#search_button:hover {
+#advanced_search_button:hover,#search_button:hover,#pv_search_button:hover {
 	cursor: pointer;
 }
 
@@ -378,7 +389,7 @@ ul#navBar li a:hover {
 }
 
 .pvimage_block {
-	text-align: right;
+	
 	padding-right: 35px;
 }
 
@@ -521,11 +532,6 @@ ul#navBar li a:hover {
 	font: 23px/ 1.6 Palatino, serif;
 	text-indent: 5px;
 	border-bottom: 1px dashed #ddd;
-}
-
-.pvart_image {
-	height: 170px;
-	width: 150px;
 }
 
 #secCol {

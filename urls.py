@@ -18,14 +18,14 @@ urlpatterns = patterns('',
     # map
     url(r'^map/$', direct_to_template, {'template': 'map.html'}, name="map"),
     
-    # advanced search 
+    # map
     url(r'^search/$', direct_to_template, {'template': 'search.html'}, name="search"),
 
     # exhibit
     url(r'^exhibit/', include('exhibit.urls')),
 
     # base
-    url(r'^$', include('base.urls')),
+    url(r'^', include('base.urls')),
 
     # admin
     url(r'^admin/', include(admin_site.urls)),

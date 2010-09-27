@@ -7,6 +7,7 @@ from django.db.models import Count
 from django.core.urlresolvers import reverse
 from django.utils.translation import gettext as _
 from artworks.models import Artwork, Serie
+from django_descriptors.models import Descriptor
 
 def series_list(request):
     orderby = None
@@ -70,8 +71,9 @@ def artworks_record(request, artwork_id):
     artwork_id = int(artwork_id)
     artwork = None
     artwork = Artwork.objects.get(id=artwork_id)
+    description = Descriptor.objects.get_for_object(artwork)   
     return render_to_response('artworks.html',
-                              {"artwork": artwork}, context_instance=RequestContext(request))
+                              {"artwork": artwork, 'descriptor':description}, context_instance=RequestContext(request))
    
 
 def in_range(request, year_from, year_to):

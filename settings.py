@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'artworks',
     'creators',
     'exhibit',
+    'convert'
 )
 
 LOGIN_URL = "/admin/"
@@ -111,8 +112,6 @@ GOOGLE_API_KEY = u"ABQIAAAAkXCmjf08FLp1fzy2qNzWThT7g5bZECU_gqoByQmzcFSTeCxKshQqE
 GOOGLE_MAPS_API_KEY = GOOGLE_API_KEY
 
 BREADCRUMBS_AUTO_HOME = True
-
-
 
 try:
     from local_settings import *

@@ -1,0 +1,26 @@
+{% load i18n %}
+<table id="pvobject_list" cellpadding="5px">
+<thead>
+    <tr>
+        <td style="padding-left: 10px; height: 25px;">Search Results</td>
+    </tr>
+</thead>
+<tbody>
+    {% for result in results.object_list %}
+    <tr class="{% cycle 'pvtr_odd' 'pvtr_even' %}" onmouseover="this.className='pvtr_highlight'" onmouseout="this.className={% cycle '\'pvtr_odd\'' '\'pvtr_even\'' %}">
+        <td style="height: 25px;">
+        	{% if result.title %}
+				{% if result.creators %}
+           		 	<a class="pvtd_a" href="{% url artworks_record result.id %}">{{ result.title }}</a>
+				{% else %}
+					<a class="pvtd_a" href="{% url series_record result.id %}">{{ result.title }}</a>
+				{% endif %}
+			{% endif %}
+			{% if result.name %}
+            	<a class="pvtd_a" href="{% url creator_record result.id %}">{{ result.name }}</a>
+			{% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
