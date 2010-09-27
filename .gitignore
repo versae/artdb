@@ -6,3 +6,4 @@ django_descriptors
 media/django_descriptors
 backups/*.json
 media/cache
+media/images
