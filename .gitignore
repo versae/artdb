@@ -4,4 +4,6 @@ local_settings.py
 *.list
 django_descriptors
 media/django_descriptors
+media/cache
 backups/*.json
+convert
