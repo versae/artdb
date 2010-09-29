@@ -95,7 +95,7 @@ function initialize() {
             filterSelect.append(filterOption);
         }
         filterLabel.attr("for", "filterSelect");
-        filterLabel.html("Artworks locations by");
+        filterLabel.html("Artwork locations by");
         filterSpanHome.attr("href", "javascript:void(0);");
         filterSpanHome.html("Home");
         filterDiv.append(filterSpanHome);
