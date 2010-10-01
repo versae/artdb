@@ -56,8 +56,23 @@
         });
     }
     
+	initialize_artist = function(){
+		 $('#work_history').mouseenter(function(){
+            $('#work_history').cycle('pause');
+        });
+        
+        $('#work_history').mouseleave(function(){
+            $('#work_history').cycle('resume');
+        });
+        
+        $('#work_history').cycle({
+            fx: 'fade',
+            timeout: '500' // choose your transition type, ex: fade, scrollUp, shuffle, etc...
+        });
+        
+	}
+	
     $(document).ready(function(){
-    
         initialize_menu('.ss_artwork');
         initialize_menu('.ss_creator');
         initialize_menu('.ss_series');
@@ -65,6 +80,7 @@
         link_menu();
         searchClicked();
         advancedSearch();
+		initialize_artist();
     });
 </script>
 {% endblock %}
@@ -75,7 +91,7 @@
     <div class="pvspace" style="padding: 10px 0 10px 20px;">
     </div>
     <div id="pvheader">
-        <img src="/media/img/banner1.png" id="pvlogo" alt="Logo" />
+    	<a href="{% url public_view %}"><img src="/media/img/baroqueart.png" id="pvlogo" alt="Logo" /></a>
         <div id="search_div">
             <input type="button" id="advanced_search_button" /><input type="button" id="search_button" /><input type="text" id="search_text" />
         </div>
@@ -165,19 +181,17 @@
                                             <tr>
                                                 <td style="border: 0px; width: 40%; padding-left: 20px;">
                                                     <div class="img_artwork" style="border: solid 1px #ededed;" align="center">
-                                                        
-                                                            {% if artwork.images.count != 0 %}
-                                                            	{% for artImg in artwork.images.all %} 
-                                                            		{% if artImg.url %} 
-                                                            			{% thumbnail artImg.url "190x190,crop" %}
-                                                            		{% else %}
-                                                            			{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
-                                                            		{% endif %} 
-                                                            	{% endfor %} 
-                                                            {% else %}
-                                                            	{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
-                                                            {% endif %} 
-                                                        
+                                                        {% if artwork.images.count != 0 %} 
+                                                        {% for artImg in artwork.images.all %} 
+                                                        {% if artImg.url %} 
+                                                        {% thumbnail artImg.url "190x190,crop" %}
+                                                        {% else %} 
+                                                        {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
+                                                        {% endif %}  
+                                                        {% endfor %} 
+                                                        {% else %} 
+                                                        {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
+                                                        {% endif %} 
                                                     </div>
                                                 </td>
                                                 <td align="left" style="border: 0px;">
@@ -212,7 +226,7 @@
                                     <div style="padding-top: 40px;">
                                         <table>
                                             <tr>
-                                                <td style="width: 40%; border: 0px; padding-left: 20px;">
+                                                <td style="width: 60%; border: 0px;" align="right">
                                                     <div id="artistdata">
                                                         <h4>{{ artist.name }}</h4>
                                                         <p>
@@ -234,12 +248,21 @@
                                                         <a href="{% url creator_record artist.id %}">View More</a>
                                                     </div>
                                                 </td>
-                                                <td style="border: 0px; padding-left: 20px;">
+                                                <td style="border: 0px; padding-right: 80px;" align="right">
                                                     <div id="work_history">
-                                                        Working History:
-                                                        <br/>
-                                                        <textarea rows="20" style="height: 190px; width: 210px;">
-                                                        </textarea>
+                                                        {% for artwork in artist.artwork_set.all %}
+                                                        	{% if artwork.images.count != 0 %} 
+                                                        		{% for artImg in artwork.images.all %} 
+                                                        			{% if artImg.url %} 
+                                                        				{% thumbnail artImg.url "190x190,crop" %}
+                                                        			{% else %}
+                                                        				{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
+                                                        			{% endif %} 
+                                                        		{% endfor %} 
+                                                        	{% else %}
+                                                        		{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %}
+                                                        	{% endif %}
+                                                        {% endfor %}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -261,7 +284,7 @@
         <div class="pvspace">
         </div>
         <div class="pvfooter">
-            <a href="#">Contact Us</a>
+            <a href="#">About Us</a>
             | <a href="#">Help</a>
         </div>
         <div id="pvcopyright">

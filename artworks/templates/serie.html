@@ -31,17 +31,18 @@
 
 {% block navigation_bar %}
 <li>
-    <a href="{% url artworks_list %}">Artworks</a>
-</li>
-<li>
-    <a href="{% url creators_list %}">Creators</a>
+    <a href="{% url map %}">Map</a>
 </li>
 <li class="current">
     <a href="{% url series_list %}">Series</a>
 </li>
 <li>
-    <a href="{% url map %}">Map</a>
+    <a href="{% url creators_list %}">Creators</a>
 </li>
+<li>
+    <a href="{% url artworks_list %}">Artworks</a>
+</li>
+
 {% endblock %}
 
 {% block current_crumb %}{{ serie.title }}{% endblock %}
@@ -90,7 +91,7 @@
                         			{% endfor %}
                     			</tbody>
 			                </table>
-						<div class="pvspace" style="height: 10px; width: 99%;">
+						<div class="pvspace" style="height: 10px; width: 100%;">
 					</div>
                 	<div class="pvpagination">   
 						{% if artworks.paginator.num_pages == 1 %}            	
@@ -119,7 +120,7 @@
 						    <a href="?page={{ artworks.paginator.num_pages }}">Last</a>
 						{% endif %}						
                 	</div>
-					<div class="pvspace" style="height: 10px; width: 99%;">
+					<div class="pvspace" style="height: 10px; width: 100%;">
         			</div>
     			</div>
 			</td>
