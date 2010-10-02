@@ -9,10 +9,17 @@ from django.db.models import Q
 from itertools import chain
 
 def public_view(request):
-    num_artworks = Artwork.objects.count()
-    random_artwork = Artwork.objects.all()[randint(0, num_artworks-1)]
+    artwork_ids = [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2417, 2444, 2446, 2449, 2506, 6744, 10472, 10478, 12020, 12032, 12347, 12693, 12786, 13262, 13269, 370, 444, 575, 661, 672, 677, 782, 889, 900, 924, 941, 8770, 9560, 9705, 11668, 11885, 1012, 3581, 4069, 6128, 1189, 890, 499, 510, 1168]
+    num_artworks = Artwork.objects.filter(id__in=artwork_ids).count()
+    if num_artworks != 0:
+        random_artwork = Artwork.objects.filter(id__in=artwork_ids)[randint(0, num_artworks-1)]
+    else:
+        random_artwork = None
     num_creator = Creator.objects.count()
-    random_creator = Creator.objects.all()[randint(0, num_creator-1)]
+    if num_creator != 0:
+        random_creator = Creator.objects.all()[randint(0, num_creator-1)]
+    else:
+        random_creator = None
     return render_to_response('pv_home.html',
                               {"artwork": random_artwork, "artist": random_creator}, context_instance=RequestContext(request))
 

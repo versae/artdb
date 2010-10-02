@@ -563,15 +563,24 @@ ul#navBar li a:hover {
 
 #sec_col_top {
 	width: 300px;
-	text-align: center;
 	border: dashed 1px #dbeca6;
-	height: 320px;
+	height: 285px;
 	position: relative;
 	top: -5px; -moz-border-radius : 10px;
 	-webkit-border-radius: 11px;
 	border-radius: 11px;
 	behavior: url(/media/htc/border-radius.htc);
 	-moz-border-radius: 10px;
+	padding-top: 35px;
+}
+
+#sec_col_top p{
+	text-align: justify;	
+	line-height: 30px;
+	font-size: 0.99em;
+	font-weight: normal;
+	font-family: "Times New Roman";
+	width: 240px;
 }
 
 #login {
@@ -826,7 +835,7 @@ ul#navBar li a:hover {
 	-webkit-border-radius: 11px; border-radius : 11px;
 	behavior: url(/media/htc/border-radius.htc); width : 898px;
 	height: 180px;
-	padding: 20px 3px 10px 17px; position : relative;
+	padding: 25px 3px 2px 17px; position : relative;
 	left: -2px;
 	position: relative;
 	border-radius: 11px; behavior : url(/media/htc/border-radius.htc);
@@ -835,6 +844,8 @@ ul#navBar li a:hover {
 
 .innermenu {
 	height: 170px;
+	position:relative;
+	top: -7px;
 }
 
 .innermenu img {

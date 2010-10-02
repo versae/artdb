@@ -56,8 +56,8 @@
         });
     }
     
-	initialize_artist = function(){
-		 $('#work_history').mouseenter(function(){
+    initialize_artist = function(){
+        $('#work_history').mouseenter(function(){
             $('#work_history').cycle('pause');
         });
         
@@ -70,8 +70,8 @@
             timeout: '500' // choose your transition type, ex: fade, scrollUp, shuffle, etc...
         });
         
-	}
-	
+    }
+    
     $(document).ready(function(){
         initialize_menu('.ss_artwork');
         initialize_menu('.ss_creator');
@@ -80,7 +80,7 @@
         link_menu();
         searchClicked();
         advancedSearch();
-		initialize_artist();
+        initialize_artist();
     });
 </script>
 {% endblock %}
@@ -91,7 +91,7 @@
     <div class="pvspace" style="padding: 10px 0 10px 20px;">
     </div>
     <div id="pvheader">
-    	<a href="{% url public_view %}"><img src="/media/img/baroqueart.png" id="pvlogo" alt="Logo" /></a>
+        <a href="{% url public_view %}"><img src="/media/img/baroqueart.png" id="pvlogo" alt="Logo" /></a>
         <div id="search_div">
             <input type="button" id="advanced_search_button" /><input type="button" id="search_button" /><input type="text" id="search_text" />
         </div>
@@ -106,12 +106,12 @@
                 <tr>
                     <td style="border:0;">
                         <div class="ss_artwork">
-                            <img src="/media/img/art2.png" /><img src="/media/img/art4.png" /><img src="/media/img/art1.png" /><img src="/media/img/art3.png" />
+                            <img src="/media/img/art1.png" /><img src="/media/img/art2.png" /><img src="/media/img/art3.png" />
                         </div>
                     </td>
                     <td style="border:0;">
                         <div class="ss_creator">
-                            <img src="/media/img/artist1.png" /><img src="/media/img/artist2.png" /><img src="/media/img/artist3.png" /><img src="/media/img/artist4.png" />
+                            <img src="/media/img/artist1.png" /><img src="/media/img/artist2.png" /><img src="/media/img/artist3.png" />
                         </div>
                     </td>
                     <td style="border:0;">
@@ -136,7 +136,11 @@
                 <table>
                     <tr>
                         <td align="left" style="border:0; padding: 0;">
-                            <div id="sec_col_top">
+                            <div id="sec_col_top" align="center">
+                            	<p>
+                            	 BAROQUEART is a database of paintings produced by artists throughout the Hispanic world during the Baroque period.<br/>
+								 <br/> It presents the rich art of baroque era in various interactive visualizations.
+								</p>
                             </div>
                             <br/>
                             <div id="secCol">
@@ -167,7 +171,7 @@
                                     <p class="member">
                                         <a href="#">Lost your Password?</a>
                                         <br/>
-                                        Not a member yet? <a href="#">Register now!</a>
+                                        Not a member yet? <a href="#">Registration soon available.</a>
                                     </p>
                                 </div>
                             </div>
@@ -176,22 +180,27 @@
                             <div id="right_div">
                                 <div id="firstCol">
                                     <h3>Pick of the Day: Artwork</h3>
-                                    <div>
+                                    <div style="height: 200px;">
+                                    	{% if artwork %}
                                         <table>
                                             <tr>
                                                 <td style="border: 0px; width: 40%; padding-left: 20px;">
-                                                    <div class="img_artwork" style="border: solid 1px #ededed;" align="center">
-                                                        {% if artwork.images.count != 0 %} 
-                                                        {% for artImg in artwork.images.all %} 
-                                                        {% if artImg.url %} 
-                                                        {% thumbnail artImg.url "190x190,crop" %}
-                                                        {% else %} 
-                                                        {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
-                                                        {% endif %}  
-                                                        {% endfor %} 
-                                                        {% else %} 
-                                                        {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
-                                                        {% endif %} 
+                                                    <div class="img_artwork" align="center">
+                                                          {% if artwork.images.count != 0 %} 
+                                                            {% for artImg in artwork.images.all %}  
+                                                              {% if artImg.url %} 
+                                                                {% thumbnail artImg.url "190x190,crop" %}
+                                                              {% else %}
+                                                                {% if artImg.image %}
+                                                                  {% thumbnail artImg.image "190x190,crop" %}
+                                                                {% else %} 
+                                                                  {% thumbnail "img/Unavailable.gif" "190x190,crop" %} 
+                                                                {% endif %}
+                                                              {% endif %} 
+                                                            {% endfor %} 
+                                                          {% else %}
+                                                            {% thumbnail "img/Unavailable.gif" "190x190,crop" %}
+                                                          {% endif %}
                                                     </div>
                                                 </td>
                                                 <td align="left" style="border: 0px;">
@@ -214,16 +223,20 @@
                                                             {% endif%}
                                                             <br/>
                                                         </p>
-                                                        <a href="{% url artworks_record artwork.id %}">View More</a>
+                                                        <a href="{% url artworks_record artwork.id %}">View More</a>													
                                                     </div>
                                                 </td>
                                             </tr>
                                         </table>
+										{% else %}
+											<span style="position:relative; left: 225px; top:100px;">No data available.</span>
+										{% endif %}
                                     </div>
                                 </div>
                                 <div id="firstCol_bottom">
                                     <h3>Pick of the Day: Artist</h3>
-                                    <div style="padding-top: 40px;">
+                                    <div style="padding-top: 40px; height: 200px;">
+									{% if artist %}
                                         <table>
                                             <tr>
                                                 <td style="width: 60%; border: 0px;" align="right">
@@ -250,23 +263,30 @@
                                                 </td>
                                                 <td style="border: 0px; padding-right: 80px;" align="right">
                                                     <div id="work_history">
-                                                        {% for artwork in artist.artwork_set.all %}
-                                                        	{% if artwork.images.count != 0 %} 
-                                                        		{% for artImg in artwork.images.all %} 
-                                                        			{% if artImg.url %} 
-                                                        				{% thumbnail artImg.url "190x190,crop" %}
-                                                        			{% else %}
-                                                        				{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
-                                                        			{% endif %} 
-                                                        		{% endfor %} 
-                                                        	{% else %}
-                                                        		{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %}
-                                                        	{% endif %}
+                                                        {% for artwork in artist.artwork_set.all %} 
+                                                          {% if artwork.images.count != 0 %} 
+                                                            {% for artImg in artwork.images.all %}  
+                                                              {% if artImg.url %} 
+                                                                {% thumbnail artImg.url "190x190,crop" %}
+                                                              {% else %}
+                                                                {% if artImg.image %}
+                                                                  {% thumbnail artImg.image "190x190,crop" %}
+                                                                {% else %} 
+                                                                  {% thumbnail "img/Unavailable.gif" "190x190,crop" %} 
+                                                                {% endif %}
+                                                              {% endif %} 
+                                                            {% endfor %} 
+                                                          {% else %}
+                                                            {% thumbnail "img/Unavailable.gif" "190x190,crop" %}
+                                                          {% endif %}
                                                         {% endfor %}
                                                     </div>
                                                 </td>
                                             </tr>
                                         </table>
+										{% else %}
+											<span style="position:relative; left: 225px; top:100px;">No data available.</span>
+										{% endif %}
                                     </div>
                                 </div>
                             </div>

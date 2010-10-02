@@ -73,13 +73,17 @@
                             {% if artwork.images.count != 0 %}
                             {% for artImg in artwork.images.all %} 
                             {% if artImg.url %} 
-                            {% thumbnail artImg.url "190x190,crop" %}
-                            {% else %}
-                            {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
-                            {% endif %} 
+                            	{% thumbnail artImg.url "190x190,crop" %}
+							{% else %}
+								{% if artImg.image %}
+									{% thumbnail artImg.image "190x190,crop" %}
+								{% else %}
+                            		{% thumbnail "img/Unavailable.gif" "190x190,crop" %} 
+                            	{% endif %}
+							{% endif %} 
                             {% endfor %} 
                             {% else %}
-                            {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
+                            {% thumbnail "img/Unavailable.gif" "190x190,crop" %} 
                             {% endif %} 
                         </div>
                     </td>
