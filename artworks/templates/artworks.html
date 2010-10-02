@@ -1,6 +1,6 @@
 {% extends "pvbase.html" %}
 {% load i18n %}
-{% load convert_tags %}
+{% load convert_tags place_map_tags %}
 {% block more_scripts %}
 <script type='text/javascript' src='/media/js/tooltip.js'>
 </script>
@@ -107,7 +107,7 @@
                             <tr>
                                 <td>
                                     {% if artwork.original_place %} 
-                                    Original Destination: <a class="hlink preview" rel="{% url map %}" href="http://maps.google.com/maps/api/staticmap?center=37.387345,-122.082138&zoom=13&markers=37.386052,-122.083851&size=300x200&sensor=false">{{ artwork.original_place.title }}</a>
+                                    Original Destination: <a class="hlink preview" rel="{% url map %}" href="{% place_map artwork.original_place.geometry artwork.original_place.point %}">{{ artwork.original_place.title }}</a>
                                     {% else %} 
                                     Original Destination: <span class="boldTxt">n/a </span>
                                     {% endif%}
@@ -116,7 +116,7 @@
                             <tr>
                                 <td>
                                     {% if artwork.current_place %} 
-                                    Current Location: <a class="hlink preview" rel="{% url map %}" href="http://maps.google.com/maps/api/staticmap?center=37.387345,-122.082138&zoom=13&markers=37.386052,-122.083851&size=300x200&sensor=false">{{ artwork.current_place.title }}</a>
+                                    Current Location: <a class="hlink preview" rel="{% url map %}" href="{% place_map artwork.current_place.geometry artwork.current_place.point %}">{{ artwork.current_place.title }}</a>
                                     {% else %} 
                                     Current Location: <span class="boldTxt">n/a </span>
                                     {% endif%}
