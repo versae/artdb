@@ -21,16 +21,16 @@
 
 {% block navigation_bar %}
 <li>
-    <a href="{% url artworks_list %}">Artworks</a>
-</li>
-<li>
-    <a href="{% url creators_list %}">Creators</a>
+    <a href="{% url map %}">Map</a>
 </li>
 <li class="current">
     <a href="{% url series_list %}">Series</a>
 </li>
 <li>
-    <a href="{% url map %}">Map</a>
+    <a href="{% url creators_list %}">Creators</a>
+</li>
+<li>
+    <a href="{% url artworks_list %}">Artworks</a>
 </li>
 {% endblock %}
 

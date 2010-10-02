@@ -21,17 +21,17 @@
 {% block title %}{% trans "Artwork" %}{% endblock %}
 
 {% block navigation_bar %}
-<li class="current">
-    <a href="{% url artworks_list %}">Artworks</a>
-</li>
 <li>
-    <a href="{% url creators_list %}">Creators</a>
+    <a href="{% url map %}">Map</a>
 </li>
 <li>
     <a href="{% url series_list %}">Series</a>
 </li>
 <li>
-    <a href="{% url map %}">Map</a>
+    <a href="{% url creators_list %}">Creators</a>
+</li>
+<li class="current">
+    <a href="{% url artworks_list %}">Artworks</a>
 </li>
 {% endblock %}
 
@@ -106,8 +106,7 @@
                 </table>
 				        <div class="pvspace" style="height: 10px;">
         </div>
-                <div class="pvpagination">
-                	<button id="fview_button"> Faceted View </button>                	
+                <div class="pvpagination">               	
                        	<a id="first" href="?orderby={{ order }}&page=1">First</a>
 						<<
                     	{% if artworks.has_previous %}

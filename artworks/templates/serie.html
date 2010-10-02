@@ -31,17 +31,18 @@
 
 {% block navigation_bar %}
 <li>
-    <a href="{% url artworks_list %}">Artworks</a>
-</li>
-<li>
-    <a href="{% url creators_list %}">Creators</a>
+    <a href="{% url map %}">Map</a>
 </li>
 <li class="current">
     <a href="{% url series_list %}">Series</a>
 </li>
 <li>
-    <a href="{% url map %}">Map</a>
+    <a href="{% url creators_list %}">Creators</a>
 </li>
+<li>
+    <a href="{% url artworks_list %}">Artworks</a>
+</li>
+
 {% endblock %}
 
 {% block current_crumb %}{{ serie.title }}{% endblock %}
@@ -90,7 +91,7 @@
                         			{% endfor %}
                     			</tbody>
 			                </table>
-						<div class="pvspace" style="height: 10px; width: 99%;">
+						<div class="pvspace" style="height: 10px; width: 100%;">
 					</div>
                 	<div class="pvpagination">   
 						{% if artworks.paginator.num_pages == 1 %}            	
@@ -119,7 +120,7 @@
 						    <a href="?page={{ artworks.paginator.num_pages }}">Last</a>
 						{% endif %}						
                 	</div>
-					<div class="pvspace" style="height: 10px; width: 99%;">
+					<div class="pvspace" style="height: 10px; width: 100%;">
         			</div>
     			</div>
 			</td>
@@ -131,11 +132,15 @@
 								{% if artImg.url %}					
 									{% thumbnail artImg.url "215x175,crop" %}
 								{% else %}
-									{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "215x175,crop" %}
-								{% endif %}								
+									{% if artImg.image %}
+										{% thumbnail artImg.image "190x190,crop" %}
+									{% else %}
+                            			{% thumbnail "img/Unavailable.gif" "190x190,crop" %} 
+                            		{% endif %}
+								{% endif %}
 							{% endfor %} 
 						{% else %}
-							{% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "215x175,crop" %}
+							{% thumbnail "img/Unavailable.gif" "215x175,crop" %}
 						{% endif %}
 					{% endfor %}	
                  </div>

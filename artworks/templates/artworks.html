@@ -43,17 +43,17 @@
 {% endblock %}
 {% block title %}{% trans "Artwork" %}{% endblock %}
 {% block navigation_bar %}
-<li class="current">
-    <a href="{% url artworks_list %}">Artworks</a>
-</li>
 <li>
-    <a href="{% url creators_list %}">Creators</a>
+    <a href="{% url map %}">Map</a>
 </li>
 <li>
     <a href="{% url series_list %}">Series</a>
 </li>
 <li>
-    <a href="{% url map %}">Map</a>
+    <a href="{% url creators_list %}">Creators</a>
+</li>
+<li class="current">
+    <a href="{% url artworks_list %}">Artworks</a>
 </li>
 {% endblock %}
 {% block current_crumb %}{{ artwork.title }}{% endblock %}
@@ -73,13 +73,17 @@
                             {% if artwork.images.count != 0 %}
                             {% for artImg in artwork.images.all %} 
                             {% if artImg.url %} 
-                            {% thumbnail artImg.url "190x190,crop" %}
-                            {% else %}
-                            {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
-                            {% endif %} 
+                            	{% thumbnail artImg.url "190x190,crop" %}
+							{% else %}
+								{% if artImg.image %}
+									{% thumbnail artImg.image "190x190,crop" %}
+								{% else %}
+                            		{% thumbnail "img/Unavailable.gif" "190x190,crop" %} 
+                            	{% endif %}
+							{% endif %} 
                             {% endfor %} 
                             {% else %}
-                            {% thumbnail "http://schooloutfits.co.uk/images/Unavailable321x321.gif" "190x190,crop" %} 
+                            {% thumbnail "img/Unavailable.gif" "190x190,crop" %} 
                             {% endif %} 
                         </div>
                     </td>
@@ -127,13 +131,6 @@
                                     {% endif %}
                                 </td>
                             </tr>
-                            <tr>
-                                <td>
-                                    It shows the virgin: 
-                                    {% for artVirgin in artwork.virgins.all %}<a class="hlink" href="{{ url }}">{{ artVirgin.name }} </a>
-                                    {% endfor %}
-                                </td>
-                            </tr>
                         </table>
                     </td>
                 </tr>
@@ -148,53 +145,11 @@
                         <div class="pvcolumn_header">
                             General Description
                         </div>
-                        <div id="pvcolumn_body">
-                            <ul>
-                                <li>
-                                    Clasificación
-                                    <ul id="classify">
-                                        {% for d in descriptor %}
-                                        {% if "Clasificación" in d.path %}
-                                        {{ d.parent.name }}: {{ d.name }}
-                                        <br/>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                                <li>
-                                    Contenido
-									<ul id="classify">
-                                        {% for d in descriptor %}
-                                        {% if "Contenido" in d.path %}
-                                        {{ d.parent.name }}: {{ d.name }}
-                                        <br/>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                                <li>
-                                    Propiedades Físicas
-									<ul id="classify">
-                                        {% for d in descriptor %}
-                                        {% if "Propiedades Físicas" in d.path %}
-                                        {{ d.parent.name }}: {{ d.name }}
-                                        <br/>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-								{% for d in descriptor %}
-                                  {% if "Propiedades Físicas" in d.path %}
-                                  {% else %}
-								  	{% if "Contenido" in d.path %}
-									{% else %}        
-                                  		{% if "Clasificación" in d.path %}
-								  		{% else %}
-								  			<li>{{ d }}</li>
-								  		{% endif %}
-									{% endif %}
-								  {% endif %}
-                                {% endfor %}
+                        <div id="pvcolumn_body" style="padding: 6px;">
+                                {% for d in descriptor %}
+									{{ d }} {% if not forloop.last %}<br/>{% endif %}
+								{% endfor %}
+
                             </ul>
                             <br/>
                         </div>

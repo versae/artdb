@@ -1,12 +1,12 @@
 /* CSS for Public View of ArtDB */
 .search_fields_button {
-	width: 50px;
-	height: 41px;
+	width: 80px;
+	height: 28px;
 	background: url(/media/img/search_mayb.png);
 	border: none;
 }
 
-.search_fields_button:hover{
+.search_fields_button:hover {
 	cursor: pointer;
 }
 
@@ -97,7 +97,7 @@
 	border: none;
 	float: right;
 	position: relative;
-	top: 8px;
+	top: -40px;
 	right: 35px;
 }
 
@@ -112,13 +112,13 @@
 }
 
 #search_button {
-	top: 8px;
+	top: -40px;
 	right: 40px;
 }
 
 #pv_search_button {
-	top: 5px;
-	right: 205px;
+	top: -45px;
+	right: 200px;
 }
 
 #search_text {
@@ -128,7 +128,7 @@
 	border: none;
 	float: right;
 	position: relative;
-	top: 8px;
+	top: -40px;
 	right: 45px;
 }
 
@@ -139,8 +139,19 @@
 	border: none;
 	float: right;
 	position: relative;
-	top: 5px;
-	right: 390px;
+	top: -45px;
+	right: 385px;
+}
+
+#pvheader #exhibitSearch input[type="text"] {
+    height: 23px;
+    width: 160px;
+    background: url(/media/img/search_box.png);
+    border: none;
+    float: right;
+    position: relative;
+    top: 5px;
+    right: 390px;
 }
 
 #pvheader #exhibitSearch input[type="text"] {
@@ -159,7 +170,7 @@
 }
 
 .pvtitle {
-	width: 950px;
+	width: 948px;
 	padding: 5px;
 	text-decoration: none;
 	font-weight: normal;
@@ -223,27 +234,34 @@
 	font-size: 0.8em;
 	padding: 5px;
 	float: right;
+	position: relative;
+	right: -340px;
+	top: -10px;
 	vertical-align: middle;
 }
 
 #pvsort_select {
 	height: 22px;
 	float: right;
-	vertical-align: middle;
+	position: relative;
+	right: -340px;
+	top: -8px;
 	border: solid 1px #dbeca6;
 	background-color: #eef9ce;
 	color: #504f4f;
 	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
 	font-size: 0.8em;
+	vertical-align: middle;
 }
 
 .pvpagination {
 	padding: 0 20px 0 0;
-	text-align: right;
+	background-color: #fff; text-align : right;
 	text-decoration: none;
 	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
 	font-size: 0.9em;
 	color: #504f4f;
+	text-align: right;
 }
 
 .pvpagination a:link,.pvpagination a:visited {
@@ -260,14 +278,16 @@
 #pvtable_div {
 	width: 955px;
 	text-decoration: none;
-	font-weight: normal;
+	background-color: #dbeca6;
+	padding-top: 5px; font-weight : normal;
 	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
 	font-size: 1em;
 	border: solid 2px #dbeca6;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 11px;
 	border-radius: 11px;
-	behavior: url(/media/htc/border-radius.htc)
+	behavior: url(/media/htc/border-radius.htc);
+	font-weight: normal;
 }
 
 #pvobject_list {
@@ -283,17 +303,16 @@
 }
 
 #pvobject_list thead td {
-	height: 40px;
+	height: 35px;
 	padding: 3px 0 3px 5px;
 	overflow: auto;
-	border-right: solid 1px #f0f0f0;
 	border-bottom: solid 1px #f0f0f0;
 }
 
 #pvobject_list tbody td {
-	min-height: 40px;
-	height: 40px;
-	max-height: 40px;
+	min-height: 30px;
+	height: 35px;
+	max-height: 35px;
 	border-right: solid 1px #f0f0f0;
 	border-bottom: solid 1px #f0f0f0;
 }
@@ -325,14 +344,18 @@
 #pvheader {
 	height: 38px;
 	width: 970px;
-	margin: 0px auto;
-	position: relative;
 }
 
 #pvlogo {
-	position: absolute;
-	top: 0px;
-	left: 0px;
+	position: relative;
+	top: -10px;
+	left: -360px;
+}
+
+#public_view_logo {
+	position: relative;
+	top: -10px;
+	left: 20px;
 }
 
 ul#navBar {
@@ -340,13 +363,14 @@ ul#navBar {
 	margin: 0px;
 	padding: 0px;
 	list-style-type: none;
-	position: absolute;
-	bottom: 0px;
-	right: 10px;
+	position: relative;
 }
 
 ul#navBar li {
-	float: left;
+	float: right;
+	position: relative;
+	top: -84px;
+	left: -10px;
 	display: block;
 	width: 87px;
 	height: 37px;
@@ -354,7 +378,7 @@ ul#navBar li {
 }
 
 ul#navBar li a:link,ul#navBar li a:visited {
-	float: left;
+	float: right;
 	display: block;
 	width: 70px;
 	margin: 0px;
@@ -395,6 +419,8 @@ ul#navBar li a:hover {
 #secWrapper {
 	width: 960px;
 	margin: 0px auto;
+	position: relative;
+	left: -5px;
 	padding: 52px 0px 0px 0px;
 	background: url(/media/img/content_top.png) no-repeat top left;
 }
@@ -485,7 +511,7 @@ ul#navBar li a:hover {
 }
 
 .pvspace {
-	width: 940px;
+	width: 955px;
 	height: 2px;
 	background: #fff;
 }
@@ -496,7 +522,7 @@ ul#navBar li a:hover {
 	padding-left: 20px;
 }
 
-.pvbreadcrumb,.pvfooter {
+.pvbreadcrumb {
 	width: 940px;
 	height: 16px;
 	padding: 3px 0 3px 20px;
@@ -508,9 +534,15 @@ ul#navBar li a:hover {
 }
 
 .pvfooter {
-	width: 930px;
+	width: 940px;
 	text-align: right;
-	padding-right: 10px;
+	padding: 3px 10px 3px 10px;
+	height: 16px;
+	background: #504f4f;
+	font-family: Cambria, "Times New Roman", Georgia, Times, serif;
+	font-size: 0.9em;
+	font-style: italic;
+	color: #fff;
 }
 
 .pvfooter a:link,a:visited {
@@ -607,10 +639,24 @@ ul#navBar li a:hover {
 
 #sec_col_top {
 	width: 300px;
-	text-align: center;
 	border: dashed 1px #dbeca6;
-	height: 320px;
+	height: 285px;
+	position: relative;
+	top: -5px; -moz-border-radius : 10px;
+	-webkit-border-radius: 11px;
+	border-radius: 11px;
+	behavior: url(/media/htc/border-radius.htc);
 	-moz-border-radius: 10px;
+	padding-top: 35px;
+}
+
+#sec_col_top p{
+	text-align: justify;	
+	line-height: 30px;
+	font-size: 0.99em;
+	font-weight: normal;
+	font-family: "Times New Roman";
+	width: 240px;
 }
 
 #login {
@@ -741,21 +787,27 @@ ul#navBar li a:hover {
 }
 
 #right_div {
-	height: 550px;
+	height: 560px;
 	width: 550px;
 	border: solid 1px #dbeca6;
 	-moz-border-radius: 10px;
-	position: relative;
+	-webkit-border-radius: 11px; border-radius : 11px;
+	behavior: url(/media/htc/border-radius.htc); position : relative;
 	left: -55px;
+	border-radius: 11px; behavior : url(/media/htc/border-radius.htc);
+	position: relative; left : -55px;
+	top: -10px;
 }
 
 #firstCol {
 	position: relative;
 	left: -8px;
-	background: url(/media/img/latest_bg.png) no-repeat top left;
+	top: 10px; background : url(/media/img/latest_bg.png) no-repeat top
+	left;
 	padding: 0px;
 	padding-top: 43px;
 	width: 600px;
+	background: url(/media/img/latest_bg.png) no-repeat top left;
 }
 
 #firstCol_bottom {
@@ -830,10 +882,11 @@ ul#navBar li a:hover {
 }
 
 #artistdata {
+	position: relative;
 	color: #414141;
 	font-size: 12px;
 	margin: 2px;
-	padding-left: 10px;
+	padding: 5px 0 0 100px;
 	text-align: left;
 	line-height: 20px;
 	height: 220px;
@@ -846,22 +899,29 @@ ul#navBar li a:hover {
 }
 
 #work_history {
-	font-size: 13px;
-	color: #414141;
-	font-family: Cambria, Georgia, "Times New Roman", Times, serif;
+	border: solid 1px #ededed;
+	width: 200px;
+	height: 200px;
+	text-align: center;
 }
 
 .menu {
 	background-color: #504f4f;
 	-moz-border-radius: 10px;
-	width: 900px;
+	-webkit-border-radius: 11px; border-radius : 11px;
+	behavior: url(/media/htc/border-radius.htc); width : 898px;
 	height: 180px;
-	padding: 10px 0 10px 10px;
+	padding: 25px 3px 2px 17px; position : relative;
+	left: -2px;
+	position: relative;
+	border-radius: 11px; behavior : url(/media/htc/border-radius.htc);
+	width: 898px;
 }
 
 .innermenu {
 	height: 170px;
-	padding: 5px;
+	position:relative;
+	top: -7px;
 }
 
 .innermenu img {

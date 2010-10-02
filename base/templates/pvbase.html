@@ -26,26 +26,29 @@
 {% block body %}
 
 <div id="pvwrap">
-	<div class="pvspace" style="padding: 10px 0 10px 20px;"></div>
+<div class="pvspace" style="padding: 10px 0 10px 20px;"></div>
 	<div id="pvheader">
-    	<img src="/media/img/banner1.png" id="pvlogo" alt="Logo" />
+    	<a href="{% url public_view %}"><img src="/media/img/baroqueart.png" id="public_view_logo" alt="Logo" /></a>
 		<div style=" height: 23px; padding: 5px 5px 7px 5px;">
 		    {% block search_box %}
 			<input type="text" id="pv_search_text"/>
 			{% endblock %}
     		<input type="button" id="pv_search_button"/>
 		</div>
-        <ul id="navBar">
+		<ul id="navBar">
         	{% block navigation_bar %}{% endblock %}         
         </ul>
     </div>
+
 <div class="pvcolorspace" style="background-color: #90ac39;"></div>
 <div class="pvspace"></div>
-<div class="pvbreadcrumb">     
+<div class="pvbreadcrumb">  
 	{% for b in request.breadcrumbs %}
-        <a href="{{ b.url }}">{{ b.name }}</a>{% if not forloop.last %}  >>  {% endif %}{% endfor %} >>
-	 {% block current_crumb %}{% endblock %}
-	 </div>
+        <a href="{{ b.url }}">{{ b.name }}</a>
+		{% if not forloop.last %}  → {% endif %}
+	{% endfor %}
+	  → {% block current_crumb %}{% endblock %}
+</div>
 <div class="pvcolorspace" style="background-color: #ffffff;"></div>
 {% block pv_page_body %}{% endblock %}
 	
@@ -53,7 +56,8 @@
     	<div class="pvspace" height="100px"></div>
     	<div class="pvcolorspace" style="background-color: #90ac39;"></div>
 <div class="pvspace"></div>
-    	<div class="pvfooter"><a href="#">Contact Us</a> | <a href="#">Help</a></div>
+    	<div class="pvfooter">
+			<a href="#">About Us</a> | <a href="#">Help</a></div>
 		<div id="pvcopyright">&copy; University of Western Ontario</div>
     </div>
 </div>
