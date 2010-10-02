@@ -5,6 +5,7 @@ local_settings.py
 django_descriptors
 media/django_descriptors
 media/cache
+media/images
 backups/*.json
 convert
 install.txt
