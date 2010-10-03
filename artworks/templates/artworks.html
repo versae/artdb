@@ -107,7 +107,7 @@
                             <tr>
                                 <td>
                                     {% if artwork.original_place %} 
-                                    Original Destination: <a class="hlink preview" rel="{% url map %}" href="{% place_map artwork.original_place.geometry artwork.original_place.point %}">{{ artwork.original_place.title }}</a>
+                                    Original Destination: <a class="hlink preview" rel="{% url map %}" href="{% if artwork.original_place.geometry %}{% place_map artwork.original_place.geometry.point_on_surface %}{% else %}{% place_map artwork.original_place.point %}{% endif %}">{{ artwork.original_place.title }}</a>
                                     {% else %} 
                                     Original Destination: <span class="boldTxt">n/a </span>
                                     {% endif%}
@@ -116,7 +116,7 @@
                             <tr>
                                 <td>
                                     {% if artwork.current_place %} 
-                                    Current Location: <a class="hlink preview" rel="{% url map %}" href="{% place_map artwork.current_place.geometry artwork.current_place.point %}">{{ artwork.current_place.title }}</a>
+                                    Current Location: <a class="hlink preview" rel="{% url map %}" href="{% if artwork.current_place.geometry %}{% place_map artwork.current_place.geometry.point_on_surface %}{% else %}{% place_map artwork.current_place.point %}{% endif %}">{{ artwork.current_place.title }}</a>
                                     {% else %} 
                                     Current Location: <span class="boldTxt">n/a </span>
                                     {% endif%}
