@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.sites.models import Site
 
 from django_descriptors.models import Descriptor
 from django_descriptors.admin import DescriptorAdmin
@@ -26,6 +27,7 @@ class AdminSite(admin.AdminSite):
 def setup_admin():
     admin_site.register(User, UserAdmin)
     admin_site.register(Group, admin.ModelAdmin)
+    admin_site.register(Site, admin.ModelAdmin)
 
     admin_site.register(Descriptor, DescriptorAdmin)
 
