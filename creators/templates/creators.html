@@ -1,5 +1,5 @@
 {% extends "pvbase.html" %}
-{% load i18n %}
+{% load i18n place_map_tags%}
 
 {% block more_scripts %}
 <script type='text/javascript' src='/media/js/tooltip.js'></script>
@@ -51,7 +51,7 @@
                             <tr>
                                 <td >
                                     {% if creator.birth_place %} 
-                                    Place of birth: <a class="hlink preview" rel="{% url map %}" href="http://maps.google.com/maps/api/staticmap?center=37.387345,-122.082138&zoom=13&markers=37.386052,-122.083851&size=300x200&sensor=false">{{ creator.birth_place.title }}</a>
+                                    Place of birth: <a class="hlink preview" rel="{% url map %}" href="{% if creator.birth_place.geometry %}{% place_map creator.birth_place.geometry.point_on_surface %}{% else %}{% place_map creator.birth_place.point %}{% endif %}">{{ creator.birth_place.title }}</a>
                                     {% else %} 
                                     Place of birth: <span class="boldTxt">n.a. </span>
                                     {% endif%}
@@ -61,7 +61,7 @@
 							<tr>
                                 <td>
                                     {% if creator.death_place %} 
-                                    Place of death: <a class="hlink preview" rel="{% url map %}" href="http://maps.google.com/maps/api/staticmap?center=37.387345,-122.082138&zoom=13&markers=37.386052,-122.083851&size=300x200&sensor=false">{{ creator.death_place.title }}</a>
+                                    Place of death: <a class="hlink preview" rel="{% url map %}" href="{% if creator.death_place.geometry %}{% place_map creator.death_place.geometry.point_on_surface %}{% else %}{% place_map creator.death_place.point %}{% endif %}">{{ creator.death_place.title }}</a>
                                     {% else %} 
                                     Place of death: <span class="boldTxt">n.a. </span>
                                     {% endif%}
