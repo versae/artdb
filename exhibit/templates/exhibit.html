@@ -30,17 +30,17 @@
 
 {% block navigation_bar %}
     <li>
-        <a href="{% url artworks_list %}">Artworks</a>
-    </li>
-    <li>
-        <a href="{% url creators_list %}">Creators</a>
+        <input id="exhibitMapHidden" type="hidden" value="{% url map %}">
+        <a id="exhibitMapLink" href="{% url map %}?from={{ year_from }}&to={{ year_to }}">Map</a>
     </li>
     <li class="current">
         <a href="{% url series_list %}">Series</a>
     </li>
     <li>
-        <input id="exhibitMapHidden" type="hidden" value="{% url map %}">
-        <a id="exhibitMapLink" href="{% url map %}?from={{ year_from }}&to={{ year_to }}">Map</a>
+        <a href="{% url creators_list %}">Creators</a>
+    </li>
+    <li>
+        <a href="{% url artworks_list %}">Artworks</a>
     </li>
 {% endblock %}
 

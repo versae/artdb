@@ -147,7 +147,11 @@
                         </div>
                         <div id="pvcolumn_body" style="padding: 6px;">
                                 {% for d in descriptor %}
-									{{ d }} {% if not forloop.last %}<br/>{% endif %}
+                                    {% if d.value %}
+									{{ d.descriptor.path }}: {{ d.value }} {% if not forloop.last %}<br/>{% endif %}
+									{% else %}
+									{{ d.descriptor.path }} {% if not forloop.last %}<br/>{% endif %}
+									{% endif %}
 								{% endfor %}
 
                             </ul>
