@@ -51,7 +51,12 @@
                             <tr>
                                 <td >
                                     {% if creator.birth_place %} 
-                                    Place of birth: <a class="hlink preview" rel="{% url map %}" href="{% if creator.birth_place.geometry %}{% place_map creator.birth_place.geometry.point_on_surface %}{% else %}{% place_map creator.birth_place.point %}{% endif %}">{{ creator.birth_place.title }}</a>
+                                    Place of birth:
+                                         {% if creator.birth_place.get_valid_point %}
+                                        <a class="hlink preview" rel="{% url map %}" href="{% place_map creator.birth_place.get_valid_point %}">{{ creator.birth_place.title }}</a>
+                                        {% else %}
+                                        {{ creator.birth_place.title }}
+                                        {% endif %}
                                     {% else %} 
                                     Place of birth: <span class="boldTxt">n.a. </span>
                                     {% endif%}
@@ -61,9 +66,14 @@
 							<tr>
                                 <td>
                                     {% if creator.death_place %} 
-                                    Place of death: <a class="hlink preview" rel="{% url map %}" href="{% if creator.death_place.geometry %}{% place_map creator.death_place.geometry.point_on_surface %}{% else %}{% place_map creator.death_place.point %}{% endif %}">{{ creator.death_place.title }}</a>
+                                    Place of death:
+                                         {% if creator.death_place.get_valid_point %}
+                                        <a class="hlink preview" rel="{% url map %}" href="{% place_map creator.death_place.get_valid_point %}">{{ creator.death_place.title }}</a>
+                                        {% else %}
+                                        {{ creator.death_place.title }}
+                                        {% endif %}
                                     {% else %} 
-                                    Place of death: <span class="boldTxt">n.a. </span>
+                                    Place of death: <span class="boldTxt">n.a.</span>
                                     {% endif%}
                                     
                                 </td>

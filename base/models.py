@@ -50,3 +50,11 @@ class GeospatialReference(models.Model):
             and not self.geometry.contains(self.point)):
             self.point = self.geometry.point_on_surface
         super(GeospatialReference, self).save(*args, **kwargs)
+
+    def get_valid_point(self):
+        valid_point = None
+        if self.geometry:
+            valid_point = self.geometry.point_on_surface
+        elif self.point:
+            valid_point = self.point
+        return valid_point

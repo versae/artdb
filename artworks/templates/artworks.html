@@ -107,7 +107,12 @@
                             <tr>
                                 <td>
                                     {% if artwork.original_place %} 
-                                    Original Destination: <a class="hlink preview" rel="{% url map %}" href="{% if artwork.original_place.geometry %}{% place_map artwork.original_place.geometry.point_on_surface %}{% else %}{% place_map artwork.original_place.point %}{% endif %}">{{ artwork.original_place.title }}</a>
+                                    Original Destination:
+                                        {% if artwork.original_place.get_valid_point %}
+                                        <a class="hlink preview" rel="{% url map %}" href="{% place_map artwork.original_place.get_valid_point %}">{{ artwork.original_place.title }}</a>
+                                        {% else %}
+                                        {{ artwork.original_place.title }}
+                                        {% endif %}
                                     {% else %} 
                                     Original Destination: <span class="boldTxt">n/a </span>
                                     {% endif%}
@@ -115,10 +120,15 @@
                             </tr>
                             <tr>
                                 <td>
-                                    {% if artwork.current_place %} 
-                                    Current Location: <a class="hlink preview" rel="{% url map %}" href="{% if artwork.current_place.geometry %}{% place_map artwork.current_place.geometry.point_on_surface %}{% else %}{% place_map artwork.current_place.point %}{% endif %}">{{ artwork.current_place.title }}</a>
+                                    {% if artwork.current_place %}
+                                    Current Location:
+                                        {% if artwork.current_place.get_valid_point %}
+                                        <a class="hlink preview" rel="{% url map %}" href="{% place_map artwork.current_place.get_valid_point %}">{{ artwork.current_place.title }}</a>
+                                        {% else %}
+                                        {{ artwork.current_place.title }}
+                                        {% endif %}
                                     {% else %} 
-                                    Current Location: <span class="boldTxt">n/a </span>
+                                    Current Location: <span class="boldTxt">n/a</span>
                                     {% endif%}
                                 </td>
                             </tr>
