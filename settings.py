@@ -70,14 +70,16 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.core.context_processors.request",
+    "django.core.context_processors.csrf",
     "base.context_processors.google_api_key",
-    "base.context_processors.project_name"
+    "base.context_processors.project_name",
 )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'breadcrumbs.middleware.BreadcrumbsMiddleware',
 )
 
@@ -106,6 +108,7 @@ INSTALLED_APPS = (
 )
 
 LOGIN_URL = "/admin/"
+LOGOUT_URL = "/"
 
 OLWIDGET_MEDIA_URL = path.join(MEDIA_URL, "olwidget")
 GOOGLE_API_KEY = u"ABQIAAAAkXCmjf08FLp1fzy2qNzWThT7g5bZECU_gqoByQmzcFSTeCxKshQqEs1adBOA4YT_D2fzAaGvjbVtIA"
