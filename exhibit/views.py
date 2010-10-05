@@ -35,7 +35,8 @@ def artworks_json(request):
         artwork_dic = {
             "identifier": artwork.id,
             "type": artwork._meta.object_name,
-            "label": artwork.title,
+            "title": artwork.title,
+            "label": "%s (#%s)" % (artwork.title, artwork.id),
             "serie": artwork.serie and artwork.serie.title,
 #            "size": artwork.size,
             "creators": creators,
