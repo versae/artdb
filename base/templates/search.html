@@ -3,36 +3,6 @@
 
 {% block more_scripts %}
 <script type="text/javascript" src="/media/js/search.js"></script>
-<script type="text/javascript">
-    this.loadTable = function(){
-        var e, d = function(s){
-            return decodeURIComponent(s.replace(/\+/g, " "));
-        }, q = window.location.search.substring(1), r = /([^&=]+)=?([^&]*)/g;
-        
-        while (e = r.exec(q)) 
-            urlParams[d(e[1])] = d(e[2]);
-			
-		if(urlParams.data){
-			data = urlParams.data;
-			$.get('{% url search_view %}', { data: data }, function(result) {
-					$('#search_table_div').html("");
-					$('#search_table_div').append(result);
-    			});
-		}
-    };
-	
-	this.callAjax = function(object_name, queryparams, queryVals, operators){
-		$.ajax({
-			    url: '{% url search_view %}',
-    			data: { objectType:object_name, params:queryparams, vals:queryVals, ops:operators },
-    			traditional: true,
-    			success: function(result) {
-					$('#search_table_div').html("");
-					$('#search_table_div').append(result);
-    			}
-			});
-	}
-</script>
 {% endblock %}
 
 {% block title %}{% trans "Search" %}{% endblock %}
@@ -58,6 +28,7 @@
 <div class="pvtitle">
     Search
 </div>
+	<input type="hidden" id="search_url" name="search_url" value="{% url search_view %}" />
    <div class="pvcolorspace" style="background-color: #ffffff;">
 </div>
 <div id="secWrapper">
@@ -71,43 +42,14 @@
 					<option value="Artwork">Artwork</option>
 					<option value="Creator">Creator</option>
 					<option value="Serie">Serie</option>
-				</select><br/><br /><br />
-				<table>
-					<tr>
-						<td class="td_height"><input type="text" id="text1" class="text_search" /></td>
-						<td rowspan="3" style="width: 15%; vertical-align: middle;">
-							<select id="op1" class="search_select" style="width:70px;">
-								<option value="or">and/or</option>
-								<option value="and">and</option>
-								<option value="or">or</option>
-							</select>
-						</td>
-						<td class="td_height"><input type="text" id="text2" class="text_search"/></td>
-						<td rowspan="3" style="width: 15%; vertical-align: middle;">
-							<select id="op2" class="search_select" style="width:70px;">
-								<option value="or">and/or</option>
-								<option value="and">and</option>
-								<option value="or">or</option>
-							</select>
-						</td>
-						<td class="td_height"><input type="text" id="text3" class="text_search"/></td>
-					</tr>
-					<tr>
-						<td style="line-height: 12px;">in</td>
-						<td style="line-height: 12px;">in</td>
-						<td style="line-height: 12px;">in</td>
-					</tr>
-					<tr>
-						<td class="td_height"><select id="field1" class="search_select"></select></td>
-						<td class="td_height"><select id="field2" class="search_select"></select></td>
-						<td class="td_height"><select id="field3" class="search_select"></select></td>
-					</tr>
-					<tr>
-						<td></td><td></td>
-						<td style="line-height: 60px;"><input type="button" class="search_fields_button" /></td>
-						<td></td><td></td>
-					</tr>
+				</select>
+				<input type="hidden" id="type_selection" name="type_selection" value="" /><br/><br /><br />
+				<table id="criteria_table">
+					<tbody>
+					</tbody>
 				</table>
+				<br/>
+			<input type="button" class="search_fields_button" />
           </div>
 		  <br />
     <div id="search_table_div" style="width:92%; border: solid 1px #f0f0f0 ;"> 

@@ -1,4 +1,12 @@
 /* CSS for Public View of ArtDB */
+
+.criteria_span{
+	padding-left: 5px;
+	font-family: "Times New Roman";
+	font-size: 0.8em;
+	color: red;
+}
+
 .search_fields_button {
 	width: 80px;
 	height: 28px;
@@ -26,6 +34,7 @@
 
 .text_search {
 	border: solid 1px #dbeca6;
+	height: 21px;
 }
 
 .td_height {
@@ -41,6 +50,16 @@
 	color: #504f4f;
 	font-family: "Times New Roman";
 	font-size: 1em;
+}
+
+.select_more {
+	height: 25px;
+	width: 25px;
+	position: relative;
+	top: 2px;
+	vertical-align :middle;
+	background: url(/media/img/add.png);
+	border: none;
 }
 
 .pv_search_select {
@@ -165,7 +184,7 @@
     right: 390px;
 }
 
-#advanced_search_button:hover,#search_button:hover {
+#advanced_search_button:hover,#search_button:hover, #pv_search_button:hover {
 	cursor: pointer;
 }
 

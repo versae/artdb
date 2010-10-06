@@ -36,7 +36,7 @@ def dynamic_query(model, fields, values, operator):
     for (f, v) in zip(fields, values):
         # We only want to build a Q with a value
         if v != "":
-            kwargs = {str('%s__contains' % f) : str('%s' % v)}
+            kwargs = {str('%s__icontains' % f) : str('%s' % v)}
             queries.append(Q(**kwargs))
     
     # Make sure we have a list of filters
@@ -45,7 +45,7 @@ def dynamic_query(model, fields, values, operator):
         # AND/OR awareness
         i = 0
         if operator == '':
-            operator = ['or', 'or']
+            operator = ['or']
         
         operator.insert(0,'or')
         
@@ -83,7 +83,6 @@ def make_query(object_name, fields, values, operators, page):
             result = dynamic_query(obj, fields, values, operators)
     paginator = Paginator(result, 20)
     results = paginator.page(page)
-    print results.object_list
     return results
 
 def search(request):

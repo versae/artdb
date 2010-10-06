@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-PROJECT_NAME = u"ArtDB"
+PROJECT_NAME = u"BaroqueArt"
 PROJECT_ROOT = path.dirname(path.abspath(__file__))
 
 ADMINS = (
