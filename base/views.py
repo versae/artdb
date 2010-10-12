@@ -5,8 +5,9 @@ from creators.models import Creator
 from random import randint
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.utils.simplejson import dumps
-from django.db.models import Q
+from django.db.models import Q, get_model
 from itertools import chain
+from django.utils.encoding import smart_str, smart_unicode
 
 def public_view(request):
     artwork_ids = [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2417, 2444, 2446, 2449, 2506, 6744, 10472, 10478, 12020, 12032, 12347, 12693, 12786, 13262, 13269, 370, 444, 575, 661, 672, 677, 782, 889, 900, 924, 941, 8770, 9560, 9705, 11668, 11885, 1012, 3581, 4069, 6128, 1189, 890, 499, 510, 1168]
@@ -36,7 +37,7 @@ def dynamic_query(model, fields, values, operator):
     for (f, v) in zip(fields, values):
         # We only want to build a Q with a value
         if v != "":
-            kwargs = {str('%s__icontains' % f) : str('%s' % v)}
+            kwargs = {str('%s__icontains' % f) : str('%s' % smart_str(v))}
             queries.append(Q(**kwargs))
     
     # Make sure we have a list of filters
@@ -74,12 +75,12 @@ def make_query(object_name, fields, values, operators, page):
             series = dynamic_query(Serie, ["title"], values, '')
             result=list(chain(artworks, creators, series))
     else:
-        query = None
+        obj = get_model("artworks", object_name)
+        if obj == None:
+          obj = get_model("creators", object_name)
         if len(fields) == 0:
-            exec('result = '+ object_name +'.objects.all()')
+            result = getattr(obj, "objects").all()
         else:
-            obj = None 
-            exec('obj = '+ object_name)
             result = dynamic_query(obj, fields, values, operators)
     paginator = Paginator(result, 20)
     results = paginator.page(page)

@@ -24,3 +24,25 @@
     {% endfor %}
 </tbody>
 </table>
+<input type="hidden" name="page_number" id="page_number" value="{{ results.number }}" />
+<input type="hidden" name="last_page" id="last_page" value="{{ results.paginator.num_pages }}" />
+
+				 <div class="pvpagination">               	
+                       	<a id="first">First</a>
+						<<
+                    	{% if results.has_previous %}
+							<a id="previous">Previous</a>
+						{% else %}
+						    <span style="color: #acb19e"> Previous </span>
+						{% endif %}
+						<span class="current">
+						  << Page {{ results.number }} of {{ results.paginator.num_pages }} >>
+						</span>
+						{% if results.has_next %}
+							<a id="next">Next</a>
+						{% else %}
+						    <span style="color: #acb19e"> Next </span>
+						{% endif %}
+						>>
+						<a id="last">Last</a>
+                </div>

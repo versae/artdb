@@ -14,7 +14,7 @@
 	border: none;
 }
 
-.search_fields_button:hover {
+.search_fields_button:hover, .select_more:hover, #first:hover, #previous:hover, #last:hover, #next:hover {
 	cursor: pointer;
 }
 

@@ -26,15 +26,16 @@ this.selectionChanged = function(){
         object_name = $(".pv_search_select option:selected");
         object_name = object_name.val();
         
-		$('#search_table_div').html("");
+        $('#search_table_div').html("");
         $('#criteria_table').html("<tbody></tbody>");
         
         if (object_name != "") {
             $('#type_selection').val(object_name);
             addCriteria(1);
-        }else{
-			$('#type_selection').val("");
-		}
+        }
+        else {
+            $('#type_selection').val("");
+        }
     });
     
 };
@@ -43,6 +44,9 @@ this.fillOperators = function(index){
     $('#op' + index).get(0).options[$('#op' + index).get(0).options.length] = new Option("and/or", "or");
     $('#op' + index).get(0).options[$('#op' + index).get(0).options.length] = new Option("and", "and");
     $('#op' + index).get(0).options[$('#op' + index).get(0).options.length] = new Option("or", "or");
+    $('#op' + index).change(function(){
+        $('#search_table_div').html("");
+    })
 }
 
 this.addCriteria = function(index){
@@ -66,6 +70,7 @@ this.addCriteria = function(index){
     $("#text" + index).val("");
     $('#text' + index).attr("disabled", true);
     $('#error' + index).hide();
+    textChanged(index);
     addNewRow(index);
     
 }
@@ -73,6 +78,9 @@ this.addCriteria = function(index){
 this.addNewRow = function(index){
 
     $('#more' + index).click(function(){
+    
+        $('#search_table_div').html("");
+        
         var newIndex = index + 1;
         
         if ($("#text" + index).val() != "") {
@@ -86,17 +94,25 @@ this.addNewRow = function(index){
     
 }
 
+this.textChanged = function(field_index){
+    $("#text" + field_index).click(function(){
+        $('#search_table_div').html("");
+    })
+}
+
 this.fieldsChanged = function(field_index){
     $('#field' + field_index).change(function(){
+        $('#search_table_div').html("");
         field_value = $('#field' + field_index + " option:selected");
+        
         if (field_value.val() != "-1") {
             if ($('#text' + field_index).attr("disabled")) {
                 $("#text" + field_index).removeAttr("disabled");
             }
         }
         else {
+            $("#text" + field_index).val("");
             if (!($('#text' + field_index).attr("disabled"))) {
-                $("#text" + field_index).val("");
                 $("#text" + field_index).attr("disabled", true);
             }
         }
@@ -105,34 +121,38 @@ this.fieldsChanged = function(field_index){
 
 this.onSearchClicked = function(){
     $('.search_fields_button').click(function(){
-        var queryparams = new Array();
-        var queryVals = new Array();
-        var operators = new Array();
-        
-        object_name = $("#type_selection").val();
-		
-        if (object_name != "") {
-        
-            var i = 1;
-            
-            while ($("#text" + i).length != 0) {
-            
-                textVal = $('#text' + i).val();
-                if (textVal != '') {
-                    queryVals.push(textVal);
-                    queryparams.push($('#field' + i + " option:selected").val());
-                    if ($("#op" + i).length != 0) 
-                        operators.push($('#op' + i + " option:selected").val());
-                }
-                $('#error' + i).hide();
-                i = i + 1;
-            }
-			
-			callAjax(object_name, queryparams, queryVals, operators);
-        }
-        
+        getFieldValues(1);
     });
 };
+
+this.getFieldValues = function(page_number){
+    var queryparams = new Array();
+    var queryVals = new Array();
+    var operators = new Array();
+    
+    object_name = $("#type_selection").val();
+    
+    if (object_name != "") {
+    
+        var i = 1;
+        
+        while ($("#text" + i).length != 0) {
+        
+            textVal = $('#text' + i).val();
+            if (textVal != '') {
+                queryVals.push(textVal);
+                queryparams.push($('#field' + i + " option:selected").val());
+                if ($("#op" + i).length != 0) 
+                    operators.push($('#op' + i + " option:selected").val());
+            }
+            $('#error' + i).hide();
+            i = i + 1;
+        }
+        
+        
+        callAjax(object_name, queryparams, queryVals, operators, page_number);
+    }
+}
 
 this.initialize_dropdowns = function(){
     $(".pv_search_select option[value='']").attr('selected', 'selected');
@@ -146,32 +166,90 @@ this.loadTable = function(){
     
     while (e = r.exec(q)) 
         urlParams[d(e[1])] = d(e[2]);
-	
+    
     if (urlParams.data) {
         data = urlParams.data;
+        if (urlParams.page) {
+            var page = eval(urlParams.page);
+        }
+        else {
+            var page = 1;
+        }
         $.get($('#search_url').val(), {
-            data: data
+            data: data,
+            page: page
         }, function(result){
             $('#search_table_div').html(result);
+            var page_number = eval($("#page_number").val());
+            var last_page = eval($("#last_page").val());
+            
+            $('#next').click(function(){
+                window.location.href = '?data=' + data + '&page=' + (page_number + 1);
+            })
+            
+            $('#first').click(function(){
+                window.location.href = '?data=' + data + '&page=1';
+            })
+            
+            $('#last').click(function(){
+                window.location.href = '?data=' + data + '&page=' + last_page;
+            })
+            
+            $('#previous').click(function(){
+                window.location.href = '?data=' + data + '&page=' + (page_number - 1);
+            })
         });
     }
 };
 
-this.callAjax = function(object_name, queryparams, queryVals, operators){
+this.callAjax = function(object_name, queryparams, queryVals, operators, page){
     $.ajax({
         url: $('#search_url').val(),
         data: {
             objectType: object_name,
             params: queryparams,
             vals: queryVals,
-            ops: operators
+            ops: operators,
+            page: page
         },
         traditional: true,
         success: function(result){
             $('#search_table_div').html(result);
+            loadPaginationScript();
         }
     });
 }
+
+this.loadPaginationScript = function(){
+
+    if ($('.pvpagination')) {
+        var page_number = eval($("#page_number").val());
+        var last_page = eval($("#last_page").val());
+        
+        $('#next').click(function(){
+            getFieldValues(page_number + 1);
+            
+        })
+        
+        $('#first').click(function(){
+            getFieldValues(1);
+            
+        })
+        
+        $('#last').click(function(){
+            getFieldValues(last_page);
+            
+        })
+        
+        $('#previous').click(function(){
+            getFieldValues(page_number - 1);
+            
+        })
+        
+    }
+    
+}
+
 // starting the script on page load
 $(document).ready(function(){
     selectionChanged();
