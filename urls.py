@@ -24,6 +24,9 @@ urlpatterns = patterns('',
     # exhibit
     url(r'^exhibit/', include('exhibit.urls')),
 
+    # qbe
+    url(r'^qbe/', include('django_qbe.urls')),
+
     # base
     url(r'^', include('base.urls')),
 
