@@ -1,0 +1,20 @@
+Dependencies of other django projects:
+--------------------------------------
+
+1. breadcrumbs:
+ http://code.google.com/p/django-breadcrumbs/
+ $ breadcrumbs ->  ../django-breadcrumbs/breadcrumbs
+
+2. convert:
+ http://bitbucket.org/aino/aino-convert/src
+ $ convert -> ../../hg/aino-convert/convert
+
+3. django_descriptors:
+ https://github.com/versae/descriptors
+ $ django_descriptors -> ../descriptors/django_descriptors/
+ $ media/django_descriptors -> ../django_descriptors/media/django_descriptors/
+
+4. django_qbe
+ http://versae.github.com/qbe/
+ $ django_qbe -> ../qbe/django_qbe/
+ $ media/django_qbe -> ../django_qbe/media/django_qbe/

@@ -4,6 +4,8 @@ local_settings.py
 *.list
 django_descriptors
 media/django_descriptors
+django_qbe
+media/django_qbe
 media/cache
 media/images
 backups/*.json
