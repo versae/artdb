@@ -7,8 +7,9 @@ from django.contrib.auth.models import User
 
 from django_descriptors.models import DescribedItem, Descriptor
 
-from base.models import GeospatialReference
-from artworks.models import Artwork, ArtworkVirgin, Serie, Virgin
+from base.models import BibliographicReference, GeospatialReference
+from artworks.models import (Artwork, ArtworkVirgin, ArtworkBibliography,
+                             Serie, Virgin)
 from creators.models import Creator, School, WorkingHistory
 
 
@@ -592,3 +593,98 @@ def update_all():
     print "- Relaciones: %s, Errores: %s" % (c7, e7)
     print "Completado (%s relaciones)" % reduce(lambda x, y: x + y,
                                                 [c1, c2, c3, c4, c5, c6, c7])
+
+
+def update_artwork_current_places_geos():
+    """
+    ID-Artwork: ID-Loc
+    """
+    print "Actualizando artworks__current_places con referencias geoespaciales"
+    f = open("migrations/artwork_current_places_geospatialreference.list")
+    line = f.readline()
+    line_number = 1
+    count = 0
+    errors = {
+        'artworks': set(),
+        'geos': set(),
+    }
+    while line:
+        artwork_id, geos_id = line.strip().split(":")
+        try:
+            artwork = Artwork.objects.get(id=int(artwork_id))
+            try:
+                geos = GeospatialReference.objects.get(id=int(geos_id))
+                artwork.current_place = geos
+                artwork.save()
+                count += 1
+            except GeospatialReference.DoesNotExist:
+                errors['geos'].add(geos_id)
+        except Artwork.DoesNotExist:
+            errors['artworks'].add(artwork_id)
+        line = f.readline()
+        line_number += 1
+    f.close()
+    return count, errors
+
+
+def migrate_biblio():
+    """
+    "ID-Biblio","Título","Autores","URL","ISBN","Notas"
+    """
+    print "Migrando Biblio"
+    BibliographicReference.objects.all().delete()
+    reader = csv.reader(open('migrations/FMBiblio.csv'), delimiter=',',
+                        quotechar='"')
+    for row in reader:
+        biblio = BibliographicReference()
+        biblio.id = row[0]
+        biblio.title = row[1]
+        if row[2]:
+            biblio.authors = row[2]
+        if row[3]:
+            biblio.url = row[3]
+        if row[4]:
+            biblio.authors = row[4][:60]
+        if row[5]:
+            biblio.notes = row[5]
+        biblio.save()
+
+
+def migrate_artworkbibliography():
+    """
+    [ID-obra * ID-Biblio * "paginas..."]
+    """
+    print "Migrando ArtworkBibliography"
+    ArtworkBibliography.objects.all().delete()
+    reader = csv.reader(open('migrations/FMArtworkBibliography.csv'), delimiter='*',
+                        quotechar='"')
+    for row in reader:
+        artwork_biblio = ArtworkBibliography()
+        try:
+            artwork_id = int(row[0])
+            biblio_id = int(row[1])
+            try:
+                artwork = Artwork.objects.get(id=artwork_id)
+                biblio = BibliographicReference.objects.get(id=biblio_id)
+                artwork_biblio.artwork = artwork
+                artwork_biblio.bibliography = biblio
+                if len(row) > 2 and row[2]:
+                    artwork_biblio.source = row[2][:250]
+                artwork_biblio.save()
+            except (Artwork.DoesNotExist, BibliographicReference.DoesNotExist):
+                pass
+        except ValueError:
+            pass
+
+
+def migrate_update():
+    print "Comenzando migración..."
+    migrate_biblio()
+    print "- %s BibliographicReferences" % BibliographicReference.objects.count()
+    migrate_artworkbibliography()
+    print "- %s ArtworkBibliographies" % ArtworkBibliography.objects.count()
+    print "Comenzando actualización..."
+    c1, e1 = update_artwork_current_places_geos()
+    print "- Relaciones: %s, Errores: %s" % (c1, e1)
+    print "Completado (%s relaciones)" % reduce(lambda x, y: x + y,
+                                                [c1, ])
