@@ -2,7 +2,7 @@
 
 
 def clean_years(request):
-    year_range = range(1600, 1801)
+    year_range = range(1550, 1851)
     year_from = 1675
     year_to = 1700
     if request.GET and "from" in request.GET and "to" in request.GET:

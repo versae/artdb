@@ -104,6 +104,7 @@ INSTALLED_APPS = (
     'base',
     'artworks',
     'creators',
+    'graphs',
     'exhibit',
     'convert'
 )

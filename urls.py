@@ -11,15 +11,19 @@ urlpatterns = patterns('',
 
     # artwork
     url(r'^artworks/', include('artworks.urls')),
-    
+
     # creator
     url(r'^creators/', include('creators.urls')),
 
     # map
     url(r'^map/$', direct_to_template, {'template': 'map.html'}, name="map"),
-    
-    # map
-    url(r'^search/$', direct_to_template, {'template': 'search.html'}, name="search"),
+
+    # search
+    url(r'^search/$', direct_to_template, {'template': 'search.html'},
+        name="search"),
+
+    # graphs
+    # url(r'^graphs/', include('graphs.urls')),
 
     # exhibit
     url(r'^exhibit/', include('exhibit.urls')),
