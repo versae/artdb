@@ -3,6 +3,7 @@ local_settings.py
 *.csv
 *.list
 *.gexf
+*.arff
 django_descriptors
 media/django_descriptors
 django_qbe
