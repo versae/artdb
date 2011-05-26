@@ -372,7 +372,7 @@ def slugify(value):
     """
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
-    
+
     From Django's "django/template/defaultfilters.py".
     """
     import unicodedata
@@ -412,7 +412,7 @@ def freq_dist_virgins():
 def freq_dist_saints():
     words = ["san", "santo", "ntro señor", "nuestro señor", "our sir",
              "ntro. señor"]
-    exclude_words = ["santa"]
+    exclude_words = []
     stop_words = ["el", "de", "con", "la", "y", "del", "a", "los", "en", "of",
                   "the", "al", "las", "los", "por", "su", "una", "un", "uno",
                   "o", "and", "il", "m"]
@@ -439,7 +439,7 @@ def freq_dist_saints():
 
 
 def freq_dist_civil():
-    descriptor_id = 153 # [ Objeto ] → Clasificación → Temática → Civil
+    descriptor_id = 153  # [ Objeto ] → Clasificación → Temática → Civil
     descriptor = Descriptor.objects.get(id=descriptor_id)
     words = []
     exclude_words = []
@@ -458,9 +458,136 @@ def freq_dist_civil():
     for artwork in artworks:
         if descriptor in Descriptor.objects.get_for_object(artwork):
             title_split = slugify(artwork.title.replace("  ",
-                                                           " ").strip()).split()
+                                                        " ").strip()).split()
             title_split = filter(lambda x: x not in stop_words, title_split)
             titles += title_split
     freq_dist = nltk.FreqDist(titles)
     freq_dist.plot()
     return freq_dist
+
+
+def freq_dist_saints_rose():
+    stop_words = ["el", "de", "con", "la", "y", "del", "a", "los", "en", "of",
+                  "the", "al", "las", "los", "por", "su", "una", "un", "uno",
+                  "o", "and", "il", "m"]
+    artworks = Artwork.objects.in_range(1600, 2000) \
+            .filter((Q(title__icontains="santa") \
+                     & Q(title__icontains="rosa")) \
+                  | (Q(title__icontains="saint") \
+                     & Q(title__icontains="rose"))) \
+            .values("title")
+    titles = []
+    for artwork in artworks:
+        print artwork["title"]
+        title_split = slugify(artwork["title"].replace("  ",
+                                                       " ").strip()).split()
+        title_split = filter(lambda x: x not in stop_words, title_split)
+        print title_split
+        titles += title_split
+    freq_dist = nltk.FreqDist(titles)
+    freq_dist.plot()
+    return freq_dist
+
+
+def freq_modularity_class(file_number):
+    """
+    Id,Label,Creator,OriginalPlace,OriginalPlaceId,OriginalPlaceLat,
+    OriginalPlaceLon,CurrentPlace,CurrentPlaceId,CurrentPlaceLat,
+    CurrentPlaceLon,Modularity Class
+    """
+    filename = "baroqueart.%s.csv" % file_number
+    csv_filename = "baroqueart.%s.modularity.csv" % file_number
+    stop_words = ["el", "de", "con", "la", "y", "del", "a", "los", "en", "of",
+                  "the", "al", "las", "los", "por", "su", "una", "un", "uno",
+                  "o", "and", "il", "m"]
+    # CSV File
+    reader = csv.reader(open(filename, "r"), delimiter=',', quotechar='"')
+    csv_file = open(csv_filename, "w")
+    writer = UnicodeWriter(csv_file)
+    labels = []
+    descriptors = Descriptor.objects.all().order_by("id").values("name", "id")
+    for descriptor in descriptors:
+        labels.append(u"%s (%s)" % (descriptor["name"], descriptor["id"]))
+    # Skip first line with labels
+    reader.next()
+    errors = {
+        'artworks': set(),
+    }
+    modularity_dict = {}
+    titles = set()
+    names = set()
+    paths = set()
+    for line in reader:
+        artwork_id = int(line[0])
+        modularity = float(line[2])
+        if modularity not in modularity_dict:
+            modularity_dict[modularity] = {"titles": [],
+                                           "descriptors": [],
+                                           "paths": [],
+                                           "total": 0}
+        degree = float(line[3])
+        weighted_degree = float(line[4])
+        eccentricity = float(line[5])
+        closeness_centrality = float(line[6])
+        betweenness_centrality = float(line[7])
+        authority = float(line[8])
+        hub = float(line[9])
+        pagerank = float(line[10])
+        component_id = float(line[11])
+        clustering_coefficient = float(line[12])
+        number_of_triangles = float(line[13])
+        eigenvector_centrality = float(line[14])
+        try:
+            artwork = Artwork.objects.get(id=artwork_id)
+            title_split = slugify(artwork.title.replace("  ",
+                                                        " ").strip()).split()
+            title_split = filter(lambda x: x not in stop_words, title_split)
+            modularity_dict[modularity]["titles"] += title_split
+            modularity_dict[modularity]["total"] += 1
+            titles = titles.union(title_split)
+            descriptors = Descriptor.objects.get_for_object(artwork)
+            descriptors = descriptors.order_by("id")
+            for descriptor in descriptors:
+                name = descriptor.name
+                name_split = slugify(name.replace("  ", " ").strip()).split()
+                name_split = filter(lambda x: x not in stop_words, name_split)
+                modularity_dict[modularity]["descriptors"] += name_split
+                modularity_dict[modularity]["total"] += len(name_split)
+                names = names.union(name_split)
+                path = descriptor.path
+                path_split = slugify(path.replace("  ", " ").strip()).split()
+                path_split = filter(lambda x: x not in stop_words, path_split)
+                modularity_dict[modularity]["paths"] += path_split
+                modularity_dict[modularity]["total"] += len(path_split)
+                paths = paths.union(path_split)
+        except Artwork.DoesNotExist, e:
+            errors.add(e)
+    csv_file.close()
+    modularity_freqs = {}
+    for key, value in modularity_dict.items():
+        if key not in modularity_freqs:
+            modularity_freqs[key] = {}
+            #writer.write(["Modularity class: %s": key])
+        modularity_freqs[key]["titles"] = nltk.FreqDist(value["titles"])
+        descriptors = value["descriptors"]
+        modularity_freqs[key]["descriptors"] = nltk.FreqDist(descriptors)
+        modularity_freqs[key]["paths"] = nltk.FreqDist(value["paths"])
+        modularity_freqs[key]["total"] = value["total"]
+        #writer.write()
+    print "\nDescriptors:"
+    for mod_class, dic in modularity_freqs.items():
+        print "%s,%s" % (mod_class, ",".join(dic["descriptors"].keys()))
+        descriptors_values = dic["descriptors"].values()
+        print "%s,%s" % (mod_class, ",".join([str(v)
+                                              for v in descriptors_values]))
+    print "\nTitles"
+    for mod_class, dic in modularity_freqs.items():
+        print "%s,%s" % (mod_class, ",".join(dic["titles"].keys()))
+        print "%s,%s" % (mod_class, ",".join([str(v)
+                                              for v in dic["titles"].values()]))
+    print "\nPaths"
+    for mod_class, dic in modularity_freqs.items():
+        print "%s,%s" % (mod_class, ",".join(dic["paths"].keys()))
+        print "%s,%s" % (mod_class, ",".join([str(v)
+                                              for v in dic["paths"].values()]))
+    return modularity_freqs
