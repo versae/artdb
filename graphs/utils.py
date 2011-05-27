@@ -499,7 +499,7 @@ def freq_modularity_class(file_number):
     csv_filename = "baroqueart.%s.modularity.csv" % file_number
     stop_words = ["el", "de", "con", "la", "y", "del", "a", "los", "en", "of",
                   "the", "al", "las", "los", "por", "su", "una", "un", "uno",
-                  "o", "and", "il", "m"]
+                  "o", "and", "il", "m", "le", "se", "e"]
     # CSV File
     reader = csv.reader(open(filename, "r"), delimiter=',', quotechar='"')
     csv_file = open(csv_filename, "w")
@@ -514,9 +514,11 @@ def freq_modularity_class(file_number):
         'artworks': set(),
     }
     modularity_dict = {}
-    titles = set()
-    names = set()
-    paths = set()
+    words = {
+        "titles": set(),
+        "descriptors": set(),
+        "paths": set(),
+    }
     for line in reader:
         artwork_id = int(line[0])
         modularity = float(line[2])
@@ -525,26 +527,14 @@ def freq_modularity_class(file_number):
                                            "descriptors": [],
                                            "paths": [],
                                            "total": 0}
-        degree = float(line[3])
-        weighted_degree = float(line[4])
-        eccentricity = float(line[5])
-        closeness_centrality = float(line[6])
-        betweenness_centrality = float(line[7])
-        authority = float(line[8])
-        hub = float(line[9])
-        pagerank = float(line[10])
-        component_id = float(line[11])
-        clustering_coefficient = float(line[12])
-        number_of_triangles = float(line[13])
-        eigenvector_centrality = float(line[14])
         try:
             artwork = Artwork.objects.get(id=artwork_id)
             title_split = slugify(artwork.title.replace("  ",
                                                         " ").strip()).split()
             title_split = filter(lambda x: x not in stop_words, title_split)
             modularity_dict[modularity]["titles"] += title_split
+            words["titles"] = words["titles"].union(title_split)
             modularity_dict[modularity]["total"] += 1
-            titles = titles.union(title_split)
             descriptors = Descriptor.objects.get_for_object(artwork)
             descriptors = descriptors.order_by("id")
             for descriptor in descriptors:
@@ -552,42 +542,113 @@ def freq_modularity_class(file_number):
                 name_split = slugify(name.replace("  ", " ").strip()).split()
                 name_split = filter(lambda x: x not in stop_words, name_split)
                 modularity_dict[modularity]["descriptors"] += name_split
+                words["descriptors"] = words["descriptors"].union(name_split)
                 modularity_dict[modularity]["total"] += len(name_split)
-                names = names.union(name_split)
                 path = descriptor.path
                 path_split = slugify(path.replace("  ", " ").strip()).split()
                 path_split = filter(lambda x: x not in stop_words, path_split)
                 modularity_dict[modularity]["paths"] += path_split
+                words["paths"] = words["paths"].union(path_split)
                 modularity_dict[modularity]["total"] += len(path_split)
-                paths = paths.union(path_split)
         except Artwork.DoesNotExist, e:
             errors.add(e)
-    csv_file.close()
     modularity_freqs = {}
     for key, value in modularity_dict.items():
         if key not in modularity_freqs:
             modularity_freqs[key] = {}
-            #writer.write(["Modularity class: %s": key])
         modularity_freqs[key]["titles"] = nltk.FreqDist(value["titles"])
         descriptors = value["descriptors"]
         modularity_freqs[key]["descriptors"] = nltk.FreqDist(descriptors)
         modularity_freqs[key]["paths"] = nltk.FreqDist(value["paths"])
         modularity_freqs[key]["total"] = value["total"]
-        #writer.write()
-    print "\nDescriptors:"
-    for mod_class, dic in modularity_freqs.items():
-        print "%s,%s" % (mod_class, ",".join(dic["descriptors"].keys()))
-        descriptors_values = dic["descriptors"].values()
-        print "%s,%s" % (mod_class, ",".join([str(v)
-                                              for v in descriptors_values]))
-    print "\nTitles"
-    for mod_class, dic in modularity_freqs.items():
-        print "%s,%s" % (mod_class, ",".join(dic["titles"].keys()))
-        print "%s,%s" % (mod_class, ",".join([str(v)
-                                              for v in dic["titles"].values()]))
-    print "\nPaths"
-    for mod_class, dic in modularity_freqs.items():
-        print "%s,%s" % (mod_class, ",".join(dic["paths"].keys()))
-        print "%s,%s" % (mod_class, ",".join([str(v)
-                                              for v in dic["paths"].values()]))
+    for elto in ["titles", "descriptors", "paths"]:
+        labels = [("Modularity %s" % mod_class)
+                  for (mod_class, value) in modularity_freqs.items()]
+        writer.writerow([elto.capitalize()] + labels)
+        for word in words[elto]:
+            freqs = [freq_dict[elto][word]
+                     for (mod_class, freq_dict) in modularity_freqs.items()]
+            if sum(freqs) > 4:
+                writer.writerow([word] + freqs)
+    csv_file.close()
     return modularity_freqs
+
+
+def save_modularity_chart():
+    from matplotlib.colors import colorConverter
+    from pylab import (asarray, linspace, axes, array, bar,
+                       ylabel, arange, yticks, xticks, title, table, show)
+
+    #Some simple functions to generate colours.
+    def pastel(colour, weight=2.4):
+        """ Convert colour into a nice pastel shade"""
+        rgb = asarray(colorConverter.to_rgb(colour))
+        # scale colour
+        maxc = max(rgb)
+        if maxc < 1.0 and maxc > 0:
+            # scale colour
+            scale = 1.0 / maxc
+            rgb = rgb * scale
+        # now decrease saturation
+        total = sum(rgb)
+        slack = 0
+        for x in rgb:
+            slack += 1.0 - x
+        # want to increase weight from total to weight
+        # pick x s.t.  slack * x == weight - total
+        # x = (weight - total) / slack
+        x = (weight - total) / slack
+        rgb = [c + (x * (1.0 - c)) for c in rgb]
+        return rgb
+
+    def get_colours(n):
+        """ Return n pastel colours. """
+        base = asarray([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        if n <= 3:
+            return base[0:n]
+        # how many new colours to we need to insert between
+        # red and green and between green and blue?
+        needed = (((n - 3) + 1) / 2, (n - 3) / 2)
+        colours = []
+        for start in (0, 1):
+            for x in linspace(0, 1, needed[start] + 2):
+                colours.append((base[start] * (1.0 - x)) +
+                               (base[start + 1] * x))
+        return [pastel(c) for c in colours[0:n]]
+
+    axes([0.2, 0.2, 0.7, 0.6])   # leave room below the axes for the table
+    data = [[66386, 174296, 75131, 577908, 32015],
+            [58230, 381139, 78045, 99308, 160454],
+            [89135, 80552, 152558, 497981, 603535],
+            [78415, 81858, 150656, 193263, 69638],
+            [139361, 331509, 343164, 781380, 52269]]
+    colLabels = ('Freeze', 'Wind', 'Flood', 'Quake', 'Hail')
+    rowLabels = ['%d year' % x for x in (100, 50, 20, 10, 5)]
+
+    # Get some pastel shades for the colours
+    colours = get_colours(len(colLabels))
+    colours.reverse()
+    rows = len(data)
+
+    ind = arange(len(colLabels)) + 0.3  # the x locations for the groups
+    cellText = []
+    width = 0.4     # the width of the bars
+    yoff = array([0.0] * len(colLabels))  # the bottom values for stacked bar chart
+    for row in xrange(rows):
+        bar(ind, data[row], width, bottom=yoff, color=colours[row])
+        yoff = yoff + data[row]
+        cellText.append(['%1.1f' % (x / 1000.0) for x in yoff])
+
+    # Add a table at the bottom of the axes
+    colours.reverse()
+    cellText.reverse()
+    the_table = table(cellText=cellText,
+                      rowLabels=rowLabels, rowColours=colours,
+                      colLabels=colLabels,
+                      loc='bottom')
+    ylabel("Loss $1000's")
+    vals = arange(0, 2500, 500)
+    yticks(vals * 1000, ['%d' % val for val in vals])
+    xticks([])
+    title('Loss by Disaster')
+    show()
