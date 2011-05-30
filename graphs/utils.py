@@ -489,7 +489,7 @@ def freq_dist_saints_rose():
     return freq_dist
 
 
-def freq_modularity_class(file_number):
+def freq_modularity_class(file_number, min_freq=0):
     """
     Id,Label,Creator,OriginalPlace,OriginalPlaceId,OriginalPlaceLat,
     OriginalPlaceLon,CurrentPlace,CurrentPlaceId,CurrentPlaceLat,
@@ -561,94 +561,144 @@ def freq_modularity_class(file_number):
         modularity_freqs[key]["descriptors"] = nltk.FreqDist(descriptors)
         modularity_freqs[key]["paths"] = nltk.FreqDist(value["paths"])
         modularity_freqs[key]["total"] = value["total"]
+    dataset = {}
     for elto in ["titles", "descriptors", "paths"]:
+        data = []
+        columns = []
         labels = [("Modularity %s" % mod_class)
                   for (mod_class, value) in modularity_freqs.items()]
         writer.writerow([elto.capitalize()] + labels)
         for word in words[elto]:
             freqs = [freq_dict[elto][word]
                      for (mod_class, freq_dict) in modularity_freqs.items()]
-            if sum(freqs) > 4:
+            if sum(freqs) > min_freq:
                 writer.writerow([word] + freqs)
+                data.append(freqs)
+                columns.append(word)
+        dataset[elto] = {
+            'data': zip(*data),
+            'rows': labels,
+            'columns': columns,
+        }
+    save_modularity_barchart("%s.modularity.%s" % (file_number, elto), dataset)
     csv_file.close()
     return modularity_freqs
 
 
-def save_modularity_chart():
+def save_modularity_barchart(file_name, dataset):
+    import pylab as p
+    fig = p.figure()
+    figure_id = 1
+    for elto, values in dataset.items():
+        data = values["data"]
+        col_labels = values["columns"]
+        row_labels = values["rows"]
+        ax = fig.add_subplot(figure_id, 1, 1)
+        figure_id += 1
+        colours = get_colours(len(row_labels))
+        colours.reverse()
+        # See note below on the breakdown of this command
+        rows_length = len(data)
+        ind = p.arange(len(col_labels)) + 0.3
+        width = 0.3
+        yoff = p.array([0.0] * len(col_labels))  # the bottom values for stacked bar chart
+        for row in xrange(rows_length):
+            ax.bar(ind, data[row], width, align="center", color=colours[row])
+
+        #Create a y label
+        ax.set_ylabel('Counts')
+        # Create a title, in italics
+        ax.set_title('Counts, by %s' % elto, fontstyle='italic')
+        # This sets the ticks on the x axis to be exactly where we put
+        # the center of the bars.
+        ax.set_xticks(ind)
+        # Set the x tick labels to the group_labels defined above.
+        ax.set_xticklabels(col_labels)
+        ax.grid(True)
+        ax.axhline(0, color='black', lw=2)
+        # Extremely nice function to auto-rotate the x axis labels.
+        # It was made for dates (hence the name) but it works
+        # for any long x tick labels
+    #    fig.title('Frequency of words in %s' % file_name)
+        fig.autofmt_xdate()
+    filename = "/tmp/baroqueart.%s.png" % file_name
+    print filename
+    fig.savefig(filename)
+
+
+def save_modularity_chart(file_name, col_labels, row_labels, data):
     from matplotlib.colors import colorConverter
     from pylab import (asarray, linspace, axes, array, bar,
-                       ylabel, arange, yticks, xticks, title, table, show)
-
-    #Some simple functions to generate colours.
-    def pastel(colour, weight=2.4):
-        """ Convert colour into a nice pastel shade"""
-        rgb = asarray(colorConverter.to_rgb(colour))
-        # scale colour
-        maxc = max(rgb)
-        if maxc < 1.0 and maxc > 0:
-            # scale colour
-            scale = 1.0 / maxc
-            rgb = rgb * scale
-        # now decrease saturation
-        total = sum(rgb)
-        slack = 0
-        for x in rgb:
-            slack += 1.0 - x
-        # want to increase weight from total to weight
-        # pick x s.t.  slack * x == weight - total
-        # x = (weight - total) / slack
-        x = (weight - total) / slack
-        rgb = [c + (x * (1.0 - c)) for c in rgb]
-        return rgb
-
-    def get_colours(n):
-        """ Return n pastel colours. """
-        base = asarray([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-        if n <= 3:
-            return base[0:n]
-        # how many new colours to we need to insert between
-        # red and green and between green and blue?
-        needed = (((n - 3) + 1) / 2, (n - 3) / 2)
-        colours = []
-        for start in (0, 1):
-            for x in linspace(0, 1, needed[start] + 2):
-                colours.append((base[start] * (1.0 - x)) +
-                               (base[start + 1] * x))
-        return [pastel(c) for c in colours[0:n]]
-
+                       ylabel, arange, yticks, xticks, title, table, savefig,
+                       subplot, legend)
+    # subplot(111)
     axes([0.2, 0.2, 0.7, 0.6])   # leave room below the axes for the table
-    data = [[66386, 174296, 75131, 577908, 32015],
-            [58230, 381139, 78045, 99308, 160454],
-            [89135, 80552, 152558, 497981, 603535],
-            [78415, 81858, 150656, 193263, 69638],
-            [139361, 331509, 343164, 781380, 52269]]
-    colLabels = ('Freeze', 'Wind', 'Flood', 'Quake', 'Hail')
-    rowLabels = ['%d year' % x for x in (100, 50, 20, 10, 5)]
+    colLabels = col_labels
+    rowLabels = row_labels
 
     # Get some pastel shades for the colours
-    colours = get_colours(len(colLabels))
+    colours = get_colours(len(rowLabels))
     colours.reverse()
     rows = len(data)
 
+    leg = legend(row_labels, 'best', shadow=False)
+
     ind = arange(len(colLabels)) + 0.3  # the x locations for the groups
-    cellText = []
-    width = 0.4     # the width of the bars
+    width = 0.3     # the width of the bars
     yoff = array([0.0] * len(colLabels))  # the bottom values for stacked bar chart
     for row in xrange(rows):
-        bar(ind, data[row], width, bottom=yoff, color=colours[row])
-        yoff = yoff + data[row]
-        cellText.append(['%1.1f' % (x / 1000.0) for x in yoff])
-
-    # Add a table at the bottom of the axes
-    colours.reverse()
-    cellText.reverse()
-    the_table = table(cellText=cellText,
-                      rowLabels=rowLabels, rowColours=colours,
-                      colLabels=colLabels,
-                      loc='bottom')
-    ylabel("Loss $1000's")
-    vals = arange(0, 2500, 500)
-    yticks(vals * 1000, ['%d' % val for val in vals])
+        bar(ind, data[row], width, color=colours[row])
+        # Acumulative
+        # bar(ind, data[row], width, bottom=yoff)
+        # yoff = yoff + data[row]
+    ylabel("Words")
     xticks([])
-    title('Loss by Disaster')
-    show()
+    title('Frequency of words in %s' % file_name)
+    filename = "/tmp/baroqueart.%s.png" % file_name
+    print filename
+    savefig(filename)
+
+
+# Some simple functions to generate colours.
+def pastel(colour, weight=2.4):
+    """ Convert colour into a nice pastel shade"""
+    from matplotlib.colors import colorConverter
+    from pylab import (asarray, linspace)
+
+    rgb = asarray(colorConverter.to_rgb(colour))
+    # scale colour
+    maxc = max(rgb)
+    if maxc < 1.0 and maxc > 0:
+        # scale colour
+        scale = 1.0 / maxc
+        rgb = rgb * scale
+    # now decrease saturation
+    total = sum(rgb)
+    slack = 0
+    for x in rgb:
+        slack += 1.0 - x
+    # want to increase weight from total to weight
+    # pick x s.t.  slack * x == weight - total
+    # x = (weight - total) / slack
+    x = (weight - total) / slack
+    rgb = [c + (x * (1.0 - c)) for c in rgb]
+    return rgb
+
+
+def get_colours(n):
+    """ Return n pastel colours. """
+    from matplotlib.colors import colorConverter
+    from pylab import (asarray, linspace)
+
+    base = asarray([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    if n <= 3:
+        return base[0:n]
+    # how many new colours to we need to insert between
+    # red and green and between green and blue?
+    needed = (((n - 3) + 1) / 2, (n - 3) / 2)
+    colours = []
+    for start in (0, 1):
+        for x in linspace(0, 1, needed[start] + 2):
+            colours.append((base[start] * (1.0 - x)) +
+                           (base[start + 1] * x))
+    return [pastel(c) for c in colours[0:n]]
