@@ -580,35 +580,44 @@ def freq_modularity_class(file_number, min_freq=0):
             'rows': labels,
             'columns': columns,
         }
-    save_modularity_barchart("%s.modularity.%s" % (file_number, elto), dataset)
+    save_modularity_barchart(file_number, dataset)
     csv_file.close()
     return modularity_freqs
 
 
-def save_modularity_barchart(file_name, dataset):
+def save_modularity_barchart(file_number, dataset):
     import pylab as p
-    fig = p.figure()
+    from matplotlib.font_manager import FontProperties
+    import matplotlib.text as text
+
+    fontP = FontProperties()
+    fontP.set_size('small')
+    fig = p.figure(figsize=(24, 6))
     figure_id = 1
+    colours = ["#219FC7", "#C77B21", "#C7213F", "#00FF7F", "#BDB76B",
+               "#FF00FF", "#FF6A00", "#21C79F", "#528B8B", "#216AA6",
+               "#21F9C7", "#C7B721", "#C7123F", "#00F7FF", "#BD7B6B",
+               "#FF0F0F", "#FFA600", "#217C9F", "#52B88B", "#21A6A6"]
+    colours.reverse()
     for elto, values in dataset.items():
         data = values["data"]
         col_labels = values["columns"]
         row_labels = values["rows"]
-        ax = fig.add_subplot(figure_id, 1, 1)
-        figure_id += 1
-        colours = get_colours(len(row_labels))
-        colours.reverse()
+        ax = fig.add_subplot(1, 3, figure_id, autoscale_on=True)
         # See note below on the breakdown of this command
         rows_length = len(data)
         ind = p.arange(len(col_labels)) + 0.3
         width = 0.3
         yoff = p.array([0.0] * len(col_labels))  # the bottom values for stacked bar chart
         for row in xrange(rows_length):
-            ax.bar(ind, data[row], width, align="center", color=colours[row])
+            ax.bar(ind, data[row], width, align="center", bottom=yoff,
+                   facecolor=colours[row])
+            yoff = yoff + data[row]
 
-        #Create a y label
-        ax.set_ylabel('Counts')
+        # Create a y label
+        ax.set_ylabel('Frequencies')
         # Create a title, in italics
-        ax.set_title('Counts, by %s' % elto, fontstyle='italic')
+        ax.set_title('Frequency of words in %s' % elto, fontstyle='italic')
         # This sets the ticks on the x axis to be exactly where we put
         # the center of the bars.
         ax.set_xticks(ind)
@@ -616,13 +625,19 @@ def save_modularity_barchart(file_name, dataset):
         ax.set_xticklabels(col_labels)
         ax.grid(True)
         ax.axhline(0, color='black', lw=2)
-        # Extremely nice function to auto-rotate the x axis labels.
-        # It was made for dates (hence the name) but it works
-        # for any long x tick labels
-    #    fig.title('Frequency of words in %s' % file_name)
+        # Legend
+        if figure_id == 3:
+            # Shink current axis by 20%
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+            # Put a legend to the right of the current axis
+            ax.legend(row_labels, loc='center left', bbox_to_anchor=(1, 0.5),
+                      prop=fontP)
+        for o in fig.findobj(text.Text):
+            o.set_fontsize(10)
         fig.autofmt_xdate()
-    filename = "/tmp/baroqueart.%s.png" % file_name
-    print filename
+        figure_id += 1
+    filename = "baroqueart.%s.frequencies.png" % file_number
     fig.savefig(filename)
 
 
