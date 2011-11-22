@@ -1,3 +1,4 @@
+*.gitignore
 *.xml
 local_settings.py
 *.csv
@@ -13,3 +14,4 @@ media/images
 backups/*.json
 convert
 install.txt
+baroqueart.*
