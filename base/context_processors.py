@@ -2,7 +2,8 @@
 from django.conf import settings
 
 def google_api_key(request):
-    return {'GOOGLE_API_KEY': getattr(settings, "GOOGLE_API_KEY", None),
+    return {'GOOGLE_ANALYTICS': getattr(settings, "GOOGLE_ANALYTICS", None),
+            'GOOGLE_API_KEY': getattr(settings, "GOOGLE_API_KEY", None),
             'GOOGLE_MAPS_API_KEY': getattr(settings,
                                            "GOOGLE_MAPS_API_KEY", None)}
 
