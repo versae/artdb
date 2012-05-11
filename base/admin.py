@@ -67,9 +67,10 @@ class GeospatialReferenceAdmin(GeoModelAdmin):
     list_per_page = 5
     # Does not work with GeometryCollection
     # list_map = ('geometry', )
+    # osmarender no longer available
     options = {
         'layers': ['google.hybrid', 'google.streets', 'google.physical',
-                   'google.satellite', 'osm.mapnik', 'osm.osmarender',
+                   'google.satellite', 'osm.mapnik',  # 'osm.osmarender',
                    've.road', 've.shaded', 've.aerial', 've.hybrid'],
         'map_options': {
             'controls': ['LayerSwitcher', 'Navigation', 'PanZoom',
