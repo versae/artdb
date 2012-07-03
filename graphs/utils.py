@@ -6,7 +6,8 @@ import re
 
 from StringIO import StringIO
 
-from django.db.models import Q
+from django.db.models import F, Q
+from django.template.defaultfilters import force_escape as escape
 
 from django_descriptors.models import Descriptor
 from artworks.models import Artwork
@@ -78,10 +79,43 @@ def export_nodes_edges(year_from=1550, year_to=1575, min_descriptors_number=0):
 
 
 def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
-                artwork_id_from=0, edge_id=0):
-    filename = "baroqueart.%s-%s.gexf" % (year_from, year_to)
+                artwork_id_from=0, edge_id=0, with_original_location=None,
+                with_current_location=None, prefix="",
+                from_location=None, to_location=None):
+    if with_original_location or with_current_location:
+        location = "locations."
+    else:
+        location = ""
+    filename = "%sbaroqueart.%s%s-%s.gexf" \
+                % (prefix, location, year_from, year_to)
     artworks = Artwork.objects.in_range(year_from,
-                                        year_to).filter(creators__isnull=False)
+                                        year_to).exclude(creators=None)
+    # Filtering by locations
+    if with_original_location == True:
+        # artworks = artworks.filter(original_place__isnull=False)
+        artworks = artworks.exclude((Q(original_place__geometry=None)
+                                    and Q(original_place__point=None)))
+    elif with_original_location == False:
+        artworks = artworks.filter(original_place=None)
+    if with_current_location == True:
+        # artworks = artworks.filter(current_place__isnull=False)
+        artworks = artworks.exclude((Q(current_place__geometry=None)
+                                    and Q(current_place__point=None)))
+    elif with_current_location == False:
+        artworks = artworks.filter(current_place=None)
+    if from_location:
+        artworks = artwork.objects.filter(
+            Q(original_place__geometry__covers=from_location.geometry)
+            or Q(original_place__geometry__coveredby=from_location.geometry)
+            or Q(original_place__point__within=from_location.geometry)
+        )
+    if to_location:
+        artworks = artwork.objects.filter(
+            Q(current_place__geometry__covers=to_location.geometry)
+            or Q(current_place__geometry__coveredby=to_location.geometry)
+            or Q(current_place__point__within=to_location.geometry)
+        )
+    # Ordering by "id"
     artworks = artworks.order_by("id")
     if artwork_id_from:
         gexf = codecs.open(filename, "a+", "utf-8")
@@ -95,17 +129,21 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
     <graph mode="static" defaultedgetype="undirected">
         <attributes class="node">
             <attribute id="0" title="Creator" type="string"/>
-            <attribute id="1" title="OriginalPlace" type="string"/>
-            <attribute id="2" title="OriginalPlaceId" type="integer"/>
-            <attribute id="3" title="OriginalPlaceLat" type="float"/>
-            <attribute id="4" title="OriginalPlaceLon" type="float"/>
-            <attribute id="5" title="CurrentPlace" type="string"/>
-            <attribute id="6" title="CurrentPlaceId" type="integer"/>
-            <attribute id="7" title="CurrentPlaceLat" type="float"/>
-            <attribute id="8" title="CurrentPlaceLon" type="float"/>
+            <attribute id="1" title="CreatorId" type="integer"/>
+            <attribute id="2" title="OriginalPlace" type="string"/>
+            <attribute id="3" title="OriginalPlaceId" type="integer"/>
+            <attribute id="4" title="OriginalPlaceLat" type="float"/>
+            <attribute id="5" title="OriginalPlaceLon" type="float"/>
+            <attribute id="6" title="CurrentPlace" type="string"/>
+            <attribute id="7" title="CurrentPlaceId" type="integer"/>
+            <attribute id="8" title="CurrentPlaceLat" type="float"/>
+            <attribute id="9" title="CurrentPlaceLon" type="float"/>
         </attributes>
         <nodes>
     """)
+        num_nodes = artworks.count()
+        print("Printing %s nodes (max %s relationships)" % (num_nodes,
+                                                            num_nodes ** 2))
         for artwork in artworks:
             start = ""
             if artwork.creation_year_start:
@@ -113,32 +151,42 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
             end = ""
             if artwork.creation_year_end:
                 end = u""" end="%s" """ % artwork.creation_year_end
+            creator = artwork.creators.all()[0]
             gexf.write(u"""
-                <node id="%s" label="%s" >
+                <node id="%s" label='%s' >
                     <attvalues>
-                        <attvalue for="0" value="%s"/>""" \
-                       % (artwork.id, artwork.title,
-                          artwork.creators.all()[0].name))
-            if artwork.original_place and artwork.original_place.point:
+                        <attvalue for="0" value="%s"/>
+                        <attvalue for="1" value="%s"/>""" \
+                       % (artwork.id, escape(artwork.title),
+                          escape(creator.name), creator.id))
+            original_place_point = (artwork.original_place
+                and (artwork.original_place.point
+                     or (artwork.original_place.geometry
+                         and artwork.original_place.geometry.point_on_surface)))
+            if artwork.original_place and original_place_point:
                 gexf.write(u"""
-                            <attvalue for="1" value="%s"/>
-                            <attvalue for="2" value="%s"/>
-                            <attvalue for="3" value="%s"/>
-                            <attvalue for="4" value="%s"/>""" \
-                           % (artwork.original_place.title,
-                              artwork.original_place.id,
-                              artwork.original_place.point.get_y(),
-                              artwork.original_place.point.get_x()))
-            if artwork.current_place and artwork.current_place.point:
+                        <attvalue for="2" value='%s'/>
+                        <attvalue for="3" value='%s'/>
+                        <attvalue for="4" value='%s'/>
+                        <attvalue for="5" value='%s'/>""" \
+                       % (escape(artwork.original_place.title),
+                          artwork.original_place.id,
+                          original_place_point.get_y(),
+                          original_place_point.get_x()))
+            current_place_point = (artwork.current_place
+                and (artwork.current_place.point
+                     or (artwork.current_place.geometry
+                         and artwork.current_place.geometry.point_on_surface)))
+            if artwork.current_place and current_place_point:
                 gexf.write(u"""
-                            <attvalue for="5" value="%s"/>
-                            <attvalue for="6" value="%s"/>
-                            <attvalue for="7" value="%s"/>
-                            <attvalue for="8" value="%s"/>""" \
-                           % (artwork.current_place.title,
-                              artwork.current_place.id,
-                              artwork.current_place.point.get_y(),
-                              artwork.current_place.point.get_x()))
+                        <attvalue for="6" value='%s'/>
+                        <attvalue for="7" value='%s'/>
+                        <attvalue for="8" value='%s'/>
+                        <attvalue for="9" value='%s'/>""" \
+                       % (escape(artwork.current_place.title),
+                          artwork.current_place.id,
+                          current_place_point.get_y(),
+                          current_place_point.get_x()))
             gexf.write(u"""
                     </attvalues>
                 </node>""")
@@ -154,7 +202,7 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
                                     artwork2).values("id").count()
             if descriptors_count >= min_descriptors_number:
                 gexf.write(u"""
-<edge id="%s" source="%s" target="%s" type="undirected" weight="%s" />""" \
+    <edge id="%s" source="%s" target="%s" type="undirected" weight="%s" />""" \
                            % (cont, artwork1.id, artwork2.id,
                               descriptors_count))
                 cont += 1
@@ -232,6 +280,87 @@ def export_desc_gexf(year_from=1550, year_to=1575, min_artworks_number=0):
 </gexf>""")
     gexf.close()
     return filename
+
+
+def export_jflowmap_csv(year_from=1550, year_to=1575,
+                        original_grouping=[], current_grouping=[],
+                        exclude_static=False, prefix=""):
+    # mexico = GeospatialReference.objects.get(id=366)
+    # peru = GeospatialReference.objects.get(id=408)
+#    nodes_filename = "%sbaroqueart.nodes.%s%s-%s.csv" \
+#                % (prefix, location, year_from, year_to)
+#    flows_filename = "%sbaroqueart.flows.%s%s-%s.csv" \
+#                % (prefix, location, year_from, year_to)
+    # Making the query
+    artworks = Artwork.objects.in_range(year_from,
+                                        year_to).exclude(creators=None)
+    artworks = artworks.exclude((Q(original_place__geometry=None)
+                                and Q(original_place__point=None)))
+    artworks = artworks.exclude((Q(current_place__geometry=None)
+                                and Q(current_place__point=None)))
+    if exclude_static:
+        artworks = artworks.exclude(original_place=F('current_place'))
+    # Helpers
+    def get_point(place):
+        return (place
+                and (place.point
+                     or (place.geometry and place.geometry.point_on_surface)))
+
+    def are_georelated(place1, place2):
+        p1 = get_point(place1)
+        p2 = get_point(place2)
+        g1 = place1.geometry
+        g2 = place2.geometry
+        return (
+            (g1 and p2 and g1.contains(p2)) or
+            (g2 and p1 and g2.contains(p1)) or
+            (g1 and g2 and (g1.overlaps(g2) or g2.overlaps(g1)))
+         )
+
+    def get_original_related(place):
+        for original_place in original_grouping:
+            if are_georelated(place, original_place):
+                return original_place
+        return place
+
+    def get_current_related(place):
+        for current_place in current_grouping:
+            if are_georelated(place, current_place):
+                return current_place
+        return place
+
+    # Init nodes and flows
+    nodes = {}
+    ids = set()
+    flows = {}
+    for place in original_grouping + current_grouping:
+        nodes[place.id] = place
+        ids.add(place.id)
+    for artwork in artworks:
+        original_place = get_original_related(artwork.original_place)
+        current_place = get_current_related(artwork.current_place)
+        key = u"%s,%s" % (original_place.id, current_place.id)
+        if key not in flows:
+            flows[key] = 0
+        flows[key] += 1
+        nodes[original_place.id] = original_place
+        nodes[current_place.id] = current_place
+        ids.add(original_place.id)
+        ids.add(current_place.id)
+    # Printing
+    print(u"Nodes:\n======")
+    print(u"Code,Name,Lat,Lon")
+    for node_id in ids:
+        node = nodes[node_id]
+        point = get_point(node)
+        print(u'%s,"%s",%s,%s' % (node_id, escape(node.title),
+                                  point.get_y(), point.get_x()))
+    print(u"Flows:\n======")
+    print(u"Origin,Dest,Baroque Paintings Migrations")
+    for k, v in flows.items():
+        origin, target = k.split(",")
+        print(u"%s,%s,%s" % (origin, target, v))
+    return nodes, ids, flows
 
 
 def add_descriptors_csv(file_number):

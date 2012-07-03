@@ -32,7 +32,7 @@ class Virgin(models.Model):
         return self.name
 
 
-class ArtworkManager(models.Manager):
+class ArtworkManager(models.GeoManager):
 
     def in_range(self, year_from, year_to):
         params = ((Q(creation_year_start__lte=year_from) &
