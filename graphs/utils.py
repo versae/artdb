@@ -1,4 +1,4 @@
-# -*-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import codecs
 import csv
 import nltk
@@ -78,10 +78,35 @@ def export_nodes_edges(year_from=1550, year_to=1575, min_descriptors_number=0):
     return filename
 
 
+# Helpers
+def get_point(place):
+    return (place
+            and (place.point
+                 or (place.geometry and place.geometry.point_on_surface)))
+
+def are_georelated(place1, place2):
+    p1 = get_point(place1)
+    p2 = get_point(place2)
+    g1 = place1.geometry
+    g2 = place2.geometry
+    return (
+        (g1 and p2 and g1.contains(p2)) or
+        (g2 and p1 and g2.contains(p1)) or
+        (g1 and g2 and (g1.overlaps(g2) or g2.overlaps(g1)))
+     )
+
+def get_place_related(place, grouping):
+    for group_place in grouping:
+        if are_georelated(place, group_place):
+            return group_place
+    return place
+
+
 def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
                 artwork_id_from=0, edge_id=0, with_original_location=None,
                 with_current_location=None, prefix="",
-                from_location=None, to_location=None):
+                from_location=None, to_location=None,
+                original_grouping=[], current_grouping=[]):
     if with_original_location or with_current_location:
         location = "locations."
     else:
@@ -126,7 +151,7 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.gexf.net/1.1draft http://www.gexf.net/1.1draft/gexf.xsd"
     version="1.1">
-    <graph mode="static" defaultedgetype="undirected">
+    <graph mode="dynamic" timeformat="double" defaultedgetype="undirected">
         <attributes class="node">
             <attribute id="0" title="Creator" type="string"/>
             <attribute id="1" title="CreatorId" type="integer"/>
@@ -134,10 +159,12 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
             <attribute id="3" title="OriginalPlaceId" type="integer"/>
             <attribute id="4" title="OriginalPlaceLat" type="float"/>
             <attribute id="5" title="OriginalPlaceLon" type="float"/>
-            <attribute id="6" title="CurrentPlace" type="string"/>
-            <attribute id="7" title="CurrentPlaceId" type="integer"/>
-            <attribute id="8" title="CurrentPlaceLat" type="float"/>
-            <attribute id="9" title="CurrentPlaceLon" type="float"/>
+            <attribute id="6" title="OriginalPlaceGroup" type="string"/>
+            <attribute id="7" title="CurrentPlace" type="string"/>
+            <attribute id="8" title="CurrentPlaceId" type="integer"/>
+            <attribute id="9" title="CurrentPlaceLat" type="float"/>
+            <attribute id="10" title="CurrentPlaceLon" type="float"/>
+            <attribute id="11" title="CurrentPlaceGroup" type="string"/>
         </attributes>
         <nodes>
     """)
@@ -153,40 +180,49 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
                 end = u""" end="%s" """ % artwork.creation_year_end
             creator = artwork.creators.all()[0]
             gexf.write(u"""
-                <node id="%s" label='%s' >
+                <node id="%s" label='%s' %s%s>
                     <attvalues>
                         <attvalue for="0" value="%s"/>
                         <attvalue for="1" value="%s"/>""" \
                        % (artwork.id, escape(artwork.title),
+                          start, end,
                           escape(creator.name), creator.id))
             original_place_point = (artwork.original_place
                 and (artwork.original_place.point
                      or (artwork.original_place.geometry
                          and artwork.original_place.geometry.point_on_surface)))
             if artwork.original_place and original_place_point:
+                related_origin = get_place_related(artwork.original_place,
+                                                   original_grouping)
                 gexf.write(u"""
                         <attvalue for="2" value='%s'/>
                         <attvalue for="3" value='%s'/>
                         <attvalue for="4" value='%s'/>
-                        <attvalue for="5" value='%s'/>""" \
+                        <attvalue for="5" value='%s'/>
+                        <attvalue for="6" value='%s'/>""" \
                        % (escape(artwork.original_place.title),
                           artwork.original_place.id,
                           original_place_point.get_y(),
-                          original_place_point.get_x()))
+                          original_place_point.get_x(),
+                          escape(related_origin.title)))
             current_place_point = (artwork.current_place
                 and (artwork.current_place.point
                      or (artwork.current_place.geometry
                          and artwork.current_place.geometry.point_on_surface)))
             if artwork.current_place and current_place_point:
+                related_current = get_place_related(artwork.current_place,
+                                                    current_grouping)
                 gexf.write(u"""
-                        <attvalue for="6" value='%s'/>
                         <attvalue for="7" value='%s'/>
                         <attvalue for="8" value='%s'/>
-                        <attvalue for="9" value='%s'/>""" \
+                        <attvalue for="9" value='%s'/>
+                        <attvalue for="10" value='%s'/>
+                        <attvalue for="11" value='%s'/>""" \
                        % (escape(artwork.current_place.title),
                           artwork.current_place.id,
                           current_place_point.get_y(),
-                          current_place_point.get_x()))
+                          current_place_point.get_x(),
+                          escape(related_current.title)))
             gexf.write(u"""
                     </attvalues>
                 </node>""")
@@ -224,7 +260,7 @@ def export_desc_gexf(year_from=1550, year_to=1575, min_artworks_number=0):
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.gexf.net/1.1draft http://www.gexf.net/1.1draft/gexf.xsd"
     version="1.1">
-    <graph mode="static" defaultedgetype="undirected" start="%s" end="%s">
+    <graph mode="dynamic" timeformat="double" defaultedgetype="undirected" start="%s" end="%s">
         <attributes class="node">
             <attribute id="0" title="Creator" type="string"/>
             <attribute id="1" title="Model" type="string"/>
@@ -287,10 +323,7 @@ def export_jflowmap_csv(year_from=1550, year_to=1575,
                         exclude_static=False, prefix=""):
     # mexico = GeospatialReference.objects.get(id=366)
     # peru = GeospatialReference.objects.get(id=408)
-#    nodes_filename = "%sbaroqueart.nodes.%s%s-%s.csv" \
-#                % (prefix, location, year_from, year_to)
-#    flows_filename = "%sbaroqueart.flows.%s%s-%s.csv" \
-#                % (prefix, location, year_from, year_to)
+    # spain = GeospatialReference.objects.get(id=434)
     # Making the query
     artworks = Artwork.objects.in_range(year_from,
                                         year_to).exclude(creators=None)
@@ -300,35 +333,6 @@ def export_jflowmap_csv(year_from=1550, year_to=1575,
                                 and Q(current_place__point=None)))
     if exclude_static:
         artworks = artworks.exclude(original_place=F('current_place'))
-    # Helpers
-    def get_point(place):
-        return (place
-                and (place.point
-                     or (place.geometry and place.geometry.point_on_surface)))
-
-    def are_georelated(place1, place2):
-        p1 = get_point(place1)
-        p2 = get_point(place2)
-        g1 = place1.geometry
-        g2 = place2.geometry
-        return (
-            (g1 and p2 and g1.contains(p2)) or
-            (g2 and p1 and g2.contains(p1)) or
-            (g1 and g2 and (g1.overlaps(g2) or g2.overlaps(g1)))
-         )
-
-    def get_original_related(place):
-        for original_place in original_grouping:
-            if are_georelated(place, original_place):
-                return original_place
-        return place
-
-    def get_current_related(place):
-        for current_place in current_grouping:
-            if are_georelated(place, current_place):
-                return current_place
-        return place
-
     # Init nodes and flows
     nodes = {}
     ids = set()
@@ -337,8 +341,10 @@ def export_jflowmap_csv(year_from=1550, year_to=1575,
         nodes[place.id] = place
         ids.add(place.id)
     for artwork in artworks:
-        original_place = get_original_related(artwork.original_place)
-        current_place = get_current_related(artwork.current_place)
+        original_place = get_place_related(artwork.original_place,
+                                           original_grouping)
+        current_place = get_place_related(artwork.current_place,
+                                          current_grouping)
         key = u"%s,%s" % (original_place.id, current_place.id)
         if key not in flows:
             flows[key] = 0
