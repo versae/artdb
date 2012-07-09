@@ -117,15 +117,15 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
                                         year_to).exclude(creators=None)
     # Filtering by locations
     if with_original_location == True:
-        # artworks = artworks.filter(original_place__isnull=False)
-        artworks = artworks.exclude((Q(original_place__geometry=None)
-                                    and Q(original_place__point=None)))
+        artworks = artworks.exclude(original_place=None)
+#        artworks = artworks.exclude((Q(original_place__geometry=None)
+#                                    and Q(original_place__point=None)))
     elif with_original_location == False:
         artworks = artworks.filter(original_place=None)
     if with_current_location == True:
-        # artworks = artworks.filter(current_place__isnull=False)
-        artworks = artworks.exclude((Q(current_place__geometry=None)
-                                    and Q(current_place__point=None)))
+        artworks = artworks.exclude(current_place=None)
+#        artworks = artworks.exclude((Q(current_place__geometry=None)
+#                                    and Q(current_place__point=None)))
     elif with_current_location == False:
         artworks = artworks.filter(current_place=None)
     if from_location:
@@ -142,6 +142,9 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
         )
     # Ordering by "id"
     artworks = artworks.order_by("id")
+    num_nodes = artworks.count()
+    print("Printing %s nodes (max %s relationships)" % (num_nodes,
+                                                        num_nodes ** 2))
     if artwork_id_from:
         gexf = codecs.open(filename, "a+", "utf-8")
     else:
@@ -168,9 +171,6 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
         </attributes>
         <nodes>
     """)
-        num_nodes = artworks.count()
-        print("Printing %s nodes (max %s relationships)" % (num_nodes,
-                                                            num_nodes ** 2))
         for artwork in artworks:
             start = ""
             if artwork.creation_year_start:
@@ -327,10 +327,12 @@ def export_jflowmap_csv(year_from=1550, year_to=1575,
     # Making the query
     artworks = Artwork.objects.in_range(year_from,
                                         year_to).exclude(creators=None)
-    artworks = artworks.exclude((Q(original_place__geometry=None)
-                                and Q(original_place__point=None)))
-    artworks = artworks.exclude((Q(current_place__geometry=None)
-                                and Q(current_place__point=None)))
+    artworks = artworks.exclude(original_place=None)
+    artworks = artworks.exclude(current_place=None)
+#    artworks = artworks.exclude((Q(original_place__geometry=None)
+#                                and Q(original_place__point=None)))
+#    artworks = artworks.exclude((Q(current_place__geometry=None)
+#                                and Q(current_place__point=None)))
     if exclude_static:
         artworks = artworks.exclude(original_place=F('current_place'))
     # Init nodes and flows
@@ -338,21 +340,24 @@ def export_jflowmap_csv(year_from=1550, year_to=1575,
     ids = set()
     flows = {}
     for place in original_grouping + current_grouping:
-        nodes[place.id] = place
-        ids.add(place.id)
+        if place.get_valid_point():
+            nodes[place.id] = place
+            ids.add(place.id)
     for artwork in artworks:
-        original_place = get_place_related(artwork.original_place,
-                                           original_grouping)
-        current_place = get_place_related(artwork.current_place,
-                                          current_grouping)
-        key = u"%s,%s" % (original_place.id, current_place.id)
-        if key not in flows:
-            flows[key] = 0
-        flows[key] += 1
-        nodes[original_place.id] = original_place
-        nodes[current_place.id] = current_place
-        ids.add(original_place.id)
-        ids.add(current_place.id)
+        if (artwork.original_place.get_valid_point()
+            and artwork.current_place.get_valid_point()):
+            original_place = get_place_related(artwork.original_place,
+                                               original_grouping)
+            current_place = get_place_related(artwork.current_place,
+                                              current_grouping)
+            key = u"%s,%s" % (original_place.id, current_place.id)
+            if key not in flows:
+                flows[key] = 0
+            flows[key] += 1
+            nodes[original_place.id] = original_place
+            nodes[current_place.id] = current_place
+            ids.add(original_place.id)
+            ids.add(current_place.id)
     # Printing
     print(u"Nodes:\n======")
     print(u"Code,Name,Lat,Lon")
