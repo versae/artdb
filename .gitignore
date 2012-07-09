@@ -15,6 +15,7 @@ media/django_qbe
 media/cache
 media/images
 backups/*.json
+backups/*.tar.gz
 convert
 install.txt
 baroqueart.*
