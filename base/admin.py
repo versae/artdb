@@ -34,7 +34,7 @@ class GeospatialReferenceAdminForm(forms.ModelForm):
         cleaned_data = super(GeospatialReferenceAdminForm, self).clean()
         geometry = cleaned_data.get("geometry")
         point = cleaned_data.get("point")
-        if geometry and point:
+        if geometry or point:
             return cleaned_data
         else:
             msg = _("A Point or Geometry must be specified.")
