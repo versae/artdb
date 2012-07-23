@@ -30,13 +30,24 @@ class GeospatialReferenceAdminForm(forms.ModelForm):
         }
         self.fields['address'].widget = OlWidgetGoogleMapsSearch(attrs=attrs)
 
+    def clean(self):
+        cleaned_data = super(GeospatialReferenceAdminForm, self).clean()
+        geometry = cleaned_data.get("geometry")
+        point = cleaned_data.get("point")
+        if geometry and point:
+            return cleaned_data
+        else:
+            msg = _("A Point or Geometry must be specified.")
+            raise forms.ValidationError(msg)
+
     def clean_geometry(self):
         geometry = self.cleaned_data['geometry']
         try:
             if geometry:
                 coords = geometry.point_on_surface.get_coords()
         except:
-            raise forms.ValidationError(_("Areas have to be plain (with no intersections)."))
+            msg = _("Areas have to be plain (with no intersections).")
+            raise forms.ValidationError(msg)
         return geometry
 
 
@@ -55,11 +66,11 @@ class GeospatialReferenceAdmin(GeoModelAdmin):
     ordering = ('title', )
     fieldsets = (
             (None, {
-                'fields': ('title', 'address', 'geometry'),
+                'fields': ('title', 'address', 'geometry', 'point'),
             }),
             (_(u'More info'), {
                 'classes': ('collapse', ),
-                'fields': ('point', 'description'),
+                'fields': ('description', ),
             }),
     )
     search_fields = ('title', 'address', 'description')
