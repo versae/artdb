@@ -110,7 +110,7 @@ class ArtworkAdmin(AutocompleteAdmin):
         for instance in instances:
             if isinstance(instance, DescribedItemInline.model):
                 instance.user = request.user
-                instance.save()
+            instance.save()
         formset.save_m2m()
 
     def creation_year(self, obj):
