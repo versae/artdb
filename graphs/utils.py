@@ -129,13 +129,13 @@ def export_gexf(year_from=1550, year_to=1575, min_descriptors_number=0,
     elif with_current_location == False:
         artworks = artworks.filter(current_place=None)
     if from_location:
-        artworks = artwork.objects.filter(
+        artworks = artworks.filter(
             Q(original_place__geometry__covers=from_location.geometry)
             or Q(original_place__geometry__coveredby=from_location.geometry)
             or Q(original_place__point__within=from_location.geometry)
         )
     if to_location:
-        artworks = artwork.objects.filter(
+        artworks = artworks.filter(
             Q(current_place__geometry__covers=to_location.geometry)
             or Q(current_place__geometry__coveredby=to_location.geometry)
             or Q(current_place__point__within=to_location.geometry)
